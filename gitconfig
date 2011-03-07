@@ -2,7 +2,7 @@
 	name = Yossef Mendelssohn
 	email = ymendel@pobox.com
 [alias]
-  alias = !git config --list | grep 'alias.' | sed 's/^alias.//' | sed 's/=/ => /'
+	alias = !git config --list | grep 'alias.' | sed 's/^alias.//' | sed 's/=/ => /'
 	stat = status
 	st = status
 	ci = commit
@@ -23,6 +23,6 @@
 	ri = rebase --interactive
 	ria = rebase --interactive --autosquash
 	fixup = !sh -c 'git commit -m \"fixup! $(git log -1 --format='\\''%s'\\'' $@)\"' -
-  squash = !sh -c 'git commit -m \"squash! $(git log -1 --format='\\''%s'\\'' $@)\"' -
-  redact = filter-branch
-  retcon = filter-branch
+	squash = !sh -c 'git commit -m \"squash! $(git log -1 --format='\\''%s'\\'' $@)\"' -
+	redact = filter-branch
+	retcon = filter-branch
