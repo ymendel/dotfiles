@@ -1,0 +1,28 @@
+[user]
+	name = Yossef Mendelssohn
+	email = ymendel@pobox.com
+[alias]
+  alias = !git config --list | grep 'alias.' | sed 's/^alias.//' | sed 's/=/ => /'
+	stat = status
+	st = status
+	ci = commit
+	co = checkout
+	staged = diff --cached
+	pending = diff --cached
+	unstage = reset HEAD
+	uncommit = reset --soft HEAD^
+	export = clone --depth 1
+	x = !gitx
+	hack = !hack
+	ship = !ship
+	deleted = log --oneline --diff-filter=D --
+	sts = status --short --branch
+	logd = log --oneline --decorate
+	bw = branch --contains
+	diffw = diff --word-diff
+	ri = rebase --interactive
+	ria = rebase --interactive --autosquash
+	fixup = !sh -c 'git commit -m \"fixup! $(git log -1 --format='\\''%s'\\'' $@)\"' -
+  squash = !sh -c 'git commit -m \"squash! $(git log -1 --format='\\''%s'\\'' $@)\"' -
+  redact = filter-branch
+  retcon = filter-branch
