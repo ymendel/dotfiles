@@ -15,3 +15,6 @@ for f in aliases functions
 do
   test -f ~/.$f && source ~/.$f
 done
+
+[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
+
