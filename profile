@@ -1,3 +1,5 @@
+export PATH="$PATH:~/scripts"
+
 export PS1="\h:\w\$(git_display) \u\$ "
 export PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME%%.*}\007"'
 
