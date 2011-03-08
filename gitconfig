@@ -26,3 +26,12 @@
 	squash = !sh -c 'git commit -m \"squash! $(git log -1 --format='\\''%s'\\'' $@)\"' -
 	redact = filter-branch
 	retcon = filter-branch
+[color]
+	status = auto
+	diff = auto
+	branch = auto
+	interactive = auto
+[color "status"]
+	added = yellow
+	changed = green
+	untracked = cyan
