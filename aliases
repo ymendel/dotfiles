@@ -1,0 +1,46 @@
+# some commands need defaults
+alias ls="ls -qF"
+
+# say what?
+alias voices="ls /System/Library/Speech/Voices/ | sed s/.SpeechVoice// | sed s/\\\\///"
+alias random_voice="voices | xargs echo | ruby -wne 'voices = \$_.split.collect { |voice|  voice.gsub(/([a-z])([A-Z])/, %q{\1 \2}) }; print voices[rand(voices.length)];'"
+
+# FLAC stuff
+alias find_nonflac="find . \( \! -name '*.flac' -and \! -type d \) -print"
+alias remove_ds_stores="find . -name ".DS_Store" -depth -exec rm {} \;"
+alias convert_flacs="find . -name '*.flac' -exec flac2mp3 {} \;"
+alias remove_flacs="find . -name '*.flac' -exec rm {} \;"
+
+alias where="type -ap"
+alias ql='qlmanage -p > /dev/null 2>&1'
+
+alias so=sudo
+
+# punch stuff
+alias punch_out_all="punch out"
+alias pi="punch in"
+alias po="punch out"
+alias pout="punch out"
+alias poa=punch_out_all
+alias pl="punch list"
+alias pt="punch total"
+alias pstat="punch status"
+alias pst="punch status"
+alias psts="punch status --short"
+alias psum="punch summary"
+
+
+alias find_process="ps auxwwww | grep -v grep | grep "
+alias find_ps=find_process
+alias fps=find_process
+
+
+# gitness
+alias h=hack
+alias s=ship
+alias shipm="ship -m"
+alias sm=shipm
+
+
+alias tab=new_tab
+alias new=new_term
