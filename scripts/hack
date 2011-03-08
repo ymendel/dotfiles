@@ -1,0 +1,23 @@
+#!/bin/sh
+BRANCHES=`git branch`
+if [ $? != 0 ]; then
+  exit
+fi
+
+GIT_SVN=0
+git branch -r | grep 'git-svn' > /dev/null
+if [ $? = 0 ]; then
+  GIT_SVN=1 
+fi
+
+MAIN=${1:-master}
+CURRENT=`git branch | awk '/^\* /{print $2}'`
+set -x
+git checkout ${MAIN}
+if [ $GIT_SVN = 1 ]; then
+  git svn rebase
+else
+  git pull origin ${MAIN}
+fi
+git checkout ${CURRENT}
+git rebase ${MAIN}

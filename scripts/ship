@@ -1,0 +1,34 @@
+#!/bin/sh
+BRANCHES=`git branch`
+if [ $? != 0 ]; then
+  exit
+fi
+
+GIT_SVN=0
+git branch -r | grep 'git-svn' > /dev/null
+if [ $? = 0 ]; then
+  GIT_SVN=1 
+fi
+
+MERGE=''
+while getopts 'm' OPT; do
+  if [ $OPT = 'm' ]; then
+    MERGE='--no-ff'
+    shift
+  fi
+done
+
+MAIN=${1:-master}
+CURRENT=`git branch | awk '/^\* /{print $2}'`
+set -x
+if [ $GIT_SVN = 1 ]; then
+  git svn dcommit
+  git checkout ${MAIN}
+  git svn rebase
+  git checkout ${CURRENT}
+else
+  git checkout ${MAIN}
+  git merge ${CURRENT} ${MERGE}
+  git push origin ${MAIN}
+  git checkout ${CURRENT}
+fi
