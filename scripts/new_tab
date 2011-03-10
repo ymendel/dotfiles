@@ -15,6 +15,6 @@ set thePath to "$DIR"
 set thePath to (POSIX path of thePath as string)
 tell application "Terminal"
   tell application "System Events" to tell process "Terminal" to keystroke "t" using command down
-  do script with command "cd " & quoted form of thePath in front window
+  do script with command "cd " & quoted form of thePath in window 2
 end tell
 END
