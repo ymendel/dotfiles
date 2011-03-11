@@ -13,9 +13,9 @@ export HISTFILESIZE=${HISTSIZE}
 export HISTCONTROL="ignoredups"
 export HISTIGNORE="&:l[sal]:[bf]g:exit"
 
-for f in aliases functions
+for f in aliases functions bash_completion_base
 do
-  test -f ~/.$f && source ~/.$f
+  test -r ~/.$f && source ~/.$f
 done
 
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
