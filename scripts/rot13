@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+
+string = nil
+
+unless ARGV.empty?
+  string = ARGV.join(' ')
+end
+
+unless string
+  print 'Enter string: '
+  string = gets.chomp
+end
+
+puts string.tr('a-zA-Z', 'n-za-mN-ZA-M')

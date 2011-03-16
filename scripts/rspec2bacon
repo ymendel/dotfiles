@@ -1,0 +1,34 @@
+#!/usr/bin/env ruby -pi.bak
+
+# bacon before takes no argument
+$_.sub!(/before\s*\(?\s*:each\s*\)?\s*/, 'before ')
+# same with after
+
+# No magic annoying spaces after 'should'.
+# Matchers are methods on the Should object
+$_.sub!(/\.should\s*/, '.should.')
+# fix `should_not` -> `should._not`
+# and catch `should_not something`
+$_.sub!(/\._not\s*/, '.not.')
+# fix `should ==` -> `should.==` and the like
+$_.sub!(/\.([=<>])/, ' \1')
+
+$_.sub!(/be_/, 'be.')
+$_.sub!(/\.be\((true|false)\)/, ' == \1')
+
+$_.sub!(/raise_error/, 'raise')
+
+
+# mocha -> facon
+
+$_.sub!(/\.stubs/, '.stub!')
+$_.sub!(/\.expects/, '.should.receive')
+$_.sub!(/\.returns/, '.and_return')
+$_.sub!(/\.raises/, '.and_raise')
+# turn .raises(SomeError, 'some message') into .and_raise(SomeError.new('some message'))
+# yields -> and_yield
+$_.gsub!(/stub\(/, 'mock(')  # this may happen multiple times on a single line
+
+# argument expectations
+# .with do  -> just print a warning and make the user do it?
+# otherwise would probably require some sexp action instead of just regexes

@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+num, sides = ARGV[0,2]
+
+num   ||= 2
+sides ||= 6
+
+num   = num.to_i
+sides = sides.to_i
+
+p Array.new(num) { rand(sides) + 1 }

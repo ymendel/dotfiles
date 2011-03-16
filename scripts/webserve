@@ -1,0 +1,33 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+require 'webrick'
+include WEBrick
+
+OPTIONS = {
+  :Port => 2000,
+  :DocumentRoot => Dir.pwd
+}
+MANDATORY_OPTIONS = %w[]
+
+parser = OptionParser.new do |opts|
+  opts.banner = <<BANNER
+Usage: #{File.basename($0)}
+
+Options are:
+BANNER
+  opts.separator ''
+  opts.on('-p', '--port=PORT', Integer,
+          "Port to use (default: #{OPTIONS[:Port]})") { |port|  OPTIONS[:Port] = port }
+  opts.on('-h', '--help',
+          'Show this help message.') { puts opts; exit }
+  opts.parse!(ARGV)
+
+  if MANDATORY_OPTIONS && MANDATORY_OPTIONS.find { |option| OPTIONS[option.to_sym].nil? }
+    puts opts; exit
+  end
+end
+
+server = HTTPServer.new(OPTIONS)
+trap('INT') { server.shutdown }
+server.start

@@ -1,0 +1,26 @@
+#!/usr/bin/env ruby
+
+code = ARGV[0]
+
+unless code
+  puts 'some code is needed'
+  exit
+end
+
+begin
+   user_block = eval "lambda { |file|  #{code} }"
+rescue Exception => e
+  puts 'unable to process code:'
+  p code
+  puts e
+  exit
+end
+
+Dir['*'].each do |file|
+  newfile = user_block.call(file)  
+  # puts "#{file} -> #{newfile}"
+  
+  next unless newfile
+  
+  File.rename(file, newfile) unless file == newfile
+end
