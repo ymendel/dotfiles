@@ -11,7 +11,7 @@ shopt -s histappend
 export HISTSIZE=10000
 export HISTFILESIZE=${HISTSIZE}
 export HISTCONTROL="ignoredups"
-export HISTIGNORE="&:l[sal]:[bf]g:exit"
+export HISTIGNORE="&:l[salh]:[bf]g:exit"
 
 for f in aliases functions bash_completion_base
 do

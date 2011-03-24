@@ -3,6 +3,7 @@ alias ls="ls -qF"
 
 alias la="ls -a"
 alias ll="ls -l"
+alias lh="ls -lh"
 alias lal="ls -al"
 
 # say what?
