@@ -7,7 +7,6 @@ unless ARGV.empty?
 end
 
 unless string
-  print 'Enter string: '
   string = gets.chomp
 end
 
