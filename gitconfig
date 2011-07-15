@@ -18,6 +18,7 @@
 	deleted = log --oneline --diff-filter=D --
 	sts = status --short --branch
 	logd = log --oneline --decorate
+	logg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
 	bw = branch --contains
 	diffw = diff --word-diff
 	ri = rebase --interactive
