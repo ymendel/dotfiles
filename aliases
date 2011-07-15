@@ -1,5 +1,6 @@
 # some commands need defaults
 alias ls="ls -qF"
+alias bc="bc -ql"
 
 alias la="ls -a"
 alias ll="ls -l"
