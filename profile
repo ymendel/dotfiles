@@ -13,7 +13,7 @@ export HISTFILESIZE=${HISTSIZE}
 export HISTCONTROL="ignoredups"
 export HISTIGNORE="&:l[salh]:[bf]g:exit"
 
-for f in aliases functions bash_completion_base
+for f in aliases functions bash_completion_base local
 do
   test -r ~/.$f && source ~/.$f
 done
