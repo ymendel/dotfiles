@@ -34,7 +34,7 @@ git_display()
 
 rvm_current()
 {
-  rvm info | sed -n '2,1s/.$//p'
+  rvm info | sed -n '2,1s/:$//p'
 }
 
 wiki() {
