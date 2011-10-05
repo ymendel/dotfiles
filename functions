@@ -32,6 +32,11 @@ git_display()
   git_current_head | awk '{if ($1) print "(" $1 ENVIRON["GIT_DIRTY"] ")"}'
 }
 
+rvm_current()
+{
+  rvm info | sed -n '2,1s/.$//p'
+}
+
 wiki() {
   dig +short txt $1.wp.dg.cx
 }
