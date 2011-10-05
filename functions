@@ -2,8 +2,8 @@ grok() {
   grep -ri "$*" . | grep -v '\.svn'
 }
 
-ip() 
-{ 
+ip()
+{
   ifconfig ${1:-en1} | awk '$1 == "inet" { print $2 }'
 }
 
