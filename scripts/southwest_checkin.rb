@@ -4,7 +4,7 @@ require 'rubygems'
 require 'mechanize'
 
 MY_NAME = 'Yossef Mendelssohn'
-CHECKIN_REQUEST_URL = 'http://www.southwest.com/content/travel_center/retrieveCheckinDoc.html?ref=ckin_hp_wl_tt'
+CHECKIN_REQUEST_URL = 'http://www.southwest.com/flight/retrieveCheckinDoc.html'
 prompt = false
 
 conf = ARGV[0]
@@ -19,16 +19,16 @@ name = name.split(' ')
 # print 'Enter your name: '
 # name = gets.chomp.split(' ')
 
-agent = WWW::Mechanize.new
+agent = Mechanize.new
 agent.user_agent_alias = 'Mac Mozilla'
 
 checkin_request_page = agent.get(CHECKIN_REQUEST_URL)
-checkin_request_form = checkin_request_page.form_with(:action => '/cgi-bin/selectBoardingPass')
-checkin_request_form.recordLocator = conf
+checkin_request_form = checkin_request_page.form_with(:name => 'retrieveItinerary')
+checkin_request_form.confirmationNumber = conf
 checkin_request_form.firstName = name.first
 checkin_request_form.lastName  = name.last
 checkin_page = checkin_request_form.submit
-error = (checkin_page / 'span#whatHappened').first
+error = (checkin_page / 'div#error_wrapper').first
 
 if error
   puts if prompt
@@ -37,16 +37,21 @@ if error
   exit
 end
 
-checkin_form = checkin_page.form_with(:action => '/cgi-bin/viewBoardingPass')
+
+checkin_form = checkin_page.form_with(:name => 'checkinOptions')
 checkin_form.checkboxes.each { |box|  box.check }
-boarding_page = checkin_form.submit
+print_button = checkin_form.buttons.detect { |b|  b.name == 'printDocuments' }
+boarding_page = checkin_form.click_button(print_button)
 
 puts if prompt
 puts "Successfully checked in, got"
 
-boarding_names = boarding_page / 'span.bpPaxName'
-boarding_names.each do |span|
-  boarding_info = span.parent.parent.parent / 'td.bpBoardingGroupLabel img'
+boarding_passes = boarding_page / 'div.details'
+boarding_passes.each do |pass|
+  boarding_name = (pass / 'p.name span').collect { |x|  x.content }.join(' ')
+  
+  boarding_info = pass / 'div.boardingPosition img'
   boarding_position = boarding_info.collect { |x| x.attributes['src'].to_s.match(/(\w).gif$/)[1] }.join
-  puts "#{span.content} - #{boarding_position}"
+  
+  puts "#{boarding_name} - #{boarding_position}"
 end
