@@ -60,3 +60,5 @@ alias rppg="ppg -t .rb"
 
 alias tab=new_tab
 alias new=new_term
+
+alias v=mvim_directory_server
