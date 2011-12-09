@@ -1,22 +1,15 @@
-export PATH="$PATH:~/scripts"
+export DOTFILES_HOME="$HOME/.dotfiles"
 
-export PS1="\h:\w\$(git_display) \u\$ "
-export PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME%%.*}\007"'
+# source all .bash files nested anywhere in the dotfiles
+# am I doing the right thing with this backtick ls?
+for f in `ls $DOTFILES_HOME/**/*.bash`
+do
+  source $f
+done
 
-export EDITOR=vi
-
-export LC_CTYPE=en_us.UTF-8
-
-shopt -s histappend
-export HISTSIZE=10000
-export HISTFILESIZE=${HISTSIZE}
-export HISTCONTROL="ignoredups"
-export HISTIGNORE="&:l[salh]:[bf]g:exit"
-
-for f in aliases functions bash_completion_base local
+# pull in the local settings only for this machine
+# (or the stuff that shouldn't be tracked publically)
+for f in local
 do
   test -r ~/.$f && source ~/.$f
 done
-
-[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
-
