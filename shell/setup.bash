@@ -17,5 +17,3 @@ for f in aliases functions bash_completion_base
 do
   test -r ~/.$f && source ~/.$f
 done
-
-[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
