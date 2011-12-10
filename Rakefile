@@ -14,7 +14,7 @@ task :install do
     overwrite = false
     backup = false
 
-    file = linkable.split('/').last.split('.symlink').last
+    file = linkable.split('/').last.chomp('.symlink')
     target = "#{ENV["HOME"]}/.#{file}"
 
     if File.exists?(target) || File.symlink?(target)
@@ -30,7 +30,7 @@ task :install do
         end
       end
       FileUtils.rm_rf(target) if overwrite || overwrite_all
-      `mv "$HOME/.#{file}" "$HOME/.#{file}.backup"` if backup || backup_all
+      `mv "#{target}" "#{target}.backup"` if backup || backup_all
     end
     `ln -s "$PWD/#{linkable}" "#{target}"`
   end
@@ -39,7 +39,7 @@ end
 task :uninstall do
   Dir.glob('**/*.symlink').each do |linkable|
 
-    file = linkable.split('/').last.split('.symlink').last
+    file = linkable.split('/').last.chomp('.symlink')
     target = "#{ENV["HOME"]}/.#{file}"
 
     # Remove all symlinks created during installation
@@ -48,8 +48,8 @@ task :uninstall do
     end
 
     # Replace any backups made during installation
-    if File.exists?("#{ENV["HOME"]}/.#{file}.backup")
-      `mv "$HOME/.#{file}.backup" "$HOME/.#{file}"` 
+    if File.exists?("#{target}.backup")
+      `mv "#{target}.backup" "#{target}"` 
     end
   end
 end
