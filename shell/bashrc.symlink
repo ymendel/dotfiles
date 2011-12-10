@@ -1,8 +1,7 @@
 export DOTFILES_HOME="$HOME/.dotfiles"
 
 # source all .bash files nested anywhere in the dotfiles
-# am I doing the right thing with this backtick ls?
-for f in `ls $DOTFILES_HOME/**/*.bash`
+for f in $DOTFILES_HOME/**/*.bash
 do
   source $f
 done
