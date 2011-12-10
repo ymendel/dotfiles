@@ -3,15 +3,18 @@
 filename = ARGV[0]
 sha1 = ARGV[1]
 
-raise "usage: sha1check [filename] [sha1]" unless filename and sha1
+unless filename and sha1
+  puts "usage: sha1check [filename] [sha1]"
+  exit 2
+end
 
 require 'digest/sha1'
 
 file_sha1 = Digest::SHA1.hexdigest(File.read(filename))
 
 if file_sha1 != sha1
-	puts "no match: file sha1 is #{file_sha1}"
-	exit 1
+  puts "no match: file sha1 is #{file_sha1}"
+  exit 1
 end
 
 puts "match"

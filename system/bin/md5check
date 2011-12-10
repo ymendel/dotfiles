@@ -3,15 +3,18 @@
 filename = ARGV[0]
 md5 = ARGV[1]
 
-raise "usage: md5check [filename] [md5]" unless filename and md5
+unless filename and md5
+  puts "usage: md5check [filename] [md5]"
+  exit 2
+end
 
 require 'digest/md5'
 
 file_md5 = Digest::MD5.hexdigest(File.read(filename))
 
 if file_md5 != md5
-	puts "no match: file md5 is #{file_md5}"
-	exit 1
+  puts "no match: file md5 is #{file_md5}"
+  exit 1
 end
 
 puts "match"

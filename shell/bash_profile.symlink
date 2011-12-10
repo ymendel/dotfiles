@@ -1,0 +1,4 @@
+for f in bashrc
+do
+  test -r ~/.$f && source ~/.$f
+done

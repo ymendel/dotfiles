@@ -1,11 +1,4 @@
-grok() {
-  grep -ri "$*" . | grep -v '\.svn'
-}
-
-ip()
-{
-  ifconfig ${1:-en1} | awk '$1 == "inet" { print $2 }'
-}
+export PS1="\h:\w\$(git_display) \u\$ "
 
 git_current_branch()
 {
@@ -28,23 +21,11 @@ git_dirty()
 
 git_display()
 {
-  export GIT_DIRTY=$(git_dirty) 
+  export GIT_DIRTY=$(git_dirty)
   git_current_head | awk '{if ($1) print "(" $1 ENVIRON["GIT_DIRTY"] ")"}'
 }
 
 rvm_current()
 {
   rvm info | sed -n '2,1s/:$//p'
-}
-
-wiki() {
-  dig +short txt $1.wp.dg.cx
-}
-
-mvim_directory_server() {
-  if [ $# == 0 ]; then
-    mvim
-  else
-    mvim --servername $(basename $(pwd)) --remote-tab-silent "$@" 1>/dev/null 2>&1
-  fi
 }

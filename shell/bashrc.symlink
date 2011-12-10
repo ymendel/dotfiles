@@ -1,0 +1,15 @@
+export DOTFILES_HOME="$HOME/.dotfiles"
+
+# source all .bash files nested anywhere in the dotfiles
+# am I doing the right thing with this backtick ls?
+for f in `ls $DOTFILES_HOME/**/*.bash`
+do
+  source $f
+done
+
+# pull in the local settings only for this machine
+# (or the stuff that shouldn't be tracked publically)
+for f in local
+do
+  test -r ~/.$f && source ~/.$f
+done
