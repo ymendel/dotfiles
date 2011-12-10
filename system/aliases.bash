@@ -20,3 +20,5 @@ alias fps=find_process
 
 alias where="type -ap"
 alias so=sudo
+
+alias remove_ds_stores="find . -name ".DS_Store" -depth -exec rm {} \;"
