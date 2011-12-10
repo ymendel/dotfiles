@@ -8,7 +8,7 @@ export HISTFILESIZE=${HISTSIZE}
 export HISTCONTROL="ignoredups"
 export HISTIGNORE="&:l[salh]:[bf]g:exit"
 
-for f in aliases functions
+for f in aliases
 do
   test -r ~/.$f && source ~/.$f
 done
