@@ -1,5 +1,3 @@
-export PS1="\h:\w\$(git_display) \u\$ "
-
 export EDITOR=vi
 
 export LC_CTYPE=en_us.UTF-8
