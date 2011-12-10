@@ -1,13 +1,3 @@
-# some commands need defaults
-alias ls="ls -qF"
-alias bc="bc -ql"
-alias mvim="mvim -p"
-
-alias la="ls -a"
-alias ll="ls -l"
-alias lh="ls -lh"
-alias lal="ls -al"
-
 # say what?
 alias voices="ls /System/Library/Speech/Voices/ | sed s/.SpeechVoice// | sed s/\\\\///"
 alias random_voice="voices | xargs echo | ruby -wne 'voices = \$_.split.collect { |voice|  voice.gsub(/([a-z])([A-Z])/, %q{\1 \2}) }; print voices[rand(voices.length)];'"
@@ -18,10 +8,7 @@ alias remove_ds_stores="find . -name ".DS_Store" -depth -exec rm {} \;"
 alias convert_flacs="find . -name '*.flac' -exec flac2mp3 {} \;"
 alias remove_flacs="find . -name '*.flac' -exec rm {} \;"
 
-alias where="type -ap"
 alias ql='qlmanage -p > /dev/null 2>&1'
-
-alias so=sudo
 
 # punch stuff
 alias punch_out_all="punch out"
@@ -36,13 +23,5 @@ alias pst="punch status"
 alias psts="punch status --short"
 alias pstsf="punch status --short --full"
 alias psum="punch summary"
-
-
-alias find_process="ps auxwwww | grep -v grep | grep "
-alias find_ps=find_process
-alias fps=find_process
-
-alias tab=new_tab
-alias new=new_term
 
 alias v=mvim_directory_server
