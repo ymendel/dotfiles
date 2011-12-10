@@ -1,8 +1,6 @@
-export PATH="$PATH:$DOTFILES_HOME/bin"
-
-for d in $DOTFILES_HOME/**/bin
+for d in $(find $DOTFILES_HOME -name bin -type d)
 do
-    export PATH="$PATH:$d"
+    PATH="$PATH:$d"
 done
 
 export PATH="$PATH:~/bin:~/scripts"
