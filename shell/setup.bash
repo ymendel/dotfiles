@@ -1,5 +1,3 @@
-export EDITOR=vi
-
 export LC_CTYPE=en_us.UTF-8
 
 shopt -s histappend
