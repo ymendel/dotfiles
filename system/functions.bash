@@ -1,5 +1,5 @@
 grok() {
-  grep -ri "$*" . | grep -v '\.svn'
+  grep -ri "$*" . | grep -v '\.svn' | grep -v '\.git'
 }
 
 ip()
