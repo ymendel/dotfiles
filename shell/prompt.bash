@@ -8,7 +8,8 @@ git_current_branch()
 git_current_head()
 {
   export BRANCH=`git branch 2>/dev/null | awk '/^\* /{print $2}'`
-  if [[ $BRANCH = "(no" ]]; then
+  if [[ $BRANCH = "(no" ]]
+  then
     export BRANCH=`git name-rev --name-only HEAD 2>/dev/null`
   fi
   echo $BRANCH
