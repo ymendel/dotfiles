@@ -15,6 +15,8 @@ wiki()
 
 flatten()
 {
-  find . -type f -mindepth 2 -exec mv {} . \;
-  find . -type d -d -depth 1 -exec rm -fr {} \;
+  FLATTEN_TARGET=${1:-.}
+
+  find $FLATTEN_TARGET -type f -mindepth 2 -exec mv {} $FLATTEN_TARGET \;
+  find $FLATTEN_TARGET -type d -d -depth 1 -exec rm -fr {} \;
 }
