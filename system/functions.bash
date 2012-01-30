@@ -12,3 +12,9 @@ wiki()
 {
   dig +short txt $1.wp.dg.cx
 }
+
+flatten()
+{
+  find . -type f -mindepth 2 -exec mv {} . \;
+  find . -type d -d -depth 1 -exec rm -fr {} \;
+}
