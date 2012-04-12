@@ -1,4 +1,3 @@
-# punch stuff
 alias punch_out_all="punch out"
 alias pi="punch in"
 alias po="punch out"
@@ -11,3 +10,5 @@ alias pst="punch status"
 alias psts="punch status --short"
 alias pstsf="punch status --short --full"
 alias psum="punch summary"
+alias pa="punch age"
+alias pc="punch clock"
