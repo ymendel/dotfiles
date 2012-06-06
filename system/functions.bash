@@ -20,3 +20,10 @@ flatten()
   find $FLATTEN_TARGET -type f -mindepth 2 -exec mv {} $FLATTEN_TARGET \;
   find $FLATTEN_TARGET -type d -d -depth 1 -exec rm -fr {} \;
 }
+
+go_to()
+{
+  loc=`which $1`
+  cd `dirname $loc`
+}
+alias gt=go_to
