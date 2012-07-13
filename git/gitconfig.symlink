@@ -29,6 +29,7 @@
 	redact = filter-branch
 	retcon = filter-branch
 	setup = !sh -c 'git clone $1 && cd `expr \"$1\" : \".*[:/]\\([a-z]*\\).git\"` && git checkout -b work' -
+	top = rev-parse --show-toplevel
 [color]
 	status = auto
 	diff = auto
