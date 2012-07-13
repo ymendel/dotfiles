@@ -8,7 +8,7 @@ unless input
 end
 
 redacted = input.gsub(/[\w'-]+/) do |word|
-  if rand < 0.1
+  if rand < 0.25
     word
   else
     '█' * word.length
