@@ -1,11 +1,6 @@
 #!/usr/bin/ruby
 
-input = ARGV[0]
-
-unless input
-  puts "usage: redact <sensitive information>"
-  exit 1
-end
+input = ARGV[0] || STDIN.read
 
 redacted = input.gsub(/[\w'-]+/) do |word|
   if rand < 0.25
