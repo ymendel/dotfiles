@@ -12,7 +12,7 @@
 	pending = diff --cached
 	unstage = reset HEAD
 	uncommit = reset --soft HEAD^
-	export = clone --depth 1
+	export = !sh -c 'git clone --depth 1 $1 && rm -fr `expr \"$1\" : \".*[:/]\\([a-zA-Z_]*\\).git\"`/.git' -
 	x = !gitx
 	hack = !hack
 	ship = !ship
@@ -28,7 +28,7 @@
 	squash = !sh -c 'git commit -m \"squash! $(git log -1 --format='\\''%s'\\'' $@)\"' -
 	redact = filter-branch
 	retcon = filter-branch
-	setup = !sh -c 'git clone $1 && cd `expr \"$1\" : \".*[:/]\\([a-z]*\\).git\"` && git checkout -b work' -
+	setup = !sh -c 'git clone $1 && cd `expr \"$1\" : \".*[:/]\\([a-zA-Z_]*\\).git\"` && git checkout -b work' -
 	top = rev-parse --show-toplevel
 [color]
 	status = auto
