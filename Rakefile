@@ -3,11 +3,11 @@ require 'rake'
 task :default => 'install'
 
 desc "Hook our dotfiles into system-standard positions."
-task :install do
+task :install, :mode do |t, args|
   linkables = Dir.glob('*/**{.symlink}')
 
   skip_all = false
-  overwrite_all = false
+  overwrite_all = args[:mode] == 'force'
   backup_all = false
 
   linkables.each do |linkable|
@@ -54,13 +54,13 @@ task :uninstall do
   end
 end
 
-task :install_scripts do
+task :install_scripts, :mode do |t, args|
   script_dir = "#{ENV["HOME"]}/Library/Scripts"
 
   linkables = Dir.glob('scripts/*/**{.scpt}')
 
   skip_all = false
-  overwrite_all = false
+  overwrite_all = args[:mode] == 'force'
   backup_all = false
 
   linkables.each do |linkable|
