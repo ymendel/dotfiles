@@ -34,6 +34,13 @@ task :install, :mode do |t, args|
     end
     `ln -s "$PWD/#{linkable}" "#{target}"`
   end
+
+
+  installs = Dir.glob('*/**{.install}')
+
+  installs.each do |install|
+    system(install)
+  end
 end
 
 task :uninstall do

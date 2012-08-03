@@ -1,0 +1,9 @@
+if [ `which defaults` ]
+then
+  for f in ${DOTFILES_HOME}osx/*.defaults
+  do
+    source $f
+  done
+
+  echo "OS X defaults written. Note that some of these changes require a logout/restart to take effect."
+fi
