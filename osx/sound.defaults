@@ -1,0 +1,2 @@
+# disable feedback sound when changing volume
+defaults write NSGlobalDomain com.apple.sound.beep.feedback -bool false
