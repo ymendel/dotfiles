@@ -1,0 +1,5 @@
+# disable the warning before emptying the Trash
+defaults write com.apple.finder WarnOnEmptyTrash -bool false
+
+# empty Trash securely by default
+defaults write com.apple.finder EmptyTrashSecurely -bool true
