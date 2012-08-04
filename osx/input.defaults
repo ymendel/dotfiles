@@ -2,7 +2,7 @@
 defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
 defaults write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
 
-# Disable "natural" (touchscreen-style) scrolling
+# disable "natural" (touchscreen-style) scrolling
 defaults write NSGlobalDomain com.apple.swipescrolldirection -bool false
 
 # keyboard shortcuts

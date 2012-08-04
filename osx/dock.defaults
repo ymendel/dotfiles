@@ -1,1 +1,2 @@
+# automatically hide/show dock
 defaults write com.apple.dock autohide -bool true

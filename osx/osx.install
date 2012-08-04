@@ -1,5 +1,8 @@
 if [ `which defaults` ]
 then
+  # general inspiration (and some specifics) from Mathias Bynens
+  # see https://github.com/mathiasbynens/dotfiles/blob/master/.osx
+
   for f in ${DOTFILES_HOME}osx/*.defaults
   do
     source $f
