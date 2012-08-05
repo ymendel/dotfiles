@@ -17,3 +17,6 @@ defaults write com.apple.sidebarlists systemitems -dict-add ShowRemovable -bool 
 defaults write com.apple.sidebarlists systemitems -dict-add ShowServers -bool true
 # do not show hard disks
 defaults write com.apple.sidebarlists systemitems -dict-add ShowHardDisks -bool false
+
+# show the ~/Library folder
+chflags nohidden ~/Library
