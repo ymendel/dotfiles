@@ -20,3 +20,6 @@ defaults write com.apple.sidebarlists systemitems -dict-add ShowHardDisks -bool 
 
 # show the ~/Library folder
 chflags nohidden ~/Library
+
+# enable text selection in QuickLook
+defaults write com.apple.finder QLEnableTextSelection -bool true
