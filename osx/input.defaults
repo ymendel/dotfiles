@@ -15,10 +15,3 @@ defaults write NSGlobalDomain com.apple.keyboard.fnState -bool true
 # change tabs with cmd-opt-arrow
 defaults write NSGlobalDomain NSUserKeyEquivalents -dict-add "Select Next Tab"     "@~\U2192"
 defaults write NSGlobalDomain NSUserKeyEquivalents -dict-add "Select Previous Tab" "@~\U2190"
-
-# iTunes
-# change tracks with cmd-opt-arrow
-defaults write com.apple.iTunes NSUserKeyEquivalents -dict-add "Next"     "@~\U2192"
-defaults write com.apple.iTunes NSUserKeyEquivalents -dict-add "Previous" "@~\U2190"
-# target search field with cmd-f
-defaults write com.apple.iTunes NSUserKeyEquivalents -dict-add "Target Search Field" "@F"

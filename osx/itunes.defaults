@@ -1,0 +1,8 @@
+# keyboard shortcuts
+###### NOTE: These shortcuts will not show in System Preferences
+######       and setting new shortcuts there will overwrite these
+# change tracks with cmd-opt-arrow
+defaults write com.apple.iTunes NSUserKeyEquivalents -dict-add "Next"     "@~\U2192"
+defaults write com.apple.iTunes NSUserKeyEquivalents -dict-add "Previous" "@~\U2190"
+# target search field with cmd-f
+defaults write com.apple.iTunes NSUserKeyEquivalents -dict-add "Target Search Field" "@F"
