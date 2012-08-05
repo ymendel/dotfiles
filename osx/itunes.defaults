@@ -1,3 +1,7 @@
+# disable Ping (sidebar, other stuff)
+defaults write com.apple.iTunes disablePingSidebar -bool true
+defaults write com.apple.iTunes disablePing -bool true
+
 # keyboard shortcuts
 ###### NOTE: These shortcuts will not show in System Preferences
 ######       and setting new shortcuts there will overwrite these
