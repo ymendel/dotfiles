@@ -1,0 +1,12 @@
+# don't show the dashboard as a space
+# Why true? This seems backwards.
+defaults write com.apple.dock dashboard-in-overlay -bool true
+
+# don't auto-rearrange spaces
+defaults write com.apple.dock mru-spaces -bool false
+
+# don't automatically switch to a space containing windows for an app
+defaults write com.apple.dock workspaces-auto-swoosh -bool false
+
+# group windows by application
+defaults write com.apple.dock expose-group-by-app -bool true
