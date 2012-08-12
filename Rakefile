@@ -2,7 +2,7 @@ require 'rake'
 
 task :default => 'install'
 
-desc "Hook our dotfiles into system-standard positions."
+desc "Hook dotfiles into system-standard positions."
 task :install, :mode do |t, args|
   linkables = Dir.glob('*/**{.symlink}')
 
@@ -43,6 +43,7 @@ task :install, :mode do |t, args|
   end
 end
 
+desc "Remove dotfiles from system-standard positions."
 task :uninstall do
   Dir.glob('**/*.symlink').each do |linkable|
 
@@ -61,6 +62,7 @@ task :uninstall do
   end
 end
 
+desc "Hook scripts into system-standard positions."
 task :install_scripts, :mode do |t, args|
   script_dir = "#{ENV["HOME"]}/Library/Scripts"
 
