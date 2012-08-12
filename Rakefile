@@ -84,8 +84,10 @@ task :install_scripts, :mode do |t, args|
     targets.push "#{script_dir}/#{file}"
 
     if File.directory?(linkable_split.first(2).join('/'))
-      target_dir = "#{ENV["HOME"]}/Library/#{linkable_split[1]}/Scripts"
-      if File.directory?(target_dir)
+      app_dir = "#{ENV['HOME']}/Library/#{linkable_split[1]}"
+      if File.directory?(app_dir)
+        target_dir = "#{app_dir}/Scripts"
+        FileUtils.mkdir_p target_dir
         file = linkable_split[2..-1].join(' ')
         targets.push "#{target_dir}/#{file}"
       end
