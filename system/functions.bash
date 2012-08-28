@@ -5,7 +5,7 @@ grok()
 
 ip()
 {
-  ifconfig ${1:-en1} | awk '$1 == "inet" { print $2 }'
+  ifconfig ${1:-en0} | awk '$1 == "inet" { print $2 }'
 }
 
 wiki()
