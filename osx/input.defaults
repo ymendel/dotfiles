@@ -15,3 +15,5 @@ defaults write NSGlobalDomain com.apple.keyboard.fnState -bool true
 # change tabs with cmd-opt-arrow
 defaults write NSGlobalDomain NSUserKeyEquivalents -dict-add "Select Next Tab"     "@~\U2192"
 defaults write NSGlobalDomain NSUserKeyEquivalents -dict-add "Select Previous Tab" "@~\U2190"
+defaults write NSGlobalDomain NSUserKeyEquivalents -dict-add "Next Tab"            "@~\U2192"
+defaults write NSGlobalDomain NSUserKeyEquivalents -dict-add "Previous Tab"        "@~\U2190"
