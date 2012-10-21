@@ -45,6 +45,8 @@
 [hub]
 	protocol = https
 [core]
-	excludesfile = /opt/github/config/git/gitignore
+excludesfile = /opt/boxen/config/git/gitignore
+helper = /opt/boxen/bin/boxen-git-credential
+
 [credential]
-	helper = osxkeychain
+helper = /opt/boxen/bin/boxen-git-credential
