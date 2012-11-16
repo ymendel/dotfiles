@@ -2,7 +2,7 @@
 	name = Yossef Mendelssohn
 	email = ymendel@pobox.com
 [alias]
-	alias = !git config --list | grep 'alias.' | sed 's/^alias.//' | sed 's/=/ => /'
+	aliases = !git config --list | grep 'alias.' | sed 's/^alias.//' | sed 's/=/ => /'
 	stat = status
 	st = status
 	ci = commit
@@ -12,6 +12,7 @@
 	pending = diff --cached
 	unstage = reset HEAD
 	uncommit = reset --soft HEAD^
+	undo = !sh -c 'git revert --no-commit ${1:-HEAD}'
 	export = !sh -c 'git clone --depth 1 $1 && rm -fr `expr \"$1\" : \".*[:/]\\([a-zA-Z_]*\\).git\"`/.git' -
 	x = !gitx
 	hack = !hack
