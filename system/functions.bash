@@ -3,6 +3,11 @@ grok()
   grep -ri "$*" . | grep -v '\.svn' | grep -v '\.git'
 }
 
+files_with()
+{
+    grok $* | cut -d : -f 1 | sort | uniq
+}
+
 ip()
 {
   ifconfig ${1:-en0} | awk '$1 == "inet" { print $2 }'
