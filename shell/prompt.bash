@@ -17,7 +17,7 @@ git_current_head()
 
 git_dirty()
 {
-  git st 2>/dev/null | grep -c : | awk '{if ($1 > 0) print "*"}'
+  git status 2>/dev/null | grep -c : | awk '{if ($1 > 0) print "*"}'
 }
 
 git_display()
