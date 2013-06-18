@@ -17,3 +17,7 @@ defaults write NSGlobalDomain NSUserKeyEquivalents -dict-add "Select Next Tab"  
 defaults write NSGlobalDomain NSUserKeyEquivalents -dict-add "Select Previous Tab" "@~\U2190"
 defaults write NSGlobalDomain NSUserKeyEquivalents -dict-add "Next Tab"            "@~\U2192"
 defaults write NSGlobalDomain NSUserKeyEquivalents -dict-add "Previous Tab"        "@~\U2190"
+
+# Keynote
+# rehearse slideshow with cmd-opt-R
+defaults write NSGlobalDomain NSUserKeyEquivalents -dict-add "Rehearse Slideshow"  "@~R"
