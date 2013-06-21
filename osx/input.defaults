@@ -20,4 +20,4 @@ defaults write NSGlobalDomain NSUserKeyEquivalents -dict-add "Previous Tab"     
 
 # Keynote
 # rehearse slideshow with cmd-opt-R
-defaults write NSGlobalDomain NSUserKeyEquivalents -dict-add "Rehearse Slideshow"  "@~R"
+defaults write com.apple.iWork.Keynote NSUserKeyEquivalents -dict-add "Rehearse Slideshow"  "@~R"
