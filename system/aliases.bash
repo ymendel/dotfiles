@@ -24,3 +24,6 @@ alias so=sudo
 alias remove_ds_stores="find . -name ".DS_Store" -depth -exec rm {} \;"
 
 alias ql='qlmanage -p > /dev/null 2>&1'
+
+alias boxon="boxen --enable-services"
+alias boxoff="boxen --disable-services"
