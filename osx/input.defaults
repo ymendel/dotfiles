@@ -13,6 +13,7 @@ defaults write NSGlobalDomain com.apple.keyboard.fnState -bool true
 #  @ = command
 #  ^ = control
 #  ~ = option
+#  $ = shift
 ###### NOTE: These shortcuts will not show in System Preferences
 ######       and setting new shortcuts there will overwrite these
 # all applications
