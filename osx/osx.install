@@ -9,10 +9,10 @@ then
   done
 
   # kill affected applications
-  for app in "Dock" "Finder" "iTunes" "SystemUIServer" "Terminal";
-  do
-    killall "$app" > /dev/null 2>&1
-  done
+  #for app in "Dock" "Finder" "iTunes" "SystemUIServer" "Terminal";
+  #do
+  #  killall "$app" > /dev/null 2>&1
+  #done
 
   echo "OS X defaults written. Note that some of these changes require a logout/restart to take effect."
 fi
