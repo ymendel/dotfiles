@@ -8,7 +8,7 @@ git_current_branch()
 git_current_head()
 {
   export BRANCH=`git branch 2>/dev/null | awk '/^\* /{print $2}'`
-  if [[ $BRANCH = "(no" ]]
+  if [[ $BRANCH = "(detached" ]]
   then
     export BRANCH=`git name-rev --name-only HEAD 2>/dev/null`
   fi
