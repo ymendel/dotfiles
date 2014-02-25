@@ -27,3 +27,5 @@ alias ql='qlmanage -p > /dev/null 2>&1'
 
 alias boxon="boxen --no-pull --enable-services"
 alias boxoff="boxen --no-pull --disable-services"
+
+alias shouty="tr [[:lower:]] [[:upper:]]"
