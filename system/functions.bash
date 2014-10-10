@@ -13,6 +13,11 @@ ip()
   ifconfig ${1:-en0} | awk '$1 == "inet" { print $2 }'
 }
 
+mac()
+{
+  ifconfig ${1:-en0} | awk '$1 == "ether" { print $2 }'
+}
+
 wiki()
 {
   dig +short txt $1.wp.dg.cx
