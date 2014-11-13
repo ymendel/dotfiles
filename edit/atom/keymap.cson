@@ -1,0 +1,9 @@
+'.editor':
+  'alt-cmd-w': 'editor:toggle-soft-wrap'
+  'alt-cmd-v': 'window:toggle-invisibles'
+
+'.platform-darwin':
+  'alt-cmd-k': 'settings-view:show-keybindings'
+
+'.platform-darwin, .platform-darwin .command-palette .editor':
+  'cmd-p': 'command-palette:toggle'
