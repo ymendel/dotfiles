@@ -1,5 +1,5 @@
 # open new windows in my home dir
-defaults write com.apple.finder NewWindowTargetPath -string "file://localhost/$HOME"
+defaults write com.apple.finder NewWindowTargetPath -string "file://$HOME"
 
 # desktop
 # show external drives, removable media
