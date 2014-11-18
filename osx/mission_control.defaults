@@ -1,6 +1,5 @@
-# don't show the dashboard as a space
-# Why true? This seems backwards.
-defaults write com.apple.dock dashboard-in-overlay -bool true
+# show the dashboard as an overlay
+defaults write com.apple.dashboard enabled-state -int 3
 
 # don't auto-rearrange spaces
 defaults write com.apple.dock mru-spaces -bool false
