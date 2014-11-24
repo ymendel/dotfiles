@@ -3,3 +3,6 @@ defaults write com.apple.dock autohide -bool true
 
 # minimize windows into the application icon
 defaults write com.apple.dock minimize-to-application -bool true
+
+# show indicators for open applications
+defaults write com.apple.dock show-process-indicators -bool true
