@@ -7,6 +7,7 @@
 	st = status
 	ci = commit
 	cia = !git add --all && git commit --all
+	cie = commit --allow-empty
 	co = checkout
 	staged = diff --cached
 	pending = diff --cached
