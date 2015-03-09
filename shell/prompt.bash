@@ -17,7 +17,7 @@ git_current_head()
 
 git_dirty()
 {
-  git status 2>/dev/null | grep -c : | awk '{if ($1 > 0) print "*"}'
+  (git status --porcelain | grep -qe . ) > /dev/null 2>&1 && echo '*'
 }
 
 git_display()
