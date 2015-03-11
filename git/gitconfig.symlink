@@ -8,6 +8,7 @@
 	ci = commit
 	cia = !git add --all && git commit --all
 	cie = commit --allow-empty
+	atc = commit --amend --no-edit
 	co = checkout
 	staged = diff --cached
 	pending = diff --cached
