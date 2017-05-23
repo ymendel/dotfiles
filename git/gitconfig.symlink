@@ -51,4 +51,4 @@
 	excludesfile = /opt/boxen/config/git/gitignore
 	helper = /opt/boxen/bin/boxen-git-credential
 [credential]
-	helper = /opt/boxen/bin/boxen-git-credential
+	helper = osxkeychain
