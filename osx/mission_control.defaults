@@ -1,4 +1,5 @@
 # show the dashboard as an overlay
+defaults write com.apple.dashboard dashboard-enabled-state -int 3
 defaults write com.apple.dashboard enabled-state -int 3
 
 # don't auto-rearrange spaces
