@@ -52,3 +52,5 @@
 	helper = /opt/boxen/bin/boxen-git-credential
 [credential]
 	helper = osxkeychain
+[init]
+	templatedir = ~/.dotfiles/git/template
