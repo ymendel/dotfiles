@@ -33,6 +33,7 @@
 	retcon = filter-branch
 	setup = !sh -c 'git clone $1 && cd `expr \"$1\" : \".*[:/]\\([a-zA-Z_]*\\).git\"` && git checkout -b work' -
 	top = rev-parse --show-toplevel
+	ctags = !.git/hooks/ctags
 [color]
 	status = auto
 	diff = auto
