@@ -10,5 +10,5 @@ done
 # (or the stuff that shouldn't be tracked publically)
 for f in local
 do
-  test -r ~/.$f && source ~/.$f
+  test -f ~/.$f && source ~/.$f
 done
