@@ -28,8 +28,8 @@
 	diffw = diff --word-diff
 	ri = rebase --interactive
 	ria = rebase --interactive --autosquash
-	fixup = !sh -c 'git commit -m \"fixup! $(git log -1 --format='\\''%s'\\'' $@)\"' -
-	squash = !sh -c 'git commit -m \"squash! $(git log -1 --format='\\''%s'\\'' $@)\"' -
+	fixup = commit --fixup
+	squash = commit --squash
 	redact = filter-branch
 	retcon = filter-branch
 	setup = !sh -c 'git clone $1 && cd `expr \"$1\" : \".*[:/]\\([a-zA-Z_]*\\).git\"` && git checkout -b work' -
