@@ -30,6 +30,8 @@
 	ria = rebase --interactive --autosquash
 	fixup = commit --fixup
 	squash = commit --squash
+	amend = commit --amend
+	reword = commit --only --amend
 	redact = filter-branch
 	retcon = filter-branch
 	setup = !sh -c 'git clone $1 && cd `expr \"$1\" : \".*[:/]\\([a-zA-Z_]*\\).git\"` && git checkout -b work' -
