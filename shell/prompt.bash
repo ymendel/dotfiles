@@ -31,11 +31,11 @@ git_ahead_behind()
   AHEAD_BEHIND=''
   if [[ $BRANCH_INFO =~ behind\ ([0-9]+) ]]
   then
-    AHEAD_BEHIND+="↓${BASH_REMATCH[1]}"
+    AHEAD_BEHIND+=" ↓${BASH_REMATCH[1]}"
   fi
   if [[ $BRANCH_INFO =~ ahead\ ([0-9]+) ]]
   then
-    AHEAD_BEHIND+="↑${BASH_REMATCH[1]}"
+    AHEAD_BEHIND+=" ↑${BASH_REMATCH[1]}"
   fi
   echo $AHEAD_BEHIND
 }
@@ -44,9 +44,12 @@ git_display()
 {
   if in_git_repo
   then
-    export GIT_DIRTY=`git_dirty`
-    export GIT_AHEAD_BEHIND=`git_ahead_behind`
-    git_current_head | awk '{if ($1) print " (" $1 ENVIRON["GIT_DIRTY"] ENVIRON["GIT_AHEAD_BEHIND"] ")"}'
+    GIT_AHEAD_BEHIND=`git_ahead_behind`
+    if [[ ! GIT_AHEAD_BEHIND =~ ^\s ]]
+    then
+        GIT_AHEAD_BEHIND=" ${GIT_AHEAD_BEHIND}"
+    fi
+    echo " ($(git_current_head)$(git_dirty)${GIT_AHEAD_BEHIND})"
   fi
 }
 
