@@ -45,7 +45,7 @@ git_display()
   if in_git_repo
   then
     GIT_AHEAD_BEHIND=`git_ahead_behind`
-    if [[ ! GIT_AHEAD_BEHIND =~ ^\s ]]
+    if [[ $GIT_AHEAD_BEHIND != '' ]]
     then
         GIT_AHEAD_BEHIND=" ${GIT_AHEAD_BEHIND}"
     fi
