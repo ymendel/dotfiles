@@ -20,6 +20,11 @@ git_current_head()
   echo $BRANCH
 }
 
+git_current_rev()
+{
+  git rev-parse --short=4 HEAD
+}
+
 git_dirty()
 {
   (git status --porcelain | grep -qe .) > /dev/null 2>&1 && echo '*'
@@ -49,7 +54,7 @@ git_display()
     then
         GIT_AHEAD_BEHIND=" ${GIT_AHEAD_BEHIND}"
     fi
-    echo " ($(git_current_head)$(git_dirty)${GIT_AHEAD_BEHIND})"
+    echo " ($(git_current_head)@$(git_current_rev)$(git_dirty)${GIT_AHEAD_BEHIND})"
   fi
 }
 
