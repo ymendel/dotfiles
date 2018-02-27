@@ -1,3 +1,7 @@
+echoc() {
+  echo -e "${1}$2${ResetColor}" | sed 's/\\\]//g'  | sed 's/\\\[//g'
+}
+
 # inspired by http://beckism.com/2009/02/better_bash_prompt/#comment-19411
 divider()
 {
