@@ -5,6 +5,7 @@
 # are also printed to STDERR.
 #
 # taken from magicmonty/bash-git-prompt (where it's called 'prompt-colors.sh')
+# and tweaked because I want more possibilities
 
 define_color_names() {
 
@@ -24,7 +25,7 @@ define_color_names() {
 
   # _map_colors ATTRNAME ATTRVALUE
   #
-  # Defines three names for every color, attribute combintaion:
+  # Defines some names for every color / attribute combination:
   #    {ATTRNAME}{COLORNAME}
   #    {ATTRNAME}{COLORNAME}Fg
   #    {ATTRNAME}{COLORNAME}Bg
@@ -41,7 +42,7 @@ define_color_names() {
       local bgcolorcode=${BgColors[x]}
       longcolorname="${attrname}${colorname}"
       _def_color $longcolorname     $attrcode $fgcolorcode
-      _def_color ${longcolorname}Fg $attrcode $fgcolorcode
+      _def_color ${longcolorname}Fg $attrcode $bgcolorcode
       _def_color ${longcolorname}Bg $attrcode $bgcolorcode
       (( x++ ))
     done
@@ -72,8 +73,18 @@ define_color_names() {
   _map_colors Dim    $AttrDim
   _map_colors ''     $AttrNorm
 
+  # just the attributes on their own
+  _def_color Bold   $AttrBright
+  _def_color Bright $AttrBright
+  _def_color Dim    $AttrDim
+  _def_color Under  $AttrUnder
+  _def_color Blink  $AttrBlink
+  _def_color Inv    $AttrRev
+  _def_color Rev    $AttrRev
+  _def_color Hide   $AttrHide
+
   _def_color IntenseBlack 0 90
-  _def_color ResetColor   0 0
+  _def_color ResetColor   0
 
 }
 
