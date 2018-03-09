@@ -14,9 +14,9 @@ define_color_names() {
     local x=0
     while (( x < 8 )) ; do
       local colorname=${ColorNames[x]}
-      local colorcode=x
-      _def_color_fg $colorname $x
-      _def_color_bg $colorname $x
+      local colorcode=$x
+      _def_color_fg $colorname $colorcode
+      _def_color_bg $colorname $colorcode
       (( x++ ))
     done
   }
