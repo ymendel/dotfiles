@@ -30,8 +30,7 @@ set_prompt()
 
 in_git_repo()
 {
-    (git rev-parse --git-dir > /dev/null 2>&1) &&
-    (git rev-parse HEAD > /dev/null 2>&1)
+    git rev-parse HEAD > /dev/null 2>&1
 }
 
 git_current_branch()
