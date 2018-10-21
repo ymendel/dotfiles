@@ -72,8 +72,14 @@ do
                 echo "HandBrake Encoding"
                 HandBrakeCLI $OPTIONS --optimize -i $VID -o $OUTFILE
             fi
-            mv $TOCHANGE $COMPLETED
-            echo "Completed and renamed to $COMPLETED"
+
+            if [ $? == 0 ]
+            then
+                mv $TOCHANGE $COMPLETED
+                echo "Completed and renamed to $COMPLETED"
+            else
+                echo "Error in converting $VID"
+            fi
         done
     fi
 done
