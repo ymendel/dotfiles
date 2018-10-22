@@ -11,8 +11,6 @@ then
     exit 0
 fi
 
-IFS=$'\n'
-
 echo "Looking for files to encode ..."
 touch $WORKFILE
 
@@ -67,15 +65,15 @@ do
             if [[ "${VID##*.}" == mkv ]];
             then
                 echo "ffmpeg encoding"
-                ffmpeg -i $VID -c:v copy -c:a copy $OUTFILE
+                ffmpeg -i "$VID" -c:v copy -c:a copy "$OUTFILE"
             else
                 echo "HandBrake Encoding"
-                HandBrakeCLI $OPTIONS --optimize -i $VID -o $OUTFILE
+                HandBrakeCLI $OPTIONS --optimize -i "$VID" -o "$OUTFILE"
             fi
 
             if [ $? == 0 ]
             then
-                mv $TOCHANGE $COMPLETED
+                mv "$TOCHANGE" "$COMPLETED"
                 echo "Completed and renamed to $COMPLETED"
             else
                 echo "Error in converting $VID"
