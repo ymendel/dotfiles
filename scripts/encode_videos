@@ -18,68 +18,65 @@ OLD_SHELLNOCASEMATCH=$(shopt -p nocasematch; true)
 shopt -s nocasematch
 
 # get list of directories to look in for video files / profiles
-PROFDIRS=`find $ENCDIR -maxdepth 1 -type d -name "*"`
+PROFDIRS=`find $ENCDIR -mindepth 1 -maxdepth 2 -type f -name "$PROFILE" -exec dirname {} \;`
 
 for DIR in $PROFDIRS
 do
-    if [ -a "$DIR/$PROFILE" ];
-    then
-        OPTIONS=`cat "$DIR/$PROFILE"`
-        echo "$DIR has profile options : $OPTIONS"
+    OPTIONS=`cat "$DIR/$PROFILE"`
+    echo "$DIR has profile options : $OPTIONS"
 
-        # look for any file with specified extensions
-        # VIDFILES=`find $DIR -type f \( -name "*.avi" -o -name "*.mkv" \)`
-        find $DIR -type f -iname "*.avi" -print0 > "$ENCDIR/avifiles"
-        find $DIR -type f -iname "*.mkv" -print0 > "$ENCDIR/mkvfiles"
-        find $DIR -type d -name "VIDEO_TS" -not -regex ".*complete/VIDEO_TS" -print0 > "$ENCDIR/videotses"
+    # look for any file with specified extensions
+    # VIDFILES=`find $DIR -type f \( -name "*.avi" -o -name "*.mkv" \)`
+    find $DIR -type f -iname "*.avi" -print0 > "$ENCDIR/avifiles"
+    find $DIR -type f -iname "*.mkv" -print0 > "$ENCDIR/mkvfiles"
+    find $DIR -type d -name "VIDEO_TS" -not -regex ".*complete/VIDEO_TS" -print0 > "$ENCDIR/videotses"
 
-        VIDFILES=()
-        while read -r -d ''; do
-            VIDFILES+=("$REPLY")
-        done < "$ENCDIR/avifiles"
-        while read -r -d ''; do
-            VIDFILES+=("$REPLY")
-        done < "$ENCDIR/mkvfiles"
-        while read -r -d ''; do
-            VIDFILES+=("$REPLY")
-        done < "$ENCDIR/videotses"
+    VIDFILES=()
+    while read -r -d ''; do
+        VIDFILES+=("$REPLY")
+    done < "$ENCDIR/avifiles"
+    while read -r -d ''; do
+        VIDFILES+=("$REPLY")
+    done < "$ENCDIR/mkvfiles"
+    while read -r -d ''; do
+        VIDFILES+=("$REPLY")
+    done < "$ENCDIR/videotses"
 
-        rm -f "$ENCDIR/avifiles"
-        rm -f "$ENCDIR/mkvfiles"
-        rm -f "$ENCDIR/videotses"
+    rm -f "$ENCDIR/avifiles"
+    rm -f "$ENCDIR/mkvfiles"
+    rm -f "$ENCDIR/videotses"
 
-        for VID in "${VIDFILES[@]}"
-        do
-            OUTFILE="${VID%.*}".mp4
+    for VID in "${VIDFILES[@]}"
+    do
+        OUTFILE="${VID%.*}".mp4
 
-            echo "Encoding video file $VID to file $OUTFILE"
+        echo "Encoding video file $VID to file $OUTFILE"
 
-            if [[ "${VID##*/}" == VIDEO_TS ]]
-            then
-                TOCHANGE="${VID%/*}"
-            else
-                TOCHANGE=$VID
-            fi
-            COMPLETED=$TOCHANGE.$COMPEXT
+        if [[ "${VID##*/}" == VIDEO_TS ]]
+        then
+            TOCHANGE="${VID%/*}"
+        else
+            TOCHANGE=$VID
+        fi
+        COMPLETED=$TOCHANGE.$COMPEXT
 
-            if [[ "${VID##*.}" == mkv ]];
-            then
-                echo "ffmpeg encoding"
-                ffmpeg -i "$VID" -c:v copy -c:a copy -c:s mov_text "$OUTFILE"
-            else
-                echo "HandBrake Encoding"
-                HandBrakeCLI $OPTIONS --optimize -i "$VID" -o "$OUTFILE"
-            fi
+        if [[ "${VID##*.}" == mkv ]];
+        then
+            echo "ffmpeg encoding"
+            ffmpeg -i "$VID" -c:v copy -c:a copy -c:s mov_text "$OUTFILE"
+        else
+            echo "HandBrake Encoding"
+            HandBrakeCLI $OPTIONS --optimize -i "$VID" -o "$OUTFILE"
+        fi
 
-            if [ $? == 0 ]
-            then
-                mv "$TOCHANGE" "$COMPLETED"
-                echo "Completed and renamed to $COMPLETED"
-            else
-                echo "Error in converting $VID"
-            fi
-        done
-    fi
+        if [ $? == 0 ]
+        then
+            mv "$TOCHANGE" "$COMPLETED"
+            echo "Completed and renamed to $COMPLETED"
+        else
+            echo "Error in converting $VID"
+        fi
+    done
 done
 
 eval $OLD_SHELLNOCASEMATCH
