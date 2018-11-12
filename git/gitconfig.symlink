@@ -3,8 +3,6 @@
 	email = ymendel@pobox.com
 [alias]
 	aliases = !git config --list | grep 'alias.' | sed 's/^alias.//' | sed 's/=/ => /'
-	stat = status
-	st = status
 	ci = commit
 	cia = !git add --all && git commit --all
 	cie = commit --allow-empty
@@ -21,7 +19,6 @@
 	hack = !hack
 	ship = !ship
 	deleted = log --oneline --diff-filter=D --
-	sts = status --short --branch
 	logd = log --oneline --decorate
 	logg = log --graph --pretty=format:'%C(yellow)%h%C(reset) -%C(cyan)%d%C(reset) %s %Cgreen(%cr) %C(bold blue)<%an>%C(reset)' --abbrev-commit --date=relative
 	bw = branch --contains
@@ -37,6 +34,10 @@
 	setup = !sh -c 'git clone $1 && cd `expr \"$1\" : \".*[:/]\\([a-zA-Z_]*\\).git\"` && git checkout -b work' -
 	top = rev-parse --show-toplevel
 	ctags = !.git/hooks/ctags
+	st = status
+	sts = status --short --branch
+	stat = !git diff --stat $(git merge-base HEAD \"$REVIEW_BASE\")
+	files = !git diff --name-only $(git merge-base HEAD \"$REVIEW_BASE\")
 [color]
 	status = auto
 	diff = auto
