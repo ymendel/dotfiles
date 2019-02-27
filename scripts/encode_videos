@@ -63,7 +63,7 @@ do
         if [[ "${VID##*.}" == mkv ]];
         then
             echo "ffmpeg encoding"
-            ffmpeg -i "$VID" -c:v copy -c:a copy -c:s mov_text "$OUTFILE"
+            ffmpeg -i "$VID" -c:v copy -c:a copy -map 0 -c:s mov_text "$OUTFILE"
         else
             echo "HandBrake Encoding"
             HandBrakeCLI $OPTIONS --optimize -i "$VID" -o "$OUTFILE"
