@@ -27,9 +27,9 @@ do
 
     # look for any file with specified extensions
     # VIDFILES=`find $DIR -type f \( -name "*.avi" -o -name "*.mkv" \)`
-    find $DIR -type f -iname "*.avi" -print0 > "$ENCDIR/avifiles"
-    find $DIR -type f -iname "*.mkv" -print0 > "$ENCDIR/mkvfiles"
-    find $DIR -type d -name "VIDEO_TS" -not -regex ".*complete/VIDEO_TS" -print0 > "$ENCDIR/videotses"
+    find $DIR -type f -iname "*.avi" -not -regex "$DIR/.@__thumb/.*" -print0 > "$ENCDIR/avifiles"
+    find $DIR -type f -iname "*.mkv" -not -regex "$DIR/.@__thumb/.*" -print0 > "$ENCDIR/mkvfiles"
+    find $DIR -type d -name "VIDEO_TS" -not -regex "$DIR/.@__thumb/.*" -not -regex ".*complete/VIDEO_TS" -print0 > "$ENCDIR/videotses"
 
     VIDFILES=()
     while read -r -d ''; do
