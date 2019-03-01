@@ -4,6 +4,7 @@ alias po="punch out"
 alias pout="punch out"
 alias poa=punch_out_all
 alias pl="punch list"
+alias plog="punch log"
 alias pt="punch total"
 alias pstat="punch status"
 alias pst="punch status"
