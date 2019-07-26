@@ -57,3 +57,5 @@
 	helper = osxkeychain
 [init]
 	templatedir = ~/.dotfiles/git/template
+[include]
+    path = ~/.gitconfig.local
