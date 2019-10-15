@@ -9,9 +9,13 @@ set_prompt()
         PS1+=" ("
         PS1+="\[${Green}\]$(git_current_head)\[${ResetColor}\]"
         PS1+="@\[${Yellow}\]$(git_current_rev)\[${ResetColor}\]"
-        PS1+="\[${Red}\]$(git_dirty)\[${ResetColor}\]"
 
-        BRANCH_INFO=`git_branch_info`
+        STATUS_INFO=`git status --porcelain --branch`
+
+        DIRTY=$(echo "${STATUS_INFO}" | git_dirty)
+        PS1+="\[${Red}\]${DIRTY}\[${ResetColor}\]"
+
+        BRANCH_INFO=`echo "${STATUS_INFO}" | git_branch_info`
         if [[ $BRANCH_INFO =~ behind\ ([0-9]+) ]]
         then
             PS1+=" \[${Red}\]↓${BASH_REMATCH[1]}"
@@ -55,10 +59,10 @@ git_current_rev()
 
 git_dirty()
 {
-    (git status --porcelain | grep -qe .) > /dev/null 2>&1 && echo -n '*'
+    (tail -n +2 | grep -qe .) > /dev/null 2>&1 && echo -n '*'
 }
 
 git_branch_info()
 {
-    git status --porcelain --branch | head -1
+    head -1
 }
