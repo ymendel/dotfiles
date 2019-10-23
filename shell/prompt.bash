@@ -10,7 +10,7 @@ set_prompt()
         PS1+="\[${Green}\]$(git_current_head)\[${ResetColor}\]"
         PS1+="@\[${Yellow}\]$(git_current_rev)\[${ResetColor}\]"
 
-        STATUS_INFO=`git status --porcelain --branch`
+        STATUS_INFO=`git status --porcelain --branch | head -2`
 
         DIRTY=$(echo "${STATUS_INFO}" | git_dirty)
         PS1+="\[${Red}\]${DIRTY}\[${ResetColor}\]"
