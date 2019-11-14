@@ -39,6 +39,8 @@
 	stat = !git diff --stat $(git merge-base HEAD \"$REVIEW_BASE\")
 	files = !git diff --name-only $(git merge-base HEAD \"$REVIEW_BASE\")
 	gob = !git fetch origin +$1:$1
+	remaster = fetch origin master:master
+	re = remaster
 [color]
 	status = auto
 	diff = auto
