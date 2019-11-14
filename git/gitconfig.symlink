@@ -40,7 +40,7 @@
 	files = !git diff --name-only $(git merge-base HEAD \"$REVIEW_BASE\")
 	gob = !git fetch origin +$1:$1
 	remaster = fetch origin master:master
-	re = remaster
+	re = !git remaster
 [color]
 	status = auto
 	diff = auto
