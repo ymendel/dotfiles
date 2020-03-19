@@ -30,4 +30,6 @@ alias boxoff="boxen --no-pull --disable-services"
 
 alias shouty="tr [[:lower:]] [[:upper:]]"
 
+alias flagmoji="tr 'A-Z' '🇦-🇿'"
+
 alias fix_camera="sudo killall VDCAssistant"
