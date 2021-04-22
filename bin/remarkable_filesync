@@ -1,0 +1,37 @@
+#!/usr/bin/env ruby
+
+require 'open3'
+
+def usage
+  [
+    "#{$0} [local_path] [remote_path]",
+    "\tlocal_path defaults to current directory",
+    "\tremote_path defaults to same name as current directory",
+  ].join("\n")
+end
+
+if %w[--help -h -?].include?(ARGV[0])
+  abort(usage)
+end
+
+local_path = File.expand_path(ARGV[0] || '.')
+remote_path = ARGV[1] || File.split(local_path).last
+
+stdout, stderr, status = Open3.capture3('rmapi', 'find', remote_path)
+remote_entries = stdout.split("\n")
+processed_remote_entries = remote_entries.collect do |entry|
+  entry.sub(/\A#{Regexp.escape(remote_path)}\//, '') + '.pdf'
+end
+
+stdout, stderr, status = Open3.capture3('find', local_path, '-name', '*.pdf')
+local_entries = stdout.split("\n")
+processed_local_entries = local_entries.collect do |entry|
+  entry.sub(/\A#{Regexp.escape(local_path)}\//, '')
+end
+
+missing_remote = processed_local_entries - processed_remote_entries
+missing_remote.each do |entry|
+  path_parts = File.split(entry)[0..-2]
+  system('rmapi', 'put', entry, File.join(remote_path, *path_parts))
+end
+

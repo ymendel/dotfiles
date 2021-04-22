@@ -1,0 +1,85 @@
+#!/usr/bin/env ruby
+
+require 'date'
+require 'uri'
+require 'open-uri'
+# require 'pdfkit'
+
+today = Date.today
+
+dir = File.expand_path(File.split($0)[0])
+Dir.chdir(dir)
+# root_dir = Dir.pwd
+
+uri_base = 'https://crosswords-static.guim.co.uk/'
+format = '%Y%m%d'
+
+# cryptic
+
+final = Dir.entries('cryptic').sort.last
+final_date = Date.parse(final.match(/(\d{8})/)[1])
+start_date = final_date + 1
+
+start_date.upto(today).each do |date|
+  filename = "gdn.cryptic.#{date.strftime(format)}.pdf"
+  p "trying #{filename}"
+  begin
+    URI.open(URI.join(uri_base, filename)) do |uri|
+      File.open(File.join('cryptic', filename), 'w') do |file|
+        file.write(uri.read)
+      end
+    end
+  rescue OpenURI::HTTPError
+    p "couldn't get #{filename}"
+  end
+end
+
+
+# everyman
+
+final = Dir.entries('everyman').sort.last
+final_date = Date.parse(final.match(/(\d{8})/)[1])
+start_date = final_date + 1
+
+start_date.upto(today).each do |date|
+  filename = "obs.everyman.#{date.strftime(format)}.pdf"
+  p "trying #{filename}"
+  begin
+    URI.open(URI.join(uri_base, filename)) do |uri|
+      File.open(File.join('everyman', filename), 'w') do |file|
+        file.write(uri.read)
+      end
+    end
+  rescue OpenURI::HTTPError
+    p "couldn't get #{filename}"
+  end
+end
+
+
+# quiptic
+
+uri_base = 'https://www.theguardian.com/crosswords/quiptic/'
+final = Dir.entries('quiptic').sort.last
+final_num = final.match(/(\d+)/)[1]
+
+num = final_num.to_i + 1
+
+loop do
+  filename = "quiptic #{num}.pdf"
+  p "trying #{filename}"
+  begin
+    tmpfile = "#{filename}.html"
+    URI.open(URI.join(uri_base, "#{num}/", 'print')) do |uri|
+      File.open(tmpfile, 'w') { |file| file.write(uri.read) }
+      unless system('prince', tmpfile, '--no-warn-css', '-o', "quiptic/#{filename}")
+        p "trouble with #{filename} - #{$?}"
+      end
+      File.delete(tmpfile)
+    end
+  rescue OpenURI::HTTPError
+    p "couldn't get #{filename}"
+    break
+  end
+
+  num += 1
+end
