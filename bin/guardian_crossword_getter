@@ -22,6 +22,7 @@ start_date = final_date + 1
 
 start_date.upto(today).each do |date|
   filename = "gdn.cryptic.#{date.strftime(format)}.pdf"
+  next if date.sunday?  # everyman on Sundays
   p "trying #{filename}"
   begin
     URI.open(URI.join(uri_base, filename)) do |uri|
@@ -43,6 +44,7 @@ start_date = final_date + 1
 
 start_date.upto(today).each do |date|
   filename = "obs.everyman.#{date.strftime(format)}.pdf"
+  next unless date.sunday?  # only on Sundays
   p "trying #{filename}"
   begin
     URI.open(URI.join(uri_base, filename)) do |uri|
