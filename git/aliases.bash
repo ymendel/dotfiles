@@ -1,8 +1,8 @@
 # gitness
-alias h=hack
-alias s=ship
-alias shipm="ship -m"
-alias sm=shipm
+# alias h=hack
+# alias s=ship
+# alias shipm="ship -m"
+# alias sm=shipm
 
 function gtt()
 {
