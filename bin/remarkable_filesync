@@ -20,8 +20,10 @@ remote_path = ARGV[1] || File.split(local_path).last
 stdout, stderr, status = Open3.capture3('rmapi', 'find', remote_path)
 remote_entries = stdout.split("\n")
 processed_remote_entries = remote_entries.collect do |entry|
-  entry.sub(/\A#{Regexp.escape(remote_path)}\//, '') + '.pdf'
-end
+  next unless entry.start_with?('[f]')
+
+  entry.sub(/\A\[f\]\s+#{Regexp.escape(remote_path)}\//, '') + '.pdf'
+end.compact
 
 stdout, stderr, status = Open3.capture3('find', local_path, '-name', '*.pdf')
 local_entries = stdout.split("\n")
