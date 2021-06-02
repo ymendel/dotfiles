@@ -1,0 +1,38 @@
+#!/bin/bash
+
+ENCDIR=/share/Public/Encode
+MEDIADIR=/share/Multimedia/Video
+TVDIR=$MEDIADIR/TV
+MOVIEDIR=$MEDIADIR/Movies
+
+find $ENCDIR -type f -name '*.complete' -exec rm {} \;
+find $ENCDIR -type d -name '*.complete' -exec rm -fr {} \;
+
+find $ENCDIR -mindepth 1 -type f -name '*.mp4' -not -regex "$ENCDIR/.@__thumb/.*" -print0 > "$ENCDIR/mp4files"
+VIDFILES=()
+while read -r -d ''; do
+    VIDFILES+=("$REPLY")
+done < "$ENCDIR/mp4files"
+rm "$ENCDIR/mp4files"
+
+TVPATTERN='^(.*?) - s([0-9]+)e[0-9]+ -'
+
+for f in "${VIDFILES[@]}"
+do
+    if [ ! -s "$f" ]
+    then
+        continue
+    fi
+
+    if [[ $f =~ $TVPATTERN ]]
+    then
+        SERIES=`basename "${BASH_REMATCH[1]}"`
+        SEASON="Season ${BASH_REMATCH[2]}"
+        TARGET="$TVDIR/$SERIES/$SEASON"
+        mkdir -p "$TARGET"
+        mv "$f" "$TARGET"
+    else
+        TARGET=$MOVIEDIR
+        mv "$f" "$TARGET"
+    fi
+done
