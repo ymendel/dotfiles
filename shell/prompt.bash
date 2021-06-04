@@ -15,6 +15,8 @@ set_prompt()
         DIRTY=$(echo "${STATUS_INFO}" | git_dirty)
         PS1+="\[${Red}\]${DIRTY}\[${ResetColor}\]"
 
+        PS1+="\[${Cyan}\]$(git_paused)\[${ResetColor}\]"
+
         BRANCH_INFO=`echo "${STATUS_INFO}" | git_branch_info`
         if [[ $BRANCH_INFO =~ behind\ ([0-9]+) ]]
         then
@@ -65,4 +67,9 @@ git_dirty()
 git_branch_info()
 {
     head -1
+}
+
+git_paused()
+{
+    git paused && echo -n '║'
 }

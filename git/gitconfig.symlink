@@ -13,6 +13,7 @@
 	pending = diff --cached
 	unstage = reset HEAD
 	uncommit = reset --soft HEAD^
+	rmcommit = reset HEAD^
 	undo = !sh -c 'git revert --no-commit ${1:-HEAD}'
 	export = !sh -c 'git clone --depth 1 $1 && rm -fr `expr \"$1\" : \".*[:/]\\([a-zA-Z_]*\\).git\"`/.git' -
 	x = !gitx
@@ -41,6 +42,9 @@
 	gob = !git fetch origin +$1:$1
 	remaster = fetch origin master:master
 	re = !git remaster
+	pause = !git add --all && git commit --all --no-verify --message 'PAUSED: Use `git resume` to continue working.'
+	paused = !git log -1 --format="%s" | grep -q '^PAUSED: '
+	resume = !git paused && git rmcommit
 [color]
 	status = auto
 	diff = auto
