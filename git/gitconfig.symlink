@@ -45,6 +45,8 @@
 	pause = !git add --all && git commit --all --no-verify --message 'PAUSED: Use `git resume` to continue working.'
 	paused = !git log -1 --format="%s" | grep -q '^PAUSED: '
 	resume = !git paused && git rmcommit
+	merged = !sh -c 'git merge-base --is-ancestor ${1:-HEAD} ${2:-master}' -
+	clean-merged = !git branch --merged master --format='%(refname:short)' | grep -v '^master$' | xargs git branch -d
 [color]
 	status = auto
 	diff = auto
