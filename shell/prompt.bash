@@ -41,13 +41,13 @@ in_git_repo()
 
 git_current_branch()
 {
-    git branch 2>/dev/null | awk '/^\* /{print $2}'
+    git branch 2>/dev/null | awk '/^\* /{$1 = ""; print $0}'
 }
 
 git_current_head()
 {
     BRANCH=`git_current_branch`
-    if [[ $BRANCH = "(detached" ]]
+    if [[ $BRANCH =~ " detached at " ]]
     then
       BRANCH=`git name-rev --name-only HEAD 2>/dev/null`
     fi
