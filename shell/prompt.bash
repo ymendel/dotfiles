@@ -8,6 +8,7 @@ set_prompt()
     then
         PS1+=" ("
         PS1+="\[${Green}\]$(git_current_head)\[${ResetColor}\]"
+        PS1+="\[${Red}\]$(git_rebasing)\[${ResetColor}\]"
         PS1+="@\[${Yellow}\]$(git_current_rev)\[${ResetColor}\]"
 
         STATUS_INFO=`git status --porcelain --branch | head -2`
@@ -49,7 +50,10 @@ git_current_head()
     BRANCH=`git_current_branch`
     if [[ $BRANCH =~ " detached at " ]]
     then
-      BRANCH=`git name-rev --name-only HEAD 2>/dev/null`
+        BRANCH=`git name-rev --name-only HEAD 2>/dev/null`
+    elif [[ $BRANCH =~ no\ branch,\ rebasing\ ([^\)]+) ]]
+    then
+        BRANCH="${BASH_REMATCH[1]}"
     fi
     echo $BRANCH
 }
@@ -72,4 +76,15 @@ git_branch_info()
 git_paused()
 {
     git paused && echo -n '║'
+}
+
+git_rebasing()
+{
+    BRANCH=`git_current_branch`
+    REBASE=''
+    if [[ $BRANCH =~ "no branch, rebasing " ]]
+    then
+        REBASE='↩'
+    fi
+    echo $REBASE
 }
