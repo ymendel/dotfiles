@@ -14,7 +14,7 @@
 	unstage = reset HEAD
 	uncommit = reset --soft HEAD^
 	rmcommit = reset HEAD^
-	undo = !sh -c 'git revert --no-commit ${1:-HEAD}'
+	undo = !sh -c 'git revert --no-commit ${1:-HEAD}' -
 	export = !sh -c 'git clone --depth 1 $1 && rm -fr `expr \"$1\" : \".*[:/]\\([a-zA-Z_]*\\).git\"`/.git' -
 	x = !gitx
 	hack = !hack
