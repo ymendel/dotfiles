@@ -8,7 +8,7 @@ set_prompt()
     then
         PS1+=" ("
         PS1+="\[${Green}\]$(git_current_head)\[${ResetColor}\]"
-        PS1+="\[${Red}\]$(git_rebasing)\[${ResetColor}\]"
+        PS1+="\[${Magenta}\]$(git_rebasing)\[${ResetColor}\]"
         PS1+="@\[${Yellow}\]$(git_current_rev)\[${ResetColor}\]"
 
         STATUS_INFO=`git status --porcelain --branch | head -2`
