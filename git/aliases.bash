@@ -4,11 +4,6 @@
 # alias shipm="ship -m"
 # alias sm=shipm
 
-function gtt()
-{
-    cd `git top`
-}
-
 # githubness
 alias ghr=github_repo_create.rb
 

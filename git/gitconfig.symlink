@@ -40,13 +40,15 @@
 	stat = !git diff --stat $(git merge-base HEAD \"$REVIEW_BASE\")
 	files = !git diff --name-only $(git merge-base HEAD \"$REVIEW_BASE\")
 	gob = !git fetch origin +$1:$1
-	remaster = fetch origin master:master
-	re = !git remaster
+	fetch-branch = !git fetch origin $1:$1
+	re-main = !git fetch-branch $MAIN_BRANCH
+	re = !git re-main
 	pause = !git add --all && git commit --all --no-verify --message 'PAUSED: Use `git resume` to continue working.'
 	paused = !git log -1 --format="%s" | grep -q '^PAUSED: '
 	resume = !git paused && git rmcommit
-	merged = !sh -c 'git merge-base --is-ancestor ${1:-HEAD} ${2:-master}' -
-	clean-merged = !git branch --merged master --format='%(refname:short)' | grep -v '^master$' | xargs git branch -d
+	merged = !sh -c 'git merge-base --is-ancestor ${1:-HEAD} ${2:-$MAIN_BRANCH}' -
+	clean-merged = !git branch --merged $MAIN_BRANCH --format='%(refname:short)' | grep -v "^${MAIN_BRANCH}$" | xargs git branch -d
+	branch-exists = show-ref --quiet --heads
 [color]
 	status = auto
 	diff = auto
@@ -64,6 +66,7 @@
 [credential]
 	helper = osxkeychain
 [init]
+	defaultBranch = main
 	templatedir = ~/.dotfiles/git/template
 [include]
     path = ~/.gitconfig.local
