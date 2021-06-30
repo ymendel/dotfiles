@@ -43,6 +43,7 @@
 	fetch-branch = !git fetch origin $1:$1
 	re-main = !git fetch-branch $MAIN_BRANCH
 	re = !git re-main
+	main = !git checkout $MAIN_BRANCH
 	pause = !git add --all && git commit --all --no-verify --message 'PAUSED: Use `git resume` to continue working.'
 	paused = !git log -1 --format="%s" | grep -q '^PAUSED: '
 	resume = !git paused && git rmcommit
