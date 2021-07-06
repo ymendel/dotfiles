@@ -24,8 +24,6 @@
 	logg = log --graph --pretty=format:'%C(yellow)%h%C(reset) -%C(cyan)%d%C(reset) %s %Cgreen(%cr) %C(bold blue)<%an>%C(reset)' --abbrev-commit --date=relative
 	bw = branch --contains
 	diffw = diff --word-diff
-	ri = rebase --interactive
-	ria = rebase --interactive --autosquash
 	fixup = commit --fixup
 	squash = commit --squash
 	amend = commit --amend
@@ -44,6 +42,12 @@
 	re-main = !git fetch-branch $MAIN_BRANCH
 	re = !git re-main
 	main = !git checkout $MAIN_BRANCH
+	rebase-main = !git rebase $MAIN_BRANCH
+	rem = !git rebase-main
+	rec = rebase --continue
+	rea = rebase --abort
+	ri = rebase --interactive
+	ria = rebase --interactive --autosquash
 	pause = !git add --all && git commit --all --no-verify --message 'PAUSED: Use `git resume` to continue working.'
 	paused = !git log -1 --format="%s" | grep -q '^PAUSED: '
 	resume = !git paused && git rmcommit
