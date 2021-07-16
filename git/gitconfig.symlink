@@ -78,3 +78,9 @@
     path = ~/.gitconfig.local
 [pull]
 	rebase = false
+[merge]
+    conflictStyle = diff3
+    tool = vim_mergetool
+[mergetool "vim_mergetool"]
+    cmd = vim -f -c "MergetoolStart" "$MERGED" "$BASE" "$LOCAL" "$REMOTE"
+    trustExitCode = true
