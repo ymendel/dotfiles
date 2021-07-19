@@ -29,6 +29,16 @@ function git_main_branch()
     false
 }
 
+function git_fetch_branch()
+{
+    if [[ $(git_current_head) == $1 ]]
+    then
+        git pull
+    else
+        git fetch origin $1:$1
+    fi
+}
+
 function gtt()
 {
     cd `git top`
