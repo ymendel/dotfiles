@@ -31,7 +31,7 @@ function git_main_branch()
 
 function git_fetch_branch()
 {
-    if [[ $(git_current_head) == $1 ]]
+    if [[ $(git_current_branch) == $1 ]]
     then
         git pull
     else

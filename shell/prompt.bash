@@ -42,7 +42,7 @@ in_git_repo()
 
 git_current_branch()
 {
-    git branch 2>/dev/null | awk '/^\* /{$1 = ""; print $0}'
+    git branch 2>/dev/null | awk '/^\* /{$1 = ""; print $0}' | sed 's/^ //'
 }
 
 git_current_head()
