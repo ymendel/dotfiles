@@ -48,6 +48,8 @@
 	rea = rebase --abort
 	ri = rebase --interactive
 	ria = rebase --interactive --autosquash
+	rim = !git ri $MAIN_BRANCH
+	riam = !git ria $MAIN_BRANCH
 	mem = !git merge $MAIN_BRANCH
 	pause = !git add --all && git commit --all --no-verify --message 'PAUSED: Use `git resume` to continue working.'
 	paused = !git log -1 --format="%s" | grep -q '^PAUSED: '
