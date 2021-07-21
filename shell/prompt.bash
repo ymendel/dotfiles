@@ -7,18 +7,18 @@ set_prompt()
     if in_git_repo
     then
         PS1+=" ("
-        PS1+="\[${Green}\]$(git_current_head)\[${ResetColor}\]"
-        PS1+="\[${Magenta}\]$(git_rebasing)\[${ResetColor}\]"
-        PS1+="@\[${Yellow}\]$(git_current_rev)\[${ResetColor}\]"
+        PS1+="\[${Green}\]$(prompt_git_current_head)\[${ResetColor}\]"
+        PS1+="\[${Magenta}\]$(prompt_git_rebasing_marker)\[${ResetColor}\]"
+        PS1+="@\[${Yellow}\]$(prompt_git_current_rev)\[${ResetColor}\]"
 
-        STATUS_INFO=`git status --porcelain --branch | head -2`
+        STATUS_INFO=$(git status --porcelain --branch | head -2)
 
-        DIRTY=$(echo "${STATUS_INFO}" | git_dirty)
+        DIRTY=$(echo "${STATUS_INFO}" | prompt_git_dirty_marker)
         PS1+="\[${Red}\]${DIRTY}\[${ResetColor}\]"
 
-        PS1+="\[${Cyan}\]$(git_paused)\[${ResetColor}\]"
+        PS1+="\[${Cyan}\]$(prompt_git_paused_marker)\[${ResetColor}\]"
 
-        BRANCH_INFO=`echo "${STATUS_INFO}" | git_branch_info`
+        BRANCH_INFO=$(echo "${STATUS_INFO}" | prompt_git_branch_info)
         if [[ $BRANCH_INFO =~ behind\ ([0-9]+) ]]
         then
             PS1+=" \[${Red}\]↓${BASH_REMATCH[1]}"
@@ -35,22 +35,12 @@ set_prompt()
     export PS1
 }
 
-in_git_repo()
+prompt_git_current_head()
 {
-    git rev-parse HEAD > /dev/null 2>&1
-}
-
-git_current_branch()
-{
-    git branch 2>/dev/null | awk '/^\* /{$1 = ""; print $0}' | sed 's/^ //'
-}
-
-git_current_head()
-{
-    BRANCH=`git_current_branch`
+    BRANCH=$(git_current_branch)
     if [[ $BRANCH =~ " detached at " ]]
     then
-        BRANCH=`git name-rev --name-only HEAD 2>/dev/null`
+        BRANCH=$(git name-rev --name-only HEAD 2>/dev/null)
     elif [[ $BRANCH =~ no\ branch,\ rebasing\ ([^\)]+) ]]
     then
         BRANCH="${BASH_REMATCH[1]}"
@@ -58,29 +48,29 @@ git_current_head()
     echo $BRANCH
 }
 
-git_current_rev()
+prompt_git_current_rev()
 {
     git rev-parse --short=4 HEAD
 }
 
-git_dirty()
+prompt_git_dirty_marker()
 {
     (tail -n +2 | grep -qe .) > /dev/null 2>&1 && echo -n '*'
 }
 
-git_branch_info()
+prompt_git_branch_info()
 {
     head -1
 }
 
-git_paused()
+prompt_git_paused_marker()
 {
     git paused && echo -n '║'
 }
 
-git_rebasing()
+prompt_git_rebasing_marker()
 {
-    BRANCH=`git_current_branch`
+    BRANCH=$(git_current_branch)
     REBASE=''
     if [[ $BRANCH =~ "no branch, rebasing " ]]
     then

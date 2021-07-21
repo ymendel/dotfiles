@@ -1,5 +1,15 @@
 PROMPT_COMMAND+=';set_git_main_branch'
 
+in_git_repo()
+{
+    git rev-parse HEAD > /dev/null 2>&1
+}
+
+git_current_branch()
+{
+    git branch 2>/dev/null | awk '/^\* /{$1 = ""; print $0}' | sed 's/^ //'
+}
+
 function set_git_main_branch
 {
     if in_git_repo
