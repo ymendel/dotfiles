@@ -1,6 +1,6 @@
 require 'rake'
 
-task :default => 'install'
+task default: :install
 
 desc "Hook dotfiles into system-standard positions."
 task :install, :mode do |t, args|
@@ -30,9 +30,9 @@ task :install, :mode do |t, args|
         end
       end
       FileUtils.rm_rf(target) if overwrite || overwrite_all
-      `mv "#{target}" "#{target}.backup"` if backup || backup_all
+      FileUtils.mv(target, "#{target}.backup") if backup || backup_all
     end
-    `ln -s "$PWD/#{linkable}" "#{target}"`
+    FileUtils.ln_s("#{ENV['PWD']}/#{linkable}", target)
   end
 
 
@@ -57,7 +57,7 @@ task :uninstall do
 
     # Replace any backups made during installation
     if File.exists?("#{target}.backup")
-      `mv "#{target}.backup" "#{target}"` 
+      FileUtils.mv("#{target}.backup", target)
     end
   end
 end
@@ -107,9 +107,9 @@ task :install_scripts, :mode do |t, args|
           end
         end
         FileUtils.rm_rf(target) if overwrite || overwrite_all
-        `mv "#{target}" "#{target}.backup"` if backup || backup_all
+        FileUtils.mv(target, "#{target}.backup") if backup || backup_all
       end
-      `ln "$PWD/#{linkable}" "#{target}"`
+      FileUtils.ln("#{ENV['PWD']}/#{linkable}", target)
     end
   end
 end
