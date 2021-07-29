@@ -1,0 +1,16 @@
+# I can't handle these for splitting
+unbind '"'
+unbind %
+
+# this is what I'm used to from my vim config
+unbind s
+unbind v
+bind s split-window -h
+bind v split-window -v
+
+# reload config file
+unbind r
+bind r source-file ~/.tmux.conf
+
+# local config
+if-shell "[ -f ~/.local/tmux.conf ]" 'source ~/.local/tmux.conf'
