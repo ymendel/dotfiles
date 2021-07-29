@@ -1,0 +1,18 @@
+#!/bin/sh
+
+osascript<<END
+set theArg to "$*"
+tell application "Terminal"
+    set defaultSettings to name of default settings
+    if (theArg = "") then
+      return name of current settings of first window
+    else if (theArg = "default" or theArg = "reset") then
+      set current settings of first window to settings set defaultSettings
+    else if (theArg starts with defaultSettings) then
+      set current settings of first window to settings set theArg
+    else
+      set settingName to defaultSettings & " " & theArg
+      set current settings of first window to settings set settingName
+    end if
+end tell
+END
