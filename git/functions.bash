@@ -1,5 +1,3 @@
-PROMPT_COMMAND+=';set_git_main_branch'
-
 in_git_repo()
 {
     git rev-parse HEAD > /dev/null 2>&1

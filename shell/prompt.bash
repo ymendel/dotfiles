@@ -1,5 +1,3 @@
-PROMPT_COMMAND+=';set_prompt'
-
 set_prompt()
 {
     PS1="\h:\w"
@@ -78,3 +76,24 @@ prompt_git_rebasing_marker()
     fi
     echo $REBASE
 }
+
+# add prompt commands
+# anything that may change over time
+
+# only add a prompt command once
+# useful for anything that will re-source the profile
+add_prompt_command()
+{
+    ADD_COMMAND="$1"
+    if [[ "$PROMPT_COMMAND" == "" ]]
+    then
+        PROMPT_COMMAND=$ADD_COMMAND
+    elif [[ ! $PROMPT_COMMAND =~ ";$ADD_COMMAND" ]]
+    then
+        PROMPT_COMMAND+=";$ADD_COMMAND"
+    fi
+}
+
+add_prompt_command 'window_title_user_host'
+add_prompt_command 'set_prompt'
+add_prompt_command 'set_git_main_branch'
