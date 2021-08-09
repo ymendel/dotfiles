@@ -175,9 +175,21 @@ ensure_local_dir () {
     fi
 }
 
+install_deps () {
+    info "installing dependencies"
+
+    if source bin/updot | while read -r data; do info "$data"; done
+    then
+        success "dependencies installed"
+    else
+        fail "error installing dependencies"
+    fi
+}
+
 ensure_bash
 install_dotfiles
 ensure_local_dir
+install_deps
 
 echo ''
 echo '  All done!'
