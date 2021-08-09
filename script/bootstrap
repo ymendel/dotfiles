@@ -1,0 +1,183 @@
+#!/usr/bin/env bash
+# ensuring bash for this, in case we're not on a bash shell (new MacOS defaults to zsh)
+#
+# bootstrap the entire dotfiles experience on this computer
+# but safe to run periodically
+
+set -e
+
+cd "$(dirname "$0")/.."
+DOTFILES_ROOT=$(pwd -P)
+
+echo ''
+
+# helpful functions
+info () {
+  printf "\r  [ \033[00;34m..\033[0m ] $1\n"
+}
+
+prompt () {
+  printf "\r  [ \033[0;33m??\033[0m ] $1\n"
+}
+
+success () {
+  printf "\r\033[2K  [ \033[00;32mOK\033[0m ] $1\n"
+}
+
+warn () {
+  printf "\r\033[2K  [\033[0;33mWARN\033[0m] $1\n"
+}
+
+fail () {
+  printf "\r\033[2K  [\033[0;31mFAIL\033[0m] $1\n"
+  echo ''
+  exit
+}
+
+ensure_bash () {
+    info 'checking shell'
+
+    if [[ "$SHELL" =~ /bash$ ]]
+    then
+        success "shell is already a bash"
+        return
+    fi
+
+    info "shell is '$SHELL'; switching to bash"
+
+    # I don't want to figure out preference order here
+    # so put multiple bashes in preference order in /etc/shells
+    bashes=$(grep -e /bash$ /etc/shells)
+
+    for bash in ${bashes[@]}
+    do
+        if [ -x $bash ]
+        then
+            info "trying '$bash'"
+            if (chsh -s $bash)
+            then
+                success "changed shell to '$bash'"
+                info "open a new terminal for best results"
+                return
+            else
+                warn "problem trying to change shell to '$bash'"
+            fi
+        fi
+    done
+
+    fail "could not change shell"
+}
+
+link_file () {
+  local src=$1 dst=$2
+
+  local overwrite= backup= skip=
+  local action=
+
+  if [ -e "$dst" ]
+  then
+    if [ "$overwrite_all" == "false" ] && [ "$backup_all" == "false" ] && [ "$skip_all" == "false" ]
+    then
+      local currentSrc="$(readlink $dst)"
+
+      if [ "$currentSrc" == "$src" ]
+      then
+        skip=true;
+      else
+        prompt "File already exists: $dst ($(basename "$src")), what do you want to do?\n\
+         [s]kip, [S]kip all, [o]verwrite, [O]verwrite all, [b]ackup, [B]ackup all?"
+        read -n 1 action
+
+        case "$action" in
+          o )
+            overwrite=true;;
+          O )
+            overwrite_all=true;;
+          b )
+            backup=true;;
+          B )
+            backup_all=true;;
+          s )
+            skip=true;;
+          S )
+            skip_all=true;;
+          * )
+            ;;
+        esac
+      fi
+    fi
+
+    overwrite=${overwrite:-$overwrite_all}
+    backup=${backup:-$backup_all}
+    skip=${skip:-$skip_all}
+
+    if [ "$overwrite" == "true" ]
+    then
+      rm -rf "$dst"
+      success "removed $dst"
+    fi
+
+    if [ "$backup" == "true" ]
+    then
+      mv "$dst" "${dst}.backup"
+      success "moved $dst to ${dst}.backup"
+    fi
+
+    if [ "$skip" == "true" ]
+    then
+      success "skipped $src"
+    fi
+  fi
+
+  if [ "$skip" != "true" ]  # "false" or empty
+  then
+    ln -s "$src" "$dst"
+    success "linked $dst to $src"
+  fi
+}
+
+install_dotfiles () {
+    info 'installing dotfiles'
+
+    local overwrite_all=false backup_all=false skip_all=false
+
+    link_file $DOTFILES_ROOT "$HOME/.dotfiles"
+
+    for src in $(find $DOTFILES_ROOT -name '*.symlink' -type f)
+    do
+        dst="$HOME/.$(basename ${src%.symlink})"
+        link_file $src $dst
+    done
+}
+
+ensure_local_dir () {
+    info 'checking local dir'
+
+    local localdir="$HOME/.local"
+
+    if [[ -e $localdir ]]
+    then
+        info "$localdir exists"
+
+        if [[ -d $localdir ]]
+        then
+            success "$localdir is already a directory"
+        else
+            fail "$localdir exists and is not a directory"
+        fi
+    else
+        if ( mkdir $localdir )
+        then
+            success "made $localdir"
+        else
+            fail "could not make $localdir"
+        fi
+    fi
+}
+
+ensure_bash
+install_dotfiles
+ensure_local_dir
+
+echo ''
+echo '  All done!'
