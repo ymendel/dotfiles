@@ -12,3 +12,7 @@ fi
 
 echo "› sudo softwareupdate -i -a"
 sudo softwareupdate -i -a
+
+defaultsFile="$(dirname $0)/set_defaults.sh"
+echo "› setting defaults"
+test -f $defaultsFile && source $defaultsFile
