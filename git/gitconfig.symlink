@@ -9,6 +9,8 @@
 	astc = commit --amend --no-edit
 	aatc = !git add --all && git commit --all --amend --no-edit
 	co = checkout
+	conflicts = diff --name-only --diff-filter=U
+	conflicted = diff --name-only --diff-filter=U
 	staged = diff --cached
 	pending = diff --cached
 	unstage = reset HEAD
