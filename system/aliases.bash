@@ -9,6 +9,9 @@ alias ll="ls -l"
 alias lh="ls -lh"
 alias lal="ls -al"
 
+# canonical present dir
+alias cpd='cd `pwd -P`'
+
 # new tabs and terms
 alias tab=new_tab
 alias new=new_term
