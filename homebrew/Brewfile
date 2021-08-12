@@ -14,11 +14,12 @@ brew 'tmux'
 brew 'universal-ctags'
 
 # apps
-# cask '1password'
-# cask '1password-cli'
-# cask 'discord'
+cask '1password'
+cask '1password-cli'
+cask 'discord'
 # cask 'google-chrome'
-# cask 'slack'
+cask 'slack'
+cask 'spectacle'
 
 # Mac App Store
 brew 'mas'
