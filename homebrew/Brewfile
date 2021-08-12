@@ -1,10 +1,13 @@
-brew "bash"
-brew "bash-completion"
-brew "bat"
-brew "fzf"
-brew "git"
-brew "graphviz"
-brew "jq"
-brew "macvim"
-brew "tmux"
-brew "universal-ctags"
+brew 'mas'
+mas 'CirclePing', id: 969990150
+
+brew 'bash'
+brew 'bash-completion'
+brew 'bat'
+brew 'fzf'
+brew 'git'
+brew 'graphviz'
+brew 'jq'
+brew 'macvim'
+brew 'tmux'
+brew 'universal-ctags'
