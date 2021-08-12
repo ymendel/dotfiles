@@ -1,5 +1,6 @@
-brew 'mas'
-mas 'CirclePing', id: 969990150
+# taps
+tap 'homebrew/cask'
+tap 'homebrew/bundle'
 
 brew 'bash'
 brew 'bash-completion'
@@ -11,3 +12,14 @@ brew 'jq'
 brew 'macvim'
 brew 'tmux'
 brew 'universal-ctags'
+
+# apps
+# cask '1password'
+# cask '1password-cli'
+# cask 'discord'
+# cask 'google-chrome'
+# cask 'slack'
+
+# Mac App Store
+brew 'mas'
+mas 'CirclePing', id: 969990150
