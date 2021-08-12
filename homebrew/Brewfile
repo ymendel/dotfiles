@@ -30,4 +30,7 @@ cask 'spectacle'
 
 # Mac App Store
 brew 'mas'
+# I wish I could use this on a new computer
+# figure out the right ping utility, something to take up the autoping mantle
+# mas 'autoping', id: 632347870
 mas 'CirclePing', id: 969990150
