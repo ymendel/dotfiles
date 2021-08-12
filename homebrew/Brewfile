@@ -13,6 +13,13 @@ brew 'macvim'
 brew 'tmux'
 brew 'universal-ctags'
 
+# media
+brew 'ffmpeg'
+brew 'gifsicle'
+brew 'imagemagick'
+# giphy capture?
+# gif brewery?
+
 # apps
 cask '1password'
 cask '1password-cli'
