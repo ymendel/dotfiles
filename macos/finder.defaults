@@ -1,13 +1,20 @@
-# open new windows in my home dir
-defaults write com.apple.finder NewWindowTargetPath -string "file://$HOME"
+# # Use column view in all Finder windows by default
+# Four-letter codes for the view modes: `icnv`, `Nlsv`, `clmv`, `glyv`
+# (for icon, list, column, gallery)
+defaults write com.apple.finder FXPreferredViewStyle -string "clmv"
 
-# desktop
+# open new Finder windows in my home dir
+# can use PfDe for desktop, or PfLo for an arbitrary location
+defaults write com.apple.finder NewWindowTarget -string "PfHm"
+defaults write com.apple.finder NewWindowTargetPath -string "file://${HOME}"
+
+# desktop icons
 # show external drives, removable media
-# defaults write com.apple.finder ShowExternalHardDrivesOnDesktop -bool true
-# defaults write com.apple.finder ShowRemovableMediaOnDesktop -bool true
+defaults write com.apple.finder ShowExternalHardDrivesOnDesktop -bool true
+defaults write com.apple.finder ShowRemovableMediaOnDesktop -bool true
 # do not show hard drives, mounted servers
-# defaults write com.apple.finder ShowHardDrivesOnDesktop -bool false
-# defaults write com.apple.finder ShowMountedServersOnDesktop -bool false
+defaults write com.apple.finder ShowHardDrivesOnDesktop -bool false
+defaults write com.apple.finder ShowMountedServersOnDesktop -bool false
 
 # sidebar
 # system items
@@ -20,6 +27,9 @@ defaults write com.apple.finder NewWindowTargetPath -string "file://$HOME"
 
 # show the ~/Library folder
 chflags nohidden ~/Library
+
+# show all filename extensions
+defaults write NSGlobalDomain AppleShowAllExtensions -bool true
 
 # enable text selection in QuickLook
 # defaults write com.apple.finder QLEnableTextSelection -bool true
