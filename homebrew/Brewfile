@@ -25,6 +25,7 @@ cask '1password'
 cask '1password-cli'
 cask 'discord'
 # cask 'google-chrome'
+cask 'mailplane'
 cask 'slack'
 cask 'spectacle'
 
