@@ -1,0 +1,30 @@
+# set dock location
+# choices: 'left', 'bottom', 'right'
+defaults write com.apple.dock orientation -string "bottom"
+
+# automatically hide/show dock
+defaults write com.apple.dock autohide -bool true
+
+# set icon size of Dock items to 64 pixels
+defaults write com.apple.dock tilesize -int 64
+# and no magnification
+defaults write com.apple.dock magnification -bool false
+
+# show indicators for open applications
+defaults write com.apple.dock show-process-indicators -bool true
+
+# make icons of hidden applications translucent
+defaults write com.apple.dock showhidden -bool true
+
+# set minimize/maximize window effect
+# choices: 'genie', 'scale'
+defaults write com.apple.dock mineffect -string "genie"
+
+# minimize windows into the application icon
+defaults write com.apple.dock minimize-to-application -bool true
+
+# enable highlight hover effect for the expanded view of a stack (Dock)
+defaults write com.apple.dock mouse-over-hilite-stack -bool true
+
+
+killall "Dock" &>/dev/null
