@@ -1,4 +1,4 @@
-killall "Activity Monitor" 2>/dev/null
+killall "Activity Monitor" &>/dev/null
 
 # Show the main window when launching Activity Monitor
 defaults write com.apple.ActivityMonitor OpenMainWindow -bool true

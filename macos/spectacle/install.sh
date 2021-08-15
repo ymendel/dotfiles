@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-killall "Spectacle" 2>/dev/null
+killall "Spectacle" &>/dev/null
 
 source "${DOTFILES_HOME}/script/helpers/printing.sh"
 source "${DOTFILES_HOME}/script/helpers/linking.sh"
