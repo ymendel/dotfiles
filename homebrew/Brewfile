@@ -10,6 +10,8 @@ brew 'git'
 brew 'graphviz'
 brew 'jq'
 brew 'macvim'
+brew 'node'
+brew 'npm'
 brew 'tmux'
 brew 'universal-ctags'
 
@@ -29,6 +31,8 @@ cask 'discord'
 cask 'mailplane'
 cask 'slack'
 cask 'spectacle'
+# this is an ugly specification, and it seems to only get the pkg and not actually install it?
+# cask 'homebrew/cask-drivers/logitech-camera-settings'
 
 # Mac App Store
 brew 'mas'

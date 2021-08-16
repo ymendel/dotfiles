@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+defaultsFile="$(dirname $0)/../webcam_defaults.json"
+
+if [[ ! -f $defaultsFile ]]
+then
+    echo "defaults file '$defaultsFile' not found"
+    exit 1
+fi
+
+uvcc import < $defaultsFile
