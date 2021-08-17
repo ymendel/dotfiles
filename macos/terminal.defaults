@@ -1,0 +1,14 @@
+# Enable Secure Keyboard Entry in Terminal.app
+# See: https://security.stackexchange.com/a/47786/8918
+defaults write com.apple.terminal SecureKeyboardEntry -bool true
+
+# use my modified version of the Pro theme by default in Terminal.app
+# TODO: determine if it really works to set this before the setting is known
+#   or if the open needs to come first again (with the sleep added back)
+defaults write com.apple.Terminal "Default Window Settings" -string "Yossef"
+defaults write com.apple.Terminal "Startup Window Settings" -string "Yossef"
+
+if (! (defaults read com.apple.Terminal "Window Settings" | grep -q 'Yossef'))
+then
+    open "$(dirname $0)/Yossef.terminal"
+fi

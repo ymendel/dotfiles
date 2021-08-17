@@ -1,7 +1,0 @@
-# use a modified version of the Pro theme by default in Terminal.app
-open "$DOTFILES_HOME/osx/Yossef.terminal"
-
-sleep 1  # wait a bit to make sure the theme is loaded
-
-defaults write com.apple.Terminal "Default Window Settings" -string "Yossef"
-defaults write com.apple.Terminal "Startup Window Settings" -string "Yossef"

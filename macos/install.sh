@@ -16,3 +16,7 @@ sudo softwareupdate -i -a
 defaultsFile="$(dirname $0)/set_defaults.sh"
 echo "› setting defaults"
 test -f $defaultsFile && source $defaultsFile
+
+echo ''
+echo "MacOS defaults written. Note that some of these changes require a logout/restart to take effect."
+echo ''
