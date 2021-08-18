@@ -5,12 +5,6 @@
 
 set -e
 
-# prompt for password immediately, instead of waiting for later
-sudo -v
-
-# keep-alive: update existing `sudo` time stamp until this command is done
-while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
-
 command="$(basename $0)"
 parentDir="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd -P)"
 dotfilesDir="$(cd "$( dirname "$parentDir" )" && pwd -P)"
@@ -42,6 +36,12 @@ while test $# -gt 0; do
     esac
     shift
 done
+
+# prompt for password immediately, instead of waiting for later
+sudo -v
+
+# keep-alive: update existing `sudo` time stamp until this command is done
+while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 
 export DOTFILES_HOME="$HOME/.dotfiles"
 
