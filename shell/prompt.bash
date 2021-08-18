@@ -55,7 +55,7 @@ prompt_git_current_rev()
 
 prompt_git_dirty_marker()
 {
-    (tail -n +2 | grep -qe .) > /dev/null 2>&1 && echo -n '*'
+    (tail -n +2 | grep -qe .) > /dev/null 2>&1 && echo -n '§'
 }
 
 prompt_git_branch_info()
@@ -65,7 +65,7 @@ prompt_git_branch_info()
 
 prompt_git_paused_marker()
 {
-    git paused && echo -n '║'
+    git paused && echo -n ' ¶'
 }
 
 prompt_git_rebasing_marker()
@@ -74,7 +74,7 @@ prompt_git_rebasing_marker()
     REBASE=''
     if [[ $BRANCH =~ "no branch, rebasing " ]]
     then
-        REBASE='↩'
+        REBASE='®'
     fi
     echo $REBASE
 }
