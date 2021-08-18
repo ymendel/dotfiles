@@ -21,7 +21,7 @@ alias find_process="ps auxwwww | grep -v grep | grep "
 alias find_ps=find_process
 alias fps=find_process
 
-alias where="type -ap"
+alias where="command -v"
 alias so=sudo
 
 alias remove_ds_stores="find . -name ".DS_Store" -depth -exec rm {} \;"
