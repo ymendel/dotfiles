@@ -16,6 +16,8 @@ set_prompt()
 
         PS1+="\[${Cyan}\]$(prompt_git_paused_marker)\[${ResetColor}\]"
 
+        PS1+="\[${Yellow}\]$(prompt_git_stash_count)\[${ResetColor}\]"
+
         BRANCH_INFO=$(echo "${STATUS_INFO}" | prompt_git_branch_info)
         if [[ $BRANCH_INFO =~ behind\ ([0-9]+) ]]
         then
@@ -75,6 +77,15 @@ prompt_git_rebasing_marker()
         REBASE='↩'
     fi
     echo $REBASE
+}
+
+prompt_git_stash_count()
+{
+    STASH_COUNT=$(git stash list | grep . -c)
+    if [[ "$STASH_COUNT" != "0" ]]
+    then
+        echo -n " ⚑$STASH_COUNT"
+    fi
 }
 
 # add prompt commands
