@@ -12,6 +12,8 @@ brew 'jq'
 brew 'macvim'
 brew 'node'
 brew 'npm'
+brew 'rg'
+brew 'rust'
 brew 'tmux'
 brew 'universal-ctags'
 
