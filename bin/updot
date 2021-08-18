@@ -43,7 +43,7 @@ while test $# -gt 0; do
     shift
 done
 
-export DOTFILES_HOME=$HOME/.dotfiles
+export DOTFILES_HOME="$HOME/.dotfiles"
 
 # Install homebrew
 $DOTFILES_HOME/homebrew/install.sh 2>&1

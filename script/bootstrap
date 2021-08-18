@@ -11,8 +11,8 @@ DOTFILES_ROOT=$(pwd -P)
 
 echo ''
 
-source "${DOTFILES_ROOT}/script/helpers/printing.sh"
-source "${DOTFILES_ROOT}/script/helpers/linking.sh"
+source "$DOTFILES_ROOT/script/helpers/printing.sh"
+source "$DOTFILES_ROOT/script/helpers/linking.sh"
 
 ensure_bash () {
     info 'checking shell'

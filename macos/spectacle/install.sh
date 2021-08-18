@@ -2,8 +2,8 @@
 
 killall "Spectacle" &>/dev/null
 
-source "${DOTFILES_HOME}/script/helpers/printing.sh"
-source "${DOTFILES_HOME}/script/helpers/linking.sh"
+source "$DOTFILES_HOME/script/helpers/printing.sh"
+source "$DOTFILES_HOME/script/helpers/linking.sh"
 
 overwrite_all=false backup_all=false skip_all=false
 

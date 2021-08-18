@@ -6,7 +6,7 @@ defaults write com.apple.finder FXPreferredViewStyle -string "clmv"
 # open new Finder windows in my home dir
 # can use PfDe for desktop, or PfLo for an arbitrary location
 defaults write com.apple.finder NewWindowTarget -string "PfHm"
-defaults write com.apple.finder NewWindowTargetPath -string "file://${HOME}"
+defaults write com.apple.finder NewWindowTargetPath -string "file://$HOME"
 
 # desktop icons
 # show external drives, removable media
