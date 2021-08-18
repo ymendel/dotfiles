@@ -8,7 +8,7 @@ done
 
 # pull in the local settings only for this machine
 # (or the stuff that shouldn't be tracked publically)
-for f in local/bashrc local_bashrc local
+for f in local/bashrc
 do
   test -f ~/.$f && source ~/.$f
 done

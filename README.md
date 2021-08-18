@@ -44,6 +44,7 @@ understand and handle with this separation.
 - _topic_/**\*.symlink**: Any file ending in `.symlink` gets symlinked into $HOME with a prepended `.` (e.g. `git/gitconfig.symlink` → `~/.gitconfig`)
   This lets all of these files stay versioned in the dotfiles repository, but still be useful in their expected locations.
   These files are symlinked by `script/bootstrap` (not `updot`).
+- **~/.local/bashrc**: This file will be sourced if it exists, allowing you to have special per-machine differences.
 
 ## Rejuvenation
 
