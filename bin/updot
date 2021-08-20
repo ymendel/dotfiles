@@ -67,3 +67,6 @@ done
 # Install software
 echo "› $DOTFILES_HOME/script/install"
 $DOTFILES_HOME/script/install
+
+# send EOT to let bootstrap know we're done
+echo -e '\x04'
