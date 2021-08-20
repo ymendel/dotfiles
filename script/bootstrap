@@ -87,6 +87,29 @@ ensure_local_dir () {
     fi
 }
 
+set_machine_profiles () {
+    info 'determining machine profile(s)'
+
+    local localdir="$HOME/.local"
+    local typefile="$localdir/machine_profiles"
+    local profiles=
+
+    if [[ -e $typefile ]]
+    then
+        success "$typefile exists"
+    else
+        prompt "What profile(s) should apply to this machine? (e.g. work, personal)\n\
+        If multiple profiles, separate them with a space."
+        read profiles
+        if (echo $profiles | tr ' ' "\n" | grep . | sort --uniq > $typefile)
+        then
+            success 'wrote profile(s)'
+        else
+            fail 'could not write profile(s)'
+        fi
+    fi
+}
+
 install_deps () {
     info "installing dependencies"
 
@@ -101,6 +124,7 @@ install_deps () {
 ensure_bash
 install_dotfiles
 ensure_local_dir
+set_machine_profiles
 install_deps
 
 echo ''

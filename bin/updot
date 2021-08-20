@@ -52,10 +52,16 @@ $DOTFILES_HOME/homebrew/install.sh 2>&1
 echo "› brew update"
 brew update
 
-for t in standard
+profiles=('standard')
+profiles+=($(cat "$HOME/.local/machine_profiles" 2>/dev/null))
+for profile in ${profiles[@]}
 do
-    echo "› brew bundle ${t}"
-    brew bundle install --file="$DOTFILES_HOME/homebrew/Brewfile.${t}" --no-upgrade
+    brewfile="$DOTFILES_HOME/homebrew/Brewfile.${profile}"
+    if [[ -f $brewfile ]]
+    then
+        echo "› brew bundle ${profile}"
+        brew bundle install --file=$brewfile --no-upgrade
+    fi
 done
 
 # Install software
