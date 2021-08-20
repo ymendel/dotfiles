@@ -52,8 +52,11 @@ $DOTFILES_HOME/homebrew/install.sh 2>&1
 echo "› brew update"
 brew update
 
-echo "› brew bundle"
-brew bundle install --file="$DOTFILES_HOME/homebrew/Brewfile" --no-upgrade
+for t in standard
+do
+    echo "› brew bundle ${t}"
+    brew bundle install --file="$DOTFILES_HOME/homebrew/Brewfile.${t}" --no-upgrade
+done
 
 # Install software
 echo "› $DOTFILES_HOME/script/install"
