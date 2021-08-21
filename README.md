@@ -36,12 +36,12 @@ understand and handle with this separation.
 
 - **script/**: This is the location for scripts and commands that handle the dotfiles project itself, like `script/bootstrap`
 - **bin/**: This gets added to the `$PATH` and anything in here is available to run everywhere. This is a sort of general, catch-all
-  location for commands and utilities that don't fit elsewhere. Also, `updot` lives here. (see below)
+  location for commands and utilities that don't fit elsewhere. Also, `updot` lives here. ([see below](#updot))
 - _topic_/**bin/**: These directories also get added to the `$PATH`, for topic-related commands that will be made available to run everywhere.
 - _topic_/**\*.bash**: Any files ending in `.bash` get loaded into the environment.
 - _topic_/**install.sh**: Any file named `install.sh` is executed by `script/install` (which is run by `updot`). These end in `.sh`
   instead of `.bash` to avoid being loaded automatically.
-- _topic_/**\*.symlink**: Any file ending in `.symlink` gets symlinked into $HOME with a prepended `.` (e.g. `git/gitconfig.symlink` → `~/.gitconfig`)
+- _topic_/**\*.symlink**: Any file ending in `.symlink` gets symlinked into `$HOME` with a prepended `.` (e.g. `git/gitconfig.symlink` → `~/.gitconfig`)
   This lets all of these files stay versioned in the dotfiles repository, but still be useful in their expected locations.
   These files are symlinked by `script/bootstrap` (not `updot`).
 - **~/.local/bashrc**: This file will be sourced if it exists, allowing you to have special per-machine differences.
