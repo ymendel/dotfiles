@@ -11,13 +11,6 @@ set_prompt()
 
         STATUS_INFO=$(git status --porcelain --branch | head -2)
 
-        DIRTY=$(echo "${STATUS_INFO}" | prompt_git_dirty_marker)
-        PS1+="\[${Red}\]${DIRTY}\[${ResetColor}\]"
-
-        PS1+="\[${Cyan}\]$(prompt_git_paused_marker)\[${ResetColor}\]"
-
-        PS1+="\[${Yellow}\]$(prompt_git_stash_count)\[${ResetColor}\]"
-
         BRANCH_INFO=$(echo "${STATUS_INFO}" | prompt_git_branch_info)
         if [[ $BRANCH_INFO =~ behind\ ([0-9]+) ]]
         then
@@ -27,8 +20,26 @@ set_prompt()
         then
             PS1+=" \[${Green}\]↑${BASH_REMATCH[1]}"
         fi
+        PS1+="\[${ResetColor}\]"
 
-        PS1+="\[${ResetColor}\])"
+        PS1+="\[${Cyan}\]$(prompt_git_paused_marker)\[${ResetColor}\]"
+
+        PS1+="|"
+
+        DIRTY=$(echo "${STATUS_INFO}" | prompt_git_dirty_marker)
+        PS1+="\[${Red}\]${DIRTY}\[${ResetColor}\]"
+
+        STASH=$(prompt_git_stash_count)
+        PS1+="\[${Yellow}\]${STASH}\[${ResetColor}\]"
+
+        CLEAN=''
+        if [[ "${DIRTY}${STASH}" == '' ]]
+        then
+            CLEAN='✔'
+        fi
+        PS1+="\[${Green}\]${CLEAN}\[${ResetColor}\]"
+
+        PS1+=")"
     fi
 
     PS1+=" \u\$ "
@@ -84,7 +95,7 @@ prompt_git_stash_count()
     STASH_COUNT=$(git stash list | grep . -c)
     if [[ "$STASH_COUNT" != "0" ]]
     then
-        echo -n " ⚑$STASH_COUNT"
+        echo -n "⚑$STASH_COUNT"
     fi
 }
 
