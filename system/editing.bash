@@ -9,15 +9,15 @@ mvim_directory_server()
   then
       if [ $1 = '--git-root' ]
       then
-        mvim --servername $(basename $(git top)) --remote-tab-silent "${@:2}" 1>/dev/null 2>&1
+        mvim --servername $(basename $(git top)) --remote-tab-silent "${@:2}" &>/dev/null
       elif [ $1 = '--pwd' ]
       then
-        mvim --servername $(basename $(pwd)) --remote-tab-silent "${@:2}" 1>/dev/null 2>&1
+        mvim --servername $(basename $(pwd)) --remote-tab-silent "${@:2}" &>/dev/null
       else
           echo 'what does that mean?'
       fi
   else
-    mvim --servername $(basename $(pwd)) --remote-tab-silent "$@" 1>/dev/null 2>&1
+    mvim --servername $(basename $(pwd)) --remote-tab-silent "$@" &>/dev/null
   fi
 }
 

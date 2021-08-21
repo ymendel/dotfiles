@@ -67,7 +67,7 @@ prompt_git_current_rev()
 
 prompt_git_dirty_marker()
 {
-    (tail -n +2 | grep -qe .) > /dev/null 2>&1 && echo -n '§'
+    (tail -n +2 | grep -qe .) &>/dev/null && echo -n '§'
 }
 
 prompt_git_branch_info()
