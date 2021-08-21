@@ -32,8 +32,10 @@ cask 'google-chrome'
 cask 'mailplane'
 cask 'slack'
 cask 'spectacle'
-# this is an ugly specification, and it seems to only get the pkg and not actually install it?
-# cask 'homebrew/cask-drivers/logitech-camera-settings'
+
+# these seem to only get the pkg, not the app
+# cask 'homebrew/cask-drivers/logitech-camera-settings'  # ugh so ugly, but fine I guess
+# cask 'yubico-yubikey-manager'
 
 # Mac App Store
 brew 'mas'
