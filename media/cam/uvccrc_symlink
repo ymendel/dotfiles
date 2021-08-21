@@ -1,0 +1,6 @@
+# temporarily renamed because having ~/.uvccrc gives me a uvcc error of
+# Error: Could not read JSON file "/usr/local/lib/node_modules/uvcc/dist/Users/yossef/.uvccrc": "Error: ENOENT: no such file or directory, open '/usr/local/lib/node_modules/uvcc/dist/Users/yossef/.uvccrc'"
+{
+  "vendor": 1133,
+  "product": 2093,
+}
