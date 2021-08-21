@@ -27,7 +27,7 @@ ensure_bash () {
 
     # I don't want to figure out preference order here
     # so put multiple bashes in preference order in /etc/shells
-    bashes=$(grep -e /bash$ /etc/shells)
+    local bashes=$(grep -e /bash$ /etc/shells)
 
     for bash in ${bashes[@]}
     do

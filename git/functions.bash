@@ -22,7 +22,7 @@ function set_git_main_branch
 
 function git_main_branch()
 {
-    branches=('main' 'master')
+    local branches=('main' 'master')
 
     for branch in ${branches[@]}
     do

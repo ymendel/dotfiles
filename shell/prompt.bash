@@ -9,9 +9,9 @@ set_prompt()
         PS1+="\[${Magenta}\]$(prompt_git_rebasing_marker)\[${ResetColor}\]"
         PS1+="@\[${Yellow}\]$(prompt_git_current_rev)\[${ResetColor}\]"
 
-        STATUS_INFO=$(git status --porcelain --branch | head -2)
+        local STATUS_INFO=$(git status --porcelain --branch | head -2)
 
-        BRANCH_INFO=$(echo "${STATUS_INFO}" | prompt_git_branch_info)
+        local BRANCH_INFO=$(echo "${STATUS_INFO}" | prompt_git_branch_info)
         if [[ $BRANCH_INFO =~ behind\ ([0-9]+) ]]
         then
             PS1+=" \[${Red}\]↓${BASH_REMATCH[1]}"
@@ -26,13 +26,13 @@ set_prompt()
 
         PS1+="|"
 
-        DIRTY=$(echo "${STATUS_INFO}" | prompt_git_dirty_marker)
+        local DIRTY=$(echo "${STATUS_INFO}" | prompt_git_dirty_marker)
         PS1+="\[${Red}\]${DIRTY}\[${ResetColor}\]"
 
-        STASH=$(prompt_git_stash_count)
+        local STASH=$(prompt_git_stash_count)
         PS1+="\[${Yellow}\]${STASH}\[${ResetColor}\]"
 
-        CLEAN=''
+        local CLEAN=''
         if [[ "${DIRTY}${STASH}" == '' ]]
         then
             CLEAN='✔'
@@ -43,12 +43,13 @@ set_prompt()
     fi
 
     PS1+=" \u\$ "
+
     export PS1
 }
 
 prompt_git_current_head()
 {
-    BRANCH=$(git_current_branch)
+    local BRANCH=$(git_current_branch)
     if [[ $BRANCH =~ " detached at " ]]
     then
         BRANCH=$(git name-rev --name-only HEAD 2>/dev/null)
@@ -81,8 +82,8 @@ prompt_git_paused_marker()
 
 prompt_git_rebasing_marker()
 {
-    BRANCH=$(git_current_branch)
-    REBASE=''
+    local BRANCH=$(git_current_branch)
+    local REBASE=''
     if [[ $BRANCH =~ "no branch, rebasing " ]]
     then
         REBASE='®'
@@ -92,7 +93,7 @@ prompt_git_rebasing_marker()
 
 prompt_git_stash_count()
 {
-    STASH_COUNT=$(git stash list | grep . -c)
+    local STASH_COUNT=$(git stash list | grep . -c)
     if [[ "$STASH_COUNT" != "0" ]]
     then
         echo -n "⚑$STASH_COUNT"
@@ -106,7 +107,7 @@ prompt_git_stash_count()
 # useful for anything that will re-source the profile
 add_prompt_command()
 {
-    ADD_COMMAND="$1"
+    local ADD_COMMAND="$1"
     if [[ "$PROMPT_COMMAND" == "" ]]
     then
         PROMPT_COMMAND=$ADD_COMMAND
