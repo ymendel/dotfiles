@@ -12,13 +12,13 @@ brew 'jq'
 brew 'macvim'
 brew 'node'
 brew 'npm'
-brew 'rg'
+brew 'ripgrep'
+brew 'ruby'
 brew 'rust'
 brew 'tmux'
 brew 'universal-ctags'
 
 # media
-brew 'ffmpeg'
 brew 'gifsicle'
 brew 'imagemagick'
 # giphy capture?

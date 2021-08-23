@@ -1,3 +1,5 @@
+brew 'ffmpeg'
+
 cask 'discord'
 cask 'evernote'
 cask 'steam'

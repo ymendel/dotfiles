@@ -1,0 +1,10 @@
+brew 'adr-tools'
+
+# language versioning
+# node
+brew 'nvm'
+# ruby
+brew 'chruby'
+brew 'ruby-install'
+
+cask 'ngrok'
