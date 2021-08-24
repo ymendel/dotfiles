@@ -1,0 +1,10 @@
+Include ~/.ssh/config.extra
+
+Host *
+  User ymendel
+  UseRoaming no
+  ControlMaster auto
+  ControlPath ~/.ssh/ctrl/%r@%h:%p
+  IdentityFile ~/.ssh/id_rsa
+  ForwardAgent yes
+  AddKeysToAgent yes
