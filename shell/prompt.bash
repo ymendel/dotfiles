@@ -1,5 +1,7 @@
 set_prompt()
 {
+    local ExitCode=$?
+
     PS1="\h:\w"
 
     if in_git_repo
@@ -40,6 +42,13 @@ set_prompt()
         PS1+="\[${Green}\]${CLEAN}\[${ResetColor}\]"
 
         PS1+=")"
+    fi
+
+    if [[ $ExitCode == 0 ]]
+    then
+        PS1="\[${Green}\]✔\[${ResetColor}\] $PS1"
+    else
+        PS1="\[${Red}\]✖$ExitCode\[${ResetColor}\] $PS1"
     fi
 
     PS1+=" \u\$ "
@@ -117,6 +126,20 @@ add_prompt_command()
     fi
 }
 
-add_prompt_command 'window_title_user_host'
-add_prompt_command 'set_prompt'
+# make sure a particlar command is at the _start_
+# this is important to make sure the exit code is correct
+prepend_prompt_command()
+{
+    local ADD_COMMAND="$1"
+    if [[ "$PROMPT_COMMAND" == "" ]]
+    then
+        PROMPT_COMMAND=$ADD_COMMAND
+    elif [[ ! $PROMPT_COMMAND =~ "^$ADD_COMMAND;" ]]
+    then
+        PROMPT_COMMAND="$ADD_COMMAND;$PROMPT_COMMAND"
+    fi
+}
+
+prepend_prompt_command 'set_prompt'
 add_prompt_command 'set_git_main_branch'
+add_prompt_command 'window_title_user_host'
