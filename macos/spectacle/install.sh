@@ -10,4 +10,4 @@ overwrite_all=false backup_all=false skip_all=false
 # TODO: get the full path of the present dir, without specifying all of this
 link_file "$DOTFILES_HOME/macos/spectacle/Shortcuts.json" "$HOME/Library/Application Support/Spectacle/Shortcuts.json"
 
-open /Applications/Spectacle.app
+open -a Spectacle
