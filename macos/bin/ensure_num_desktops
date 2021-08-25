@@ -1,0 +1,24 @@
+#!/bin/sh
+
+num_desktops=${1:-9}
+
+# from https://apple.stackexchange.com/questions/407422/create-a-new-space-using-a-keyboard-shortcut-in-macos-big-sur
+# and massaged a bit
+osascript<<END
+do shell script "open -a 'Mission Control'"
+delay 0.5
+tell application "System Events"
+    tell process "Dock"
+        set spacesGroup to group "Spaces Bar" of group 1 of group 1
+        set addDesktopButton to button 1 of (every button whose value of attribute "AXDescription" is "add desktop") of spacesGroup
+        set desktopButtons to buttons of list 1 of spacesGroup
+        repeat while length of desktopButtons < $num_desktops
+            click addDesktopButton
+            delay 0.5
+            set desktopButtons to buttons of list 1 of spacesGroup
+        end repeat
+    end tell
+end tell
+delay 0.5
+tell application "System Events" to key code 53
+END
