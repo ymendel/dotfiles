@@ -3,6 +3,7 @@
 #
 # bootstrap the entire dotfiles experience on this computer
 # but safe to run periodically
+# (n.b. this is the main way to automatically change your shell and handle .symlink files)
 
 set -e
 
