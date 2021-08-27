@@ -2,58 +2,66 @@ set_prompt()
 {
     local ExitCode=$?
 
-    PS1="\h:\w"
-
-    if in_git_repo
-    then
-        PS1+=" ("
-        PS1+="\[${Green}\]$(prompt_git_current_head)\[${ResetColor}\]"
-        PS1+="\[${Magenta}\]$(prompt_git_rebasing_marker)\[${ResetColor}\]"
-        PS1+="@\[${Yellow}\]$(prompt_git_current_rev)\[${ResetColor}\]"
-
-        local STATUS_INFO=$(git status --porcelain --branch | head -2)
-
-        local BRANCH_INFO=$(echo "${STATUS_INFO}" | prompt_git_branch_info)
-        if [[ $BRANCH_INFO =~ behind\ ([0-9]+) ]]
-        then
-            PS1+=" \[${Red}\]↓${BASH_REMATCH[1]}"
-        fi
-        if [[ $BRANCH_INFO =~ ahead\ ([0-9]+) ]]
-        then
-            PS1+=" \[${Green}\]↑${BASH_REMATCH[1]}"
-        fi
-        PS1+="\[${ResetColor}\]"
-
-        PS1+="\[${Cyan}\]$(prompt_git_paused_marker)\[${ResetColor}\]"
-
-        PS1+="|"
-
-        local DIRTY=$(echo "${STATUS_INFO}" | prompt_git_dirty_marker)
-        PS1+="\[${Red}\]${DIRTY}\[${ResetColor}\]"
-
-        local STASH=$(prompt_git_stash_count)
-        PS1+="\[${Yellow}\]${STASH}\[${ResetColor}\]"
-
-        local CLEAN=''
-        if [[ "${DIRTY}${STASH}" == '' ]]
-        then
-            CLEAN='✔'
-        fi
-        PS1+="\[${Green}\]${CLEAN}\[${ResetColor}\]"
-
-        PS1+=")"
-    fi
+    PS1=""
 
     if [[ $ExitCode == 0 ]]
     then
-        PS1="\[${Green}\]✔\[${ResetColor}\] $PS1"
+        PS1="\[${Green}\]✔\[${ResetColor}\] "
     else
-        PS1="\[${Red}\]✖$ExitCode\[${ResetColor}\] $PS1"
+        PS1="\[${Red}\]✖$ExitCode\[${ResetColor}\] "
     fi
+
+    PS1+="\h:\w"
+
+    add_prompt_git_info
 
     PS1+=" \u\$ "
 
     export PS1
+}
+
+add_prompt_git_info() {
+    if (! in_git_repo)
+    then
+        return
+    fi
+
+    PS1+=" ("
+    PS1+="\[${Green}\]$(prompt_git_current_head)\[${ResetColor}\]"
+    PS1+="\[${Magenta}\]$(prompt_git_rebasing_marker)\[${ResetColor}\]"
+    PS1+="@\[${Yellow}\]$(prompt_git_current_rev)\[${ResetColor}\]"
+
+    local STATUS_INFO=$(git status --porcelain --branch | head -2)
+
+    local BRANCH_INFO=$(echo "${STATUS_INFO}" | prompt_git_branch_info)
+    if [[ $BRANCH_INFO =~ behind\ ([0-9]+) ]]
+    then
+        PS1+=" \[${Red}\]↓${BASH_REMATCH[1]}"
+    fi
+    if [[ $BRANCH_INFO =~ ahead\ ([0-9]+) ]]
+    then
+        PS1+=" \[${Green}\]↑${BASH_REMATCH[1]}"
+    fi
+    PS1+="\[${ResetColor}\]"
+
+    PS1+="\[${Cyan}\]$(prompt_git_paused_marker)\[${ResetColor}\]"
+
+    PS1+="|"
+
+    local DIRTY=$(echo "${STATUS_INFO}" | prompt_git_dirty_marker)
+    PS1+="\[${Red}\]${DIRTY}\[${ResetColor}\]"
+
+    local STASH=$(prompt_git_stash_count)
+    PS1+="\[${Yellow}\]${STASH}\[${ResetColor}\]"
+
+    local CLEAN=''
+    if [[ "${DIRTY}${STASH}" == '' ]]
+    then
+        CLEAN='✔'
+    fi
+    PS1+="\[${Green}\]${CLEAN}\[${ResetColor}\]"
+
+    PS1+=")"
 }
 
 prompt_git_current_head()
