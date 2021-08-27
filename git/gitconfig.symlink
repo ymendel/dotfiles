@@ -39,7 +39,7 @@
 	top = rev-parse --show-toplevel
 	ctags = !.git/hooks/ctags
 	st = status
-	sts = status --short --branch
+	sts = status --short --branch --untracked-files=all
 	stat = !git diff --stat $(git merge-base HEAD \"$REVIEW_BASE\")
 	files = !git diff --name-only $(git merge-base HEAD \"$REVIEW_BASE\")
 	get-other-branch = !git fetch origin +$1:$1
@@ -93,5 +93,7 @@
 [mergetool "vim_mergetool"]
 	cmd = vim -f -c "MergetoolStart" "$MERGED" "$BASE" "$LOCAL" "$REMOTE"
 	trustExitCode = true
+[status]
+	showUntrackedFiles = all
 [core]
 	excludesfile = ~/.gitignore
