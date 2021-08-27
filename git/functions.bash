@@ -8,7 +8,7 @@ git_current_branch()
     git branch 2>/dev/null | awk '/^\* /{$1 = ""; print $0}' | sed 's/^ //'
 }
 
-function set_git_main_branch
+set_git_main_branch()
 {
     if in_git_repo
     then
@@ -20,7 +20,7 @@ function set_git_main_branch
     fi
 }
 
-function git_main_branch()
+git_main_branch()
 {
     local branches=('main' 'master')
 
@@ -37,7 +37,7 @@ function git_main_branch()
     false
 }
 
-function git_fetch_branch()
+git_fetch_branch()
 {
     if [[ $(git_current_branch) == $1 ]]
     then
@@ -47,7 +47,7 @@ function git_fetch_branch()
     fi
 }
 
-function gtt()
+gtt()
 {
     cd `git top`
 }
