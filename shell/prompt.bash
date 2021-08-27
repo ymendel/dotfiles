@@ -4,12 +4,7 @@ set_prompt()
 
     PS1=""
 
-    if [[ $ExitCode == 0 ]]
-    then
-        PS1="\[${Green}\]✔\[${ResetColor}\] "
-    else
-        PS1="\[${Red}\]✖$ExitCode\[${ResetColor}\] "
-    fi
+    add_prompt_exit_code $ExitCode
 
     PS1+="\h:\w"
 
@@ -18,6 +13,17 @@ set_prompt()
     PS1+=" \u\$ "
 
     export PS1
+}
+
+add_prompt_exit_code() {
+    local ExitCode=$1
+
+    if [[ $ExitCode == 0 ]]
+    then
+        PS1+="\[${Green}\]✔\[${ResetColor}\] "
+    else
+        PS1+="\[${Red}\]✖$ExitCode\[${ResetColor}\] "
+    fi
 }
 
 add_prompt_git_info() {
