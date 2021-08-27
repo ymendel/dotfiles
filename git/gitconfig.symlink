@@ -43,7 +43,8 @@
 	stat = !git diff --stat $(git merge-base HEAD \"$REVIEW_BASE\")
 	files = !git diff --name-only $(git merge-base HEAD \"$REVIEW_BASE\")
 	gob = !git fetch origin +$1:$1
-	fetch-branch = !bash -ic 'git_fetch_branch $1' -
+	fetch-branch = !bash -ic 'git_fetch_branch ${1:-$(git_current_branch)}' -
+	fb = fetch-branch
 	re-main = !git fetch-branch $MAIN_BRANCH
 	re = !git re-main
 	main = !git checkout $MAIN_BRANCH
