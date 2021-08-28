@@ -1,3 +1,6 @@
+# TODO: understand nameref better so this doesn't have to be a global
+declare -A DirtyBreakdown
+
 set_prompt()
 {
     local ExitCode=$?
@@ -49,8 +52,18 @@ add_prompt_git_info() {
 
     PS1+="|"
 
-    local Dirty=$(prompt_git_dirty_marker "$StatusInfo")
-    PS1+="\[${Red}\]${Dirty}\[${ResetColor}\]"
+    local Dirty
+    if [[ $GIT_PROMPT_DIRTY_BREAKDOWN ]]
+    then
+        prompt_git_dirty_breakdown "$StatusInfo"
+        PS1+="\[${Green}\]${DirtyBreakdown[modified]}\[${ResetColor}\]"
+        PS1+="\[${Yellow}\]${DirtyBreakdown[staged]}\[${ResetColor}\]"
+        PS1+="\[${Cyan}\]${DirtyBreakdown[untracked]}\[${ResetColor}\]"
+        Dirty=${DirtyBreakdown[@]}
+    else
+        Dirty=$(prompt_git_dirty_marker "$StatusInfo")
+        PS1+="\[${Red}\]${Dirty}\[${ResetColor}\]"
+    fi
 
     local Stash=$(prompt_git_stash_count)
     PS1+="\[${Yellow}\]${Stash}\[${ResetColor}\]"
@@ -85,7 +98,12 @@ prompt_git_current_rev()
 
 prompt_git_status_info()
 {
-    git status --porcelain --branch | head -2
+    if [[ $GIT_PROMPT_DIRTY_BREAKDOWN ]]
+    then
+        git status --porcelain --branch --untracked-files=all
+    else
+        git status --porcelain --branch | head -2
+    fi
 }
 
 prompt_git_branch_info()
@@ -108,6 +126,30 @@ prompt_git_branch_info()
 prompt_git_dirty_marker()
 {
     echo "$1" | (tail -n +2 | grep -qe .) &>/dev/null && echo -n '§'
+}
+
+prompt_git_dirty_breakdown()
+{
+    local StatusInfo=$(echo "$1" | tail -n +2 | cut -c 1-2)
+    DirtyBreakdown=([modified]='' [staged]='' [untracked]='')
+
+    local ModifiedCount=$(echo "$StatusInfo" | grep ' M' -c)
+    if [[ "$ModifiedCount" != "0" ]]
+    then
+        DirtyBreakdown[modified]="✚${ModifiedCount}"
+    fi
+
+    local StagedCount=$(echo "$StatusInfo" | grep -e '[MA] ' -c)
+    if [[ "$StagedCount" != "0" ]]
+    then
+        DirtyBreakdown[staged]="●${StagedCount}"
+    fi
+
+    local UntrackedCount=$(echo "$StatusInfo" | grep '??' -c)
+    if [[ "$UntrackedCount" != "0" ]]
+    then
+        DirtyBreakdown[untracked]="…${UntrackedCount}"
+    fi
 }
 
 prompt_git_paused_marker()
