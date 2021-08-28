@@ -37,9 +37,9 @@ add_prompt_git_info() {
     PS1+="\[${Magenta}\]$(prompt_git_rebasing_marker)\[${ResetColor}\]"
     PS1+="@\[${Yellow}\]$(prompt_git_current_rev)\[${ResetColor}\]"
 
-    local STATUS_INFO=$(git status --porcelain --branch | head -2)
+    local STATUS_INFO=$(prompt_git_status_info)
 
-    local BRANCH_INFO=$(echo "${STATUS_INFO}" | prompt_git_branch_info)
+    local BRANCH_INFO=$(prompt_git_branch_info "$STATUS_INFO")
     if [[ $BRANCH_INFO =~ behind\ ([0-9]+) ]]
     then
         PS1+=" \[${Red}\]↓${BASH_REMATCH[1]}"
@@ -54,7 +54,7 @@ add_prompt_git_info() {
 
     PS1+="|"
 
-    local DIRTY=$(echo "${STATUS_INFO}" | prompt_git_dirty_marker)
+    local DIRTY=$(prompt_git_dirty_marker "$STATUS_INFO")
     PS1+="\[${Red}\]${DIRTY}\[${ResetColor}\]"
 
     local STASH=$(prompt_git_stash_count)
@@ -88,14 +88,19 @@ prompt_git_current_rev()
     git rev-parse --short=4 HEAD
 }
 
-prompt_git_dirty_marker()
+prompt_git_status_info()
 {
-    (tail -n +2 | grep -qe .) &>/dev/null && echo -n '§'
+    git status --porcelain --branch | head -2
 }
 
 prompt_git_branch_info()
 {
-    head -1
+    echo "$1" | head -1
+}
+
+prompt_git_dirty_marker()
+{
+    echo "$1" | (tail -n +2 | grep -qe .) &>/dev/null && echo -n '§'
 }
 
 prompt_git_paused_marker()
