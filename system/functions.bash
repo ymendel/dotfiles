@@ -25,10 +25,10 @@ wiki()
 
 flatten()
 {
-    local FLATTEN_TARGET=${1:-.}
+    local FlattenTarget=${1:-.}
 
-    find $FLATTEN_TARGET -type f -mindepth 2 -exec mv {} $FLATTEN_TARGET \;
-    find $FLATTEN_TARGET -type d -d -depth 1 -exec rm -fr {} \;
+    find $FlattenTarget -type f -mindepth 2 -exec mv {} $FlattenTarget \;
+    find $FlattenTarget -type d -d -depth 1 -exec rm -fr {} \;
 }
 
 go_to()

@@ -37,14 +37,14 @@ add_prompt_git_info() {
     PS1+="\[${Magenta}\]$(prompt_git_rebasing_marker)\[${ResetColor}\]"
     PS1+="@\[${Yellow}\]$(prompt_git_current_rev)\[${ResetColor}\]"
 
-    local STATUS_INFO=$(prompt_git_status_info)
+    local StatusInfo=$(prompt_git_status_info)
 
-    local BRANCH_INFO=$(prompt_git_branch_info "$STATUS_INFO")
-    if [[ $BRANCH_INFO =~ behind\ ([0-9]+) ]]
+    local BranchInfo=$(prompt_git_branch_info "$StatusInfo")
+    if [[ $BranchInfo =~ behind\ ([0-9]+) ]]
     then
         PS1+=" \[${Red}\]↓${BASH_REMATCH[1]}"
     fi
-    if [[ $BRANCH_INFO =~ ahead\ ([0-9]+) ]]
+    if [[ $BranchInfo =~ ahead\ ([0-9]+) ]]
     then
         PS1+=" \[${Green}\]↑${BASH_REMATCH[1]}"
     fi
@@ -54,33 +54,33 @@ add_prompt_git_info() {
 
     PS1+="|"
 
-    local DIRTY=$(prompt_git_dirty_marker "$STATUS_INFO")
-    PS1+="\[${Red}\]${DIRTY}\[${ResetColor}\]"
+    local Dirty=$(prompt_git_dirty_marker "$StatusInfo")
+    PS1+="\[${Red}\]${Dirty}\[${ResetColor}\]"
 
-    local STASH=$(prompt_git_stash_count)
-    PS1+="\[${Yellow}\]${STASH}\[${ResetColor}\]"
+    local Stash=$(prompt_git_stash_count)
+    PS1+="\[${Yellow}\]${Stash}\[${ResetColor}\]"
 
-    local CLEAN=''
-    if [[ "${DIRTY}${STASH}" == '' ]]
+    local Clean=''
+    if [[ "${Dirty}${Stash}" == '' ]]
     then
-        CLEAN='✔'
+        Clean='✔'
     fi
-    PS1+="\[${Green}\]${CLEAN}\[${ResetColor}\]"
+    PS1+="\[${Green}\]${Clean}\[${ResetColor}\]"
 
     PS1+=")"
 }
 
 prompt_git_current_head()
 {
-    local BRANCH=$(git_current_branch)
-    if [[ $BRANCH =~ " detached at " ]]
+    local Branch=$(git_current_branch)
+    if [[ $Branch =~ " detached at " ]]
     then
-        BRANCH=$(git name-rev --name-only HEAD 2>/dev/null)
-    elif [[ $BRANCH =~ no\ branch,\ rebasing\ ([^\)]+) ]]
+        Branch=$(git name-rev --name-only HEAD 2>/dev/null)
+    elif [[ $Branch =~ no\ branch,\ rebasing\ ([^\)]+) ]]
     then
-        BRANCH="${BASH_REMATCH[1]}"
+        Branch="${BASH_REMATCH[1]}"
     fi
-    echo $BRANCH
+    echo $Branch
 }
 
 prompt_git_current_rev()
@@ -110,21 +110,21 @@ prompt_git_paused_marker()
 
 prompt_git_rebasing_marker()
 {
-    local BRANCH=$(git_current_branch)
-    local REBASE=''
-    if [[ $BRANCH =~ "no branch, rebasing " ]]
+    local Branch=$(git_current_branch)
+    local Rebase=''
+    if [[ $Branch =~ "no branch, rebasing " ]]
     then
-        REBASE='®'
+        Rebase='®'
     fi
-    echo $REBASE
+    echo $Rebase
 }
 
 prompt_git_stash_count()
 {
-    local STASH_COUNT=$(git stash list | grep . -c)
-    if [[ "$STASH_COUNT" != "0" ]]
+    local StashCount=$(git stash list | grep . -c)
+    if [[ "$StashCount" != "0" ]]
     then
-        echo -n "⚑$STASH_COUNT"
+        echo -n "⚑$StashCount"
     fi
 }
 
@@ -135,13 +135,13 @@ prompt_git_stash_count()
 # useful for anything that will re-source the profile
 add_prompt_command()
 {
-    local ADD_COMMAND="$1"
+    local AddCommand="$1"
     if [[ "$PROMPT_COMMAND" == "" ]]
     then
-        PROMPT_COMMAND=$ADD_COMMAND
-    elif [[ ! $PROMPT_COMMAND =~ ";$ADD_COMMAND" ]]
+        PROMPT_COMMAND=$AddCommand
+    elif [[ ! $PROMPT_COMMAND =~ ";$AddCommand" ]]
     then
-        PROMPT_COMMAND+=";$ADD_COMMAND"
+        PROMPT_COMMAND+=";$AddCommand"
     fi
 }
 
@@ -149,13 +149,13 @@ add_prompt_command()
 # this is important to make sure the exit code is correct
 prepend_prompt_command()
 {
-    local ADD_COMMAND="$1"
+    local AddCommand="$1"
     if [[ "$PROMPT_COMMAND" == "" ]]
     then
-        PROMPT_COMMAND=$ADD_COMMAND
-    elif [[ ! $PROMPT_COMMAND =~ "^$ADD_COMMAND;" ]]
+        PROMPT_COMMAND=$AddCommand
+    elif [[ ! $PROMPT_COMMAND =~ "^$AddCommand;" ]]
     then
-        PROMPT_COMMAND="$ADD_COMMAND;$PROMPT_COMMAND"
+        PROMPT_COMMAND="$AddCommand;$PROMPT_COMMAND"
     fi
 }
 
