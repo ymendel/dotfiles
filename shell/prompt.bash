@@ -62,7 +62,7 @@ add_prompt_git_info() {
         PS1+="\[${Yellow}\]${DirtyBreakdown[renamed]}\[${ResetColor}\]"
         PS1+="\[${Cyan}\]${DirtyBreakdown[untracked]}\[${ResetColor}\]"
         PS1+="\[${Red}\]${DirtyBreakdown[conflicted]}\[${ResetColor}\]"
-        Dirty=${DirtyBreakdown[@]}
+        Dirty=$(echo "${DirtyBreakdown[@]}" | tr -d ' ')
     else
         Dirty=$(prompt_git_dirty_marker "$StatusInfo")
         PS1+="\[${Red}\]${Dirty}\[${ResetColor}\]"
