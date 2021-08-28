@@ -159,6 +159,16 @@ prompt_git_dirty_breakdown()
     fi
 }
 
+see_git_dirty_breakdown()
+{
+    export GIT_PROMPT_DIRTY_BREAKDOWN=1
+}
+
+see_git_dirty_simple()
+{
+    unset GIT_PROMPT_DIRTY_BREAKDOWN
+}
+
 prompt_git_paused_marker()
 {
     git paused && echo -n ' ¶'
