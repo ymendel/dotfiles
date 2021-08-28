@@ -39,16 +39,11 @@ add_prompt_git_info() {
 
     local StatusInfo=$(prompt_git_status_info)
 
-    local BranchInfo=$(prompt_git_branch_info "$StatusInfo")
-    if [[ $BranchInfo =~ behind\ ([0-9]+) ]]
-    then
-        PS1+=" \[${Red}\]↓${BASH_REMATCH[1]}"
-    fi
-    if [[ $BranchInfo =~ ahead\ ([0-9]+) ]]
-    then
-        PS1+=" \[${Green}\]↑${BASH_REMATCH[1]}"
-    fi
-    PS1+="\[${ResetColor}\]"
+    local BranchInfo
+    declare -a BranchInfo
+    prompt_git_branch_info "$StatusInfo" BranchInfo
+    PS1+="\[${Red}\]${BranchInfo[0]}\[${ResetColor}\]"
+    PS1+="\[${Green}\]${BranchInfo[1]}\[${ResetColor}\]"
 
     PS1+="\[${Cyan}\]$(prompt_git_paused_marker)\[${ResetColor}\]"
 
@@ -95,7 +90,19 @@ prompt_git_status_info()
 
 prompt_git_branch_info()
 {
-    echo "$1" | head -1
+    local BranchInfoStr=$(echo "$1" | head -1)
+
+    local -n BehindAhead=$2
+    BehindAhead=('' '')
+
+    if [[ $BranchInfoStr =~ behind\ ([0-9]+) ]]
+    then
+        BehindAhead[0]=" ↓${BASH_REMATCH[1]}"
+    fi
+    if [[ $BranchInfoStr =~ ahead\ ([0-9]+) ]]
+    then
+        BehindAhead[1]=" ↑${BASH_REMATCH[1]}"
+    fi
 }
 
 prompt_git_dirty_marker()
