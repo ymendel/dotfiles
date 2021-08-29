@@ -56,12 +56,12 @@ add_prompt_git_info() {
     if [[ $GIT_PROMPT_DIRTY_BREAKDOWN ]]
     then
         prompt_git_dirty_breakdown "$StatusInfo"
-        PS1+="\[${Green}\]${DirtyBreakdown[modified]}\[${ResetColor}\]"
+        PS1+="\[${Red}\]${DirtyBreakdown[conflicted]}\[${ResetColor}\]"
         PS1+="\[${Yellow}\]${DirtyBreakdown[staged]}\[${ResetColor}\]"
         PS1+="\[${Red}\]${DirtyBreakdown[stagedDelete]}\[${ResetColor}\]"
-        PS1+="\[${Yellow}\]${DirtyBreakdown[renamed]}\[${ResetColor}\]"
+        PS1+="\[${Green}\]${DirtyBreakdown[modified]}\[${ResetColor}\]"
+        PS1+="\[${Magenta}\]${DirtyBreakdown[renamed]}\[${ResetColor}\]"
         PS1+="\[${Cyan}\]${DirtyBreakdown[untracked]}\[${ResetColor}\]"
-        PS1+="\[${Red}\]${DirtyBreakdown[conflicted]}\[${ResetColor}\]"
         Dirty=$(echo "${DirtyBreakdown[@]}" | tr -d ' ')
     else
         Dirty=$(prompt_git_dirty_marker "$StatusInfo")
