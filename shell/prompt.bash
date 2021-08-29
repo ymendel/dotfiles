@@ -1,5 +1,6 @@
-# TODO: understand nameref better so this doesn't have to be a global
+# TODO: understand nameref better so these don't have to be globals
 declare -A DirtyBreakdown
+declare -A BranchInfo
 
 set_prompt()
 {
@@ -42,11 +43,10 @@ add_prompt_git_info() {
 
     local StatusInfo=$(prompt_git_status_info)
 
-    local BranchInfo
-    declare -a BranchInfo
-    prompt_git_branch_info "$StatusInfo" BranchInfo
-    PS1+="\[${Red}\]${BranchInfo[0]}\[${ResetColor}\]"
-    PS1+="\[${Green}\]${BranchInfo[1]}\[${ResetColor}\]"
+    prompt_git_branch_info "$StatusInfo"
+    PS1+="\[${Red}\]${BranchInfo[behind]}\[${ResetColor}\]"
+    PS1+="\[${Green}\]${BranchInfo[ahead]}\[${ResetColor}\]"
+    PS1+="\[${Cyan}\]${BranchInfo[local]}\[${ResetColor}\]"
 
     PS1+="\[${Cyan}\]$(prompt_git_paused_marker)\[${ResetColor}\]"
 
@@ -113,16 +113,21 @@ prompt_git_branch_info()
 {
     local BranchInfoStr=$(echo "$1" | head -1)
 
-    local -n BehindAhead=$2
-    BehindAhead=('' '')
+    BranchInfo=([behind]='' [ahead]='' [local]='')
 
-    if [[ $BranchInfoStr =~ behind\ ([0-9]+) ]]
+    if [[ $BranchInfoStr =~ \.\.\. ]]
     then
-        BehindAhead[0]=" ↓${BASH_REMATCH[1]}"
-    fi
-    if [[ $BranchInfoStr =~ ahead\ ([0-9]+) ]]
-    then
-        BehindAhead[1]=" ↑${BASH_REMATCH[1]}"
+        if [[ $BranchInfoStr =~ behind\ ([0-9]+) ]]
+        then
+            BranchInfo[behind]=" ↓${BASH_REMATCH[1]}"
+        fi
+
+        if [[ $BranchInfoStr =~ ahead\ ([0-9]+) ]]
+        then
+            BranchInfo[ahead]=" ↑${BASH_REMATCH[1]}"
+        fi
+    else
+        BranchInfo[local]=" ▼"
     fi
 }
 
