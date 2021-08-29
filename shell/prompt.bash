@@ -166,7 +166,7 @@ prompt_git_dirty_breakdown()
         DirtyBreakdown[untracked]="…${UntrackedCount}"
     fi
 
-    local ConflictedCount=$(echo "$StatusInfo" | grep -e 'U.\|.U' -c)
+    local ConflictedCount=$(echo "$StatusInfo" | grep -e 'U.\|.U\|AA' -c)
     if [[ "$ConflictedCount" != "0" ]]
     then
         DirtyBreakdown[conflicted]="✖${ConflictedCount}"
