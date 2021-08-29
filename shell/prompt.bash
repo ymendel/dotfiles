@@ -126,7 +126,8 @@ prompt_git_branch_info()
         then
             BranchInfo[ahead]=" ↑${BASH_REMATCH[1]}"
         fi
-    else
+    elif [[ ! $BranchInfoStr =~ \(no\ branch\) ]]
+    then
         BranchInfo[local]=" ▼"
     fi
 }
