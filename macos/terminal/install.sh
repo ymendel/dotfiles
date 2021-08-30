@@ -5,6 +5,8 @@ then
     exit 0
 fi
 
+cd "$(dirname $0)"
+
 settings=()
 for f in *.terminal; do settings+=("${f%.terminal}"); done
 
@@ -22,6 +24,6 @@ do
     then
         # TODO: figure out how to import these without opening a window
         # or at least auto-close the window afterwards
-        open "$(dirname $0)/$setting.terminal"
+        open "$setting.terminal"
     fi
 done
