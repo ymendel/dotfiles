@@ -1,5 +1,3 @@
-export EDITOR=vim
-
 mvim_directory_server()
 {
   if [ $# == 0 ]
