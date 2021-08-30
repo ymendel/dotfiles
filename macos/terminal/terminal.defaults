@@ -7,8 +7,3 @@ defaults write com.apple.terminal SecureKeyboardEntry -bool true
 #   or if the open needs to come first again (with the sleep added back)
 defaults write com.apple.Terminal "Default Window Settings" -string "Yossef"
 defaults write com.apple.Terminal "Startup Window Settings" -string "Yossef"
-
-if (! (defaults read com.apple.Terminal "Window Settings" | grep -q 'Yossef'))
-then
-    open "$(dirname $0)/Yossef.terminal"
-fi
