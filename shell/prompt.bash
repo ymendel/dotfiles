@@ -183,6 +183,7 @@ see_git_dirty_breakdown()
 {
     export GIT_PROMPT_DIRTY_BREAKDOWN=1
 }
+see_git_dirty_breakdown
 
 see_git_dirty_simple()
 {
