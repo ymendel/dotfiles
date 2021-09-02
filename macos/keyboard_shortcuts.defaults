@@ -1,3 +1,22 @@
+# to make the app show up in Keyboard System Preferences, add it to the array
+# but only once!
+# see https://github.com/ymendel/dotfiles/issues/1
+addCustomMenuEntryIfNeeded()
+{
+    local appName=$1
+
+    if [[ $# == 0 || $# > 1 ]]; then
+        echo "usage: addCustomMenuEntryIfNeeded com.company.appname"
+        return 1
+    else
+        if ! ( defaults read com.apple.universalaccess "com.apple.custommenu.apps" | grep -q "$appName" )
+        then
+            # FIXME: this gives me a "could not write" error, but sudo quiets that and still does nothing
+            defaults write com.apple.universalaccess "com.apple.custommenu.apps" -array-add "$appName"
+        fi
+    fi
+}
+
 # keyboard shortcuts
 # modifier key legend:
 #  @ = command
@@ -28,3 +47,5 @@ done
 # Mailplane
 # close tab with cmd-W
 defaults write com.mailplaneapp.Mailplane3 NSUserKeyEquivalents -dict-add "Close Tab" "${CmdKey}W"
+# TODO: uncomment this when the function works
+# addCustomMenuEntryIfNeeded "com.mailplaneapp.Mailplane3"
