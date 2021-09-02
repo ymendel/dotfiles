@@ -142,13 +142,13 @@ prompt_git_dirty_breakdown()
     local StatusInfo=$(echo "$1" | tail -n +2 | cut -c 1-2)
     DirtyBreakdown=([modified]='' [staged]='' [stagedDelete]='' [renamed]='' [untracked]='' [conflicted]='')
 
-    local ModifiedCount=$(echo "$StatusInfo" | grep ' M' -c)
+    local ModifiedCount=$(echo "$StatusInfo" | grep -e '.M' -c)
     if [[ "$ModifiedCount" != "0" ]]
     then
         DirtyBreakdown[modified]="✚${ModifiedCount}"
     fi
 
-    local StagedCount=$(echo "$StatusInfo" | grep -e '[MA] ' -c)
+    local StagedCount=$(echo "$StatusInfo" | grep -e '[MA].' -c)
     if [[ "$StagedCount" != "0" ]]
     then
         DirtyBreakdown[staged]="●${StagedCount}"
@@ -160,7 +160,7 @@ prompt_git_dirty_breakdown()
         DirtyBreakdown[stagedDelete]="-${StagedDeleteCount}"
     fi
 
-    local RenamedCount=$(echo "$StatusInfo" | grep 'R ' -c)
+    local RenamedCount=$(echo "$StatusInfo" | grep -e 'R.' -c)
     if [[ "$RenamedCount" != "0" ]]
     then
         DirtyBreakdown[renamed]="→${RenamedCount}"
