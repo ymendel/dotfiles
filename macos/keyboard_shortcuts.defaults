@@ -4,18 +4,27 @@
 #  ^ = control
 #  ~ = option
 #  $ = shift
+
+CmdKey='@'
+CtrlKey='^'
+OptKey='~'
+ShiftKey='$'
+
+LeftArrow='\U2190'
+RightArrow='\U2192'
+
 ###### NOTE: These shortcuts will not show in System Preferences
 ######       and setting new shortcuts there will overwrite these
 ###### TODO: determine if this note is still true
 # all applications
 # change tabs with cmd-opt-arrow
-defaults write NSGlobalDomain NSUserKeyEquivalents -dict-add "Show Next Tab"       "@~\U2192"
-defaults write NSGlobalDomain NSUserKeyEquivalents -dict-add "Show Previous Tab"   "@~\U2190"
-defaults write NSGlobalDomain NSUserKeyEquivalents -dict-add "Select Next Tab"     "@~\U2192"
-defaults write NSGlobalDomain NSUserKeyEquivalents -dict-add "Select Previous Tab" "@~\U2190"
-defaults write NSGlobalDomain NSUserKeyEquivalents -dict-add "Next Tab"            "@~\U2192"
-defaults write NSGlobalDomain NSUserKeyEquivalents -dict-add "Previous Tab"        "@~\U2190"
+prefixes=('' 'Show ' 'Select ')
+for prefix in "${prefixes[@]}"
+do
+    defaults write NSGlobalDomain NSUserKeyEquivalents -dict-add "${prefix}Previous Tab" "${CmdKey}${OptKey}${LeftArrow}"
+    defaults write NSGlobalDomain NSUserKeyEquivalents -dict-add "${prefix}Next Tab"     "${CmdKey}${OptKey}${RightArrow}"
+done
 
 # Mailplane
 # close tab with cmd-W
-defaults write com.mailplaneapp.Mailplane3 NSUserKeyEquivalents -dict-add "Close Tab" "@W"
+defaults write com.mailplaneapp.Mailplane3 NSUserKeyEquivalents -dict-add "Close Tab" "${CmdKey}W"
