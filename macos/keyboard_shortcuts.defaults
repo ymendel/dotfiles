@@ -9,7 +9,7 @@ addCustomMenuEntryIfNeeded()
         echo "usage: addCustomMenuEntryIfNeeded com.company.appname"
         return 1
     else
-        if ! ( defaults read com.apple.universalaccess "com.apple.custommenu.apps" | grep -q "$appName" )
+        if ! ( defaults read com.apple.universalaccess "com.apple.custommenu.apps" 2>/dev/null | grep -q "$appName" )
         then
             # FIXME: this gives me a "could not write" error, but sudo quiets that and still does nothing
             defaults write com.apple.universalaccess "com.apple.custommenu.apps" -array-add "$appName"
@@ -24,10 +24,10 @@ addCustomMenuEntryIfNeeded()
 #  ~ = option
 #  $ = shift
 
-CmdKey='@'
-CtrlKey='^'
-OptKey='~'
-ShiftKey='$'
+Cmd='@'
+Ctrl='^'
+Opt='~'
+Shift='$'
 
 LeftArrow='\U2190'
 RightArrow='\U2192'
@@ -40,12 +40,12 @@ RightArrow='\U2192'
 prefixes=('' 'Show ' 'Select ')
 for prefix in "${prefixes[@]}"
 do
-    defaults write NSGlobalDomain NSUserKeyEquivalents -dict-add "${prefix}Previous Tab" "${CmdKey}${OptKey}${LeftArrow}"
-    defaults write NSGlobalDomain NSUserKeyEquivalents -dict-add "${prefix}Next Tab"     "${CmdKey}${OptKey}${RightArrow}"
+    defaults write NSGlobalDomain NSUserKeyEquivalents -dict-add "${prefix}Previous Tab" "${Cmd}${Opt}${LeftArrow}"
+    defaults write NSGlobalDomain NSUserKeyEquivalents -dict-add "${prefix}Next Tab"     "${Cmd}${Opt}${RightArrow}"
 done
 
 # Mailplane
 # close tab with cmd-W
-defaults write com.mailplaneapp.Mailplane3 NSUserKeyEquivalents -dict-add "Close Tab" "${CmdKey}W"
+defaults write com.mailplaneapp.Mailplane3 NSUserKeyEquivalents -dict-add "Close Tab" "${Cmd}W"
 # TODO: uncomment this when the function works
 # addCustomMenuEntryIfNeeded "com.mailplaneapp.Mailplane3"
