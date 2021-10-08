@@ -8,3 +8,6 @@ brew 'chruby'
 brew 'ruby-install'
 
 cask 'ngrok'
+
+# good pair-programming
+cask 'pop'
