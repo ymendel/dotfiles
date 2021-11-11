@@ -1,4 +1,5 @@
 # say what?
-alias voices="say -v ? | ruby -wne 'print \$_.sub(/\s+en_US.*$/, %q{}).tr(%q{ }, %q{_})'"
-alias random_voice="voices | xargs echo | ruby -wne 'voices = \$_.split.collect { |voice|  voice.tr(%q{_}, %q{ }) }; print voices[rand(voices.length)];'"
+alias voices="say -v ?"
+alias voice_names="voices | awk '{print \$1}'"
+alias random_voice="voice_names | sort -R | head -1"
 alias random_say="say -v \`random_voice\`"
