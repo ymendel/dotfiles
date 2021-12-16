@@ -18,6 +18,8 @@ end
 def check_create_dir(remote_dir)
   stdout, stderr, status = Open3.capture3('rmapi', 'stat', remote_dir)
   unless status.success?
+    parent = File.dirname(remote_dir)
+    check_create_dir(parent) unless parent == '.'  # recursively check/create, dealing with absence of rmapi mkdir_p
     unless system('rmapi', 'mkdir', remote_dir)
       puts "directory '#{remote_dir}' doesn't exist remotely and could not create"
       exit 1
@@ -46,8 +48,7 @@ end
 
 missing_remote = processed_local_entries - processed_remote_entries
 missing_remote.each do |entry|
-  path_parts = File.split(entry)[0..-2]
-  remote_dir = File.join(remote_path, *path_parts)
+  remote_dir = File.join(remote_path, File.dirname(entry))
   check_create_dir(remote_dir)
   system('rmapi', 'put', entry, remote_dir)
 end
