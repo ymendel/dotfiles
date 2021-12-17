@@ -22,6 +22,7 @@ brew 'universal-ctags'
 # media
 brew 'gifsicle'
 brew 'imagemagick'
+cask 'licecap'
 # giphy capture?
 # gif brewery?
 
