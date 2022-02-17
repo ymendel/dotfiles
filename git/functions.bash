@@ -39,11 +39,17 @@ git_main_branch()
 
 git_fetch_branch()
 {
+    local force=''
+    if [ ! -z "$2" ]
+    then
+        force='--force'
+    fi
+
     if [[ $(git_current_branch) == $1 ]]
     then
-        git pull
+        git pull $force
     else
-        git fetch origin $1:$1
+        git fetch origin $1:$1 $force
     fi
 }
 

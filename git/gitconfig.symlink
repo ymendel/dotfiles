@@ -45,7 +45,9 @@
 	get-other-branch = !git fetch origin +$1:$1
 	gob = get-other-branch
 	fetch-branch = !bash -ic 'git_fetch_branch ${1:-$(git_current_branch)}' -
+	fetch-branch-force = !bash -ic 'git_fetch_branch ${1:-$(git_current_branch)} force' -
 	fb = fetch-branch
+	fbf = fetch-branch-force
 	re-main = !git fetch-branch $MAIN_BRANCH
 	re = !git re-main
 	main = !git checkout $MAIN_BRANCH
