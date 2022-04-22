@@ -64,6 +64,13 @@ do
     fi
 done
 
+brewfile="$HOME/.local/Brewfile"
+if [[ -f $brewfile ]]
+then
+    echo "› brew bundle local"
+    brew bundle install --file=$brewfile --no-upgrade
+fi
+
 # Install software
 echo "› $DOTFILES_HOME/script/install"
 $DOTFILES_HOME/script/install
