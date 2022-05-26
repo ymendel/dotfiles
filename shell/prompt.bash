@@ -58,7 +58,7 @@ add_prompt_git_info() {
         prompt_git_dirty_breakdown "$StatusInfo"
         PS1+="\[${Red}\]${DirtyBreakdown[conflicted]}\[${ResetColor}\]"
         PS1+="\[${Yellow}\]${DirtyBreakdown[staged]}\[${ResetColor}\]"
-        PS1+="\[${Red}\]${DirtyBreakdown[stagedDelete]}\[${ResetColor}\]"
+        PS1+="\[${Red}\]${DirtyBreakdown[deleted]}\[${ResetColor}\]"
         PS1+="\[${Green}\]${DirtyBreakdown[modified]}\[${ResetColor}\]"
         PS1+="\[${Magenta}\]${DirtyBreakdown[renamed]}\[${ResetColor}\]"
         PS1+="\[${Cyan}\]${DirtyBreakdown[untracked]}\[${ResetColor}\]"
@@ -140,7 +140,7 @@ prompt_git_dirty_marker()
 prompt_git_dirty_breakdown()
 {
     local StatusInfo=$(echo "$1" | tail -n +2 | cut -c 1-2)
-    DirtyBreakdown=([modified]='' [staged]='' [stagedDelete]='' [renamed]='' [untracked]='' [conflicted]='')
+    DirtyBreakdown=([modified]='' [staged]='' [deleted]='' [renamed]='' [untracked]='' [conflicted]='')
 
     local ModifiedCount=$(echo "$StatusInfo" | grep -e '.M' -c)
     if [[ "$ModifiedCount" != "0" ]]
@@ -154,10 +154,10 @@ prompt_git_dirty_breakdown()
         DirtyBreakdown[staged]="●${StagedCount}"
     fi
 
-    local StagedDeleteCount=$(echo "$StatusInfo" | grep 'D ' -c)
-    if [[ "$StagedDeleteCount" != "0" ]]
+    local DeletedCount=$(echo "$StatusInfo" | grep 'D \| D' -c)
+    if [[ "$DeletedCount" != "0" ]]
     then
-        DirtyBreakdown[stagedDelete]="-${StagedDeleteCount}"
+        DirtyBreakdown[deleted]="-${DeletedCount}"
     fi
 
     local RenamedCount=$(echo "$StatusInfo" | grep -e 'R.' -c)
