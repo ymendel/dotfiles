@@ -1,0 +1,1 @@
+alias pbpass=get_op_password_to_paste
