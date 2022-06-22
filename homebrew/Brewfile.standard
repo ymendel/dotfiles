@@ -1,6 +1,7 @@
 # taps
 tap 'homebrew/cask'
 tap 'homebrew/bundle'
+tap 'homebrew/cask-fonts'
 
 brew 'bash'
 brew 'bash-completion@2'
@@ -18,6 +19,10 @@ brew 'ruby'
 brew 'rust'
 brew 'tmux'
 brew 'universal-ctags'
+
+# fonts
+cask 'font-fira-code'
+cask 'font-iosevka'
 
 # media
 brew 'gifsicle'
