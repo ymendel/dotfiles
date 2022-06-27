@@ -15,7 +15,7 @@ while read -r -d ''; do
 done < "$ENCDIR/mp4files"
 rm "$ENCDIR/mp4files"
 
-TVPATTERN='^(.*?) - s([0-9]+)e[0-9]+ -'
+TVPATTERN='^(.*?) - s([0-9]+)e[0-9]+(-e[0-9]+)? -'
 
 for f in "${VIDFILES[@]}"
 do
