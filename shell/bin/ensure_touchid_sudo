@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+SUDO_FILE="/etc/pam.d/sudo"
+
+if [[ ! -f $SUDO_FILE ]]
+then
+    echo "$SUDO_FILE does not exist, or is not a file"
+    exit 1
+fi
+
+if (grep -qEe "^auth\s+sufficient\s+pam_tid.so$" $SUDO_FILE)
+then
+    echo "touch-id sudo is already allowed"
+    exit
+fi
+
+echo "adding touch-id sudo"
+
+TID_SUDO_LINE="auth       sufficient     pam_tid.so"
+OUTFILE=$SUDO_FILE
+
+# start a sudo session
+sudo -v
+
+# make writeable
+chmod 644 $SUDO_FILE
+
+readarray -t sudoLines < $SUDO_FILE
+
+commentEnd=0
+
+for index in ${!sudoLines[@]}
+do
+    if [[ ${sudoLines[$index]:0:1} != "#" ]]
+    then
+        commentEnd=$index
+        break
+    fi
+done
+
+{
+for (( index=0; index<$commentEnd; index++ ))
+do
+    echo "${sudoLines[$index]}"
+done
+echo "$TID_SUDO_LINE"
+for (( index=$commentEnd; index<${#sudoLines[@]}; index++ ))
+do
+    echo "${sudoLines[$index]}"
+done
+} > $OUTFILE
+
+# make readonly
+chmod 444 $SUDO_FILE
+
+echo "touch-id sudo added"
