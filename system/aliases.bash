@@ -31,8 +31,8 @@ alias ql='qlmanage -p > /dev/null 2>&1'
 alias boxon="boxen --no-pull --enable-services"
 alias boxoff="boxen --no-pull --disable-services"
 
-alias shouty="tr [[:lower:]] [[:upper:]]"
+alias shouty="cltr [[:lower:]] [[:upper:]]"
 
-alias flagmoji="tr 'A-Z' '🇦-🇿'"
+alias flagmoji="cltr 'A-Za-z' '🇦-🇿🇦-🇿'"
 
 alias fix_camera="sudo killall VDCAssistant"

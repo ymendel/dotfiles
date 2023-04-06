@@ -37,3 +37,14 @@ go_to()
     cd `dirname $loc`
 }
 alias gt=go_to
+
+command_line_tr()
+{
+    if [[ -z "$3" ]]
+    then
+        tr $@
+    else
+        echo "${@:3}" | tr $1 $2
+    fi
+}
+alias cltr=command_line_tr
