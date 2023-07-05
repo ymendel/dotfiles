@@ -22,6 +22,13 @@ set_git_main_branch()
 
 git_main_branch()
 {
+    local branch=$(git config config.main-branch)
+    if [ -n "$branch" ]
+    then
+        echo -n $branch
+        return 0
+    fi
+
     local branches=('main' 'master')
 
     for branch in ${branches[@]}
@@ -33,7 +40,8 @@ git_main_branch()
         fi
     done
 
-    echo 'could not determine main branch' >&2
+    echo 'could not automatically determine main branch' >&2
+    echo 'consider setting the config.main-branch value' >&2
     false
 }
 
