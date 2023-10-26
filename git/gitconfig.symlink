@@ -66,6 +66,8 @@
 	merged = !sh -c 'git merge-base --is-ancestor ${1:-HEAD} ${2:-$MAIN_BRANCH}' -
 	clean-merged = !git branch --merged $MAIN_BRANCH --format='%(refname:short)' | grep -v "^${MAIN_BRANCH}$" | xargs git branch -d
 	branch-exists = show-ref --quiet --heads
+	blame-with-subject = !bash -ic 'git_blame_with_subject $*' -
+	bws = blame-with-subject
 [color]
 	status = auto
 	diff = auto
