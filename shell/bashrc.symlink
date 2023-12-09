@@ -1,7 +1,7 @@
 export DOTFILES_HOME="$HOME/.dotfiles"
 
 # source all .bash files nested anywhere in the dotfiles
-for f in $(find -H $DOTFILES_HOME -name *.bash -type f)
+for f in $(find -s -H $DOTFILES_HOME -name *.bash -type f)
 do
   source $f
 done
