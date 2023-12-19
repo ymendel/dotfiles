@@ -1,11 +1,11 @@
 #!/bin/bash
 
 ENCDIR=/share/Public/Encode
-MEDIADIR=/share/Multimedia/Video
+MEDIADIR=/share/Media/Video
 TVDIR=$MEDIADIR/TV
 MOVIEDIR=$MEDIADIR/Movies
 
-find $ENCDIR -type f -name '*.complete' -exec rm {} \;
+find $ENCDIR -type f -name '*.complete' -exec rm -f {} \;
 find $ENCDIR -type d -name '*.complete' -exec rm -fr {} \;
 
 find $ENCDIR -mindepth 1 -type f -name '*.mp4' -not -regex "$ENCDIR/.@__thumb/.*" -print0 > "$ENCDIR/mp4files"
@@ -15,6 +15,7 @@ while read -r -d ''; do
 done < "$ENCDIR/mp4files"
 rm "$ENCDIR/mp4files"
 
+shopt -s nocasematch
 TVPATTERN='^(.*?) - s([0-9]+)e[0-9]+(-e[0-9]+)? -'
 
 for f in "${VIDFILES[@]}"
@@ -36,3 +37,5 @@ do
         mv "$f" "$TARGET"
     fi
 done
+
+shopt -u nocasematch
