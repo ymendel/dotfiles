@@ -1,0 +1,50 @@
+#!/bin/bash
+
+SUBDIR=/share/Download
+MEDIADIR=/share/Media/Video
+TVDIR=$MEDIADIR/TV
+MOVIEDIR=$MEDIADIR/Movies
+
+find "$SUBDIR/" -mindepth 1 -type f -name '*.srt' -not -regex "$ENCDIR/.@__thumb/.*" -print0 > "$SUBDIR/srtfiles"
+SUBFILES=()
+while read -r -d ''; do
+    SUBFILES+=("$REPLY")
+done < "$SUBDIR/srtfiles"
+rm "$SUBDIR/srtfiles"
+
+shopt -s nocasematch
+# note: probably a better way to handle this with a single regex,
+# but not sure how best to extract the match later
+TVPATTERNSERIES='^(.*?) - s([0-9]+)e[0-9]+(-e[0-9]+)? -'
+TVPATTERNDATE='^(.*?) - ([0-9]{4})-([0-9]{2})-([0-9]{2}) -'
+
+for f in "${SUBFILES[@]}"
+do
+    if [ ! -s "$f" ]
+    then
+        continue
+    fi
+
+    if [[ $f =~ $TVPATTERNSERIES ]]
+    then
+        SERIES=`basename "${BASH_REMATCH[1]}"`
+        SEASON="Season ${BASH_REMATCH[2]}"
+        TARGET="$TVDIR/$SERIES/$SEASON"
+        mkdir -p "$TARGET"
+        cp -al "$f" "$TARGET"
+    elif [[ $f =~ $TVPATTERNDATE ]]
+    then
+        SERIES=`basename "${BASH_REMATCH[1]}"`
+        SEASON="Season ${BASH_REMATCH[2]}"
+        TARGET="$TVDIR/$SERIES/$SEASON"
+        mkdir -p "$TARGET"
+        cp -al "$f" "$TARGET"
+    else
+        MOVIE=`basename "${f%.*}"`
+        TARGET="$MOVIEDIR/$MOVIE"
+        mkdir -p "$TARGET"
+        cp -al "$f" "$TARGET"
+    fi
+done
+
+shopt -u nocasematch
