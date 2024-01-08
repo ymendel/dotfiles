@@ -37,13 +37,15 @@ do
         mv "$f" "$TARGET"
     elif [[ $f =~ $TVPATTERNDATE ]]
     then
-      SERIES=`basename "${BASH_REMATCH[1]}"`
-      SEASON="Season ${BASH_REMATCH[2]}"
-      TARGET="$TVDIR/$SERIES/$SEASON"
-      mkdir -p "$TARGET"
-      mv "$f" "$TARGET"
+        SERIES=`basename "${BASH_REMATCH[1]}"`
+        SEASON="Season ${BASH_REMATCH[2]}"
+        TARGET="$TVDIR/$SERIES/$SEASON"
+        mkdir -p "$TARGET"
+        mv "$f" "$TARGET"
     else
-        TARGET=$MOVIEDIR
+        MOVIE=`basename "${f%.*}"`
+        TARGET="$MOVIEDIR/$MOVIE"
+        mkdir -p "$TARGET"
         mv "$f" "$TARGET"
     fi
 done
