@@ -1,0 +1,23 @@
+#!/bin/bash
+
+DOWNLOADDIR=/share/Download
+MEDIADIR=/share/Media/Video
+MOVIEDIR=$MEDIADIR/Movies
+TVDIR=$MEDIADIR/TV
+
+OUTFILE=$DOWNLOADDIR/bazarr_output.log
+
+bazarr_directory=$1
+bazarr_series_id=$2
+
+if [[ $bazarr_series_id == "" ]]
+then
+  echo "copying '$bazarr_directory' to $MOVIEDIR" >> $OUTFILE
+  cp -al "$bazarr_directory" $MOVIEDIR
+else
+  series_directory=`dirname "$bazarr_directory"`
+  echo "copying '$series_directory' to $TVDIR" >> $OUTFILE
+  cp -al "$series_directory" $TVDIR
+fi
+
+echo "------" >> $OUTFILE
