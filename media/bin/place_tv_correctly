@@ -1,0 +1,18 @@
+#!/bin/bash
+
+DOWNLOADDIR=/share/Download
+MEDIADIR=/share/Media/Video
+TVDIR=$MEDIADIR/TV
+
+OUTFILE=$DOWNLOADDIR/sonarr_place_output.log
+
+echo "event type: $sonarr_eventtype" >> $OUTFILE
+
+if [[ $sonarr_eventtype == "Download" ]]
+then
+  echo "copying '$sonarr_series_path' to $TVDIR" >> $OUTFILE
+
+  cp -al "$sonarr_series_path" $TVDIR
+fi
+
+echo "------" >> $OUTFILE

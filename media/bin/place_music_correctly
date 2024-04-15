@@ -1,0 +1,18 @@
+#!/bin/bash
+
+DOWNLOADDIR=/share/Download
+MEDIADIR=/share/Media/Audio
+MUSICDIR=$MEDIADIR/Music
+
+OUTFILE=$DOWNLOADDIR/lidarr_place_output.log
+
+echo "event type: $lidarr_eventtype" >> $OUTFILE
+
+if [[ $lidarr_eventtype == "AlbumDownload" ]]
+then
+  echo "copying '$lidarr_artist_path' to $MUSICDIR" >> $OUTFILE
+
+  cp -al "$lidarr_artist_path" $MUSICDIR
+fi
+
+echo "------" >> $OUTFILE

@@ -1,0 +1,18 @@
+#!/bin/bash
+
+DOWNLOADDIR=/share/Download
+MEDIADIR=/share/Media/Video
+MOVIEDIR=$MEDIADIR/Movies
+
+OUTFILE=$DOWNLOADDIR/radarr_place_output.log
+
+echo "event type: $radarr_eventtype" >> $OUTFILE
+
+if [[ $radarr_eventtype == "Download" ]]
+then
+  echo "copying '$radarr_movie_path' to $MOVIEDIR" >> $OUTFILE
+
+  cp -al "$radarr_movie_path" $MOVIEDIR
+fi
+
+echo "------" >> $OUTFILE
