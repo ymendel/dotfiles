@@ -23,18 +23,13 @@ if event == "Download":
   series_title = os.environ.get("sonarr_series_title")
   season_num = os.environ.get("sonarr_episodefile_seasonnumber")
   episode_nums = os.environ.get("sonarr_episodefile_episodenumbers")
+  episode_ids = os.environ.get("sonarr_episodefile_episodeids")
 
-  f.write("unmonitoring '{}' (id {}), season {} episode(s) {}\n".format(series_title, series_id, season_num, episode_nums))
+  f.write("unmonitoring '{}' (id {}), season {} episode(s) {} (id(s) {})\n".format(series_title, series_id, season_num, episode_nums, episode_ids))
 
-  season_num = int(season_num)
-  episode_nums = [int(n) for n in episode_nums.split(",")]
+  episode_ids = [int(n) for n in episode_ids.split(",")]
 
   sonarr = SonarrAPI(HOST_URL, API_KEY)
-  series = sonarr.get_series(series_id)
-  series_episodes = sonarr.get_episode(series_id, True)
-  episodes = [episode for episode in series_episodes if episode['seasonNumber'] == season_num and episode['episodeNumber'] in episode_nums]
-  episode_ids = [episode['id'] for episode in episodes]
-
   sonarr.upd_episode_monitor(episode_ids, False)
 
 f.write("------\n")
