@@ -32,6 +32,8 @@ alias boxon="boxen --no-pull --enable-services"
 alias boxoff="boxen --no-pull --disable-services"
 
 alias shouty="cltr [[:lower:]] [[:upper:]]"
+# TODO: make this work without perl? just sed/awk/tr or whatever? am I that good?
+alias alty="perl -le '\$_ = join(\" \", @ARGV); s/(.)(.)?/\U\1\L\2/g; print'"
 
 alias flagmoji="cltr 'A-Za-z' '🇦-🇿🇦-🇿'"
 
