@@ -14,3 +14,4 @@ cask 'ngrok'
 
 # good pair-programming
 cask 'pop'
+cask 'zed'
