@@ -52,6 +52,12 @@ $DOTFILES_HOME/homebrew/install.sh 2>&1
 echo "› brew update"
 brew update
 
+# if a cask is already installed in some other way
+# (like a work machine with some provisioned apps)
+# let `brew bundle install` go by with the "warning" error code of 1
+# cf. https://github.com/Homebrew/brew/issues/12361
+set +e
+
 profiles=('standard')
 profiles+=($(cat "$HOME/.local/machine_profiles" 2>/dev/null))
 for profile in ${profiles[@]}
@@ -61,8 +67,15 @@ do
     then
         echo "› brew bundle ${profile}"
         brew bundle install --file=$brewfile --no-upgrade
+
+        if [ $? -gt 1 ]; then
+          exit $?
+        fi
     fi
 done
+
+# and we're back to our normal "errors are errors"
+set -e
 
 brewfile="$HOME/.local/Brewfile"
 if [[ -f $brewfile ]]
