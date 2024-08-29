@@ -1,3 +1,4 @@
+# vim: set filetype=gitconfig:
 [user]
 	name = Yossef Mendelssohn
 	email = ymendel@pobox.com
