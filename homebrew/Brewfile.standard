@@ -39,7 +39,7 @@ cask 'google-chrome'
 cask 'krisp'
 cask 'mailplane'
 cask 'slack'
-cask 'spectacle'
+cask 'rectangle'
 
 # these seem to only get the pkg, not the app
 # cask 'homebrew/cask-drivers/logitech-camera-settings'  # ugh so ugly, but fine I guess
