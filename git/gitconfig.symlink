@@ -94,6 +94,7 @@
 	templatedir = ~/.dotfiles/git/template
 [include]
 	path = ~/.gitconfig.local
+	path = ~/.local/gitconfig
 [pull]
 	rebase = false
 [merge]
