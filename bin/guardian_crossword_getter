@@ -41,6 +41,8 @@ end
 final = Dir.entries('everyman').sort.last
 final_date = Date.parse(final.match(/(\d{8})/)[1])
 start_date = final_date + 1
+# temporarily turn this off — everyman has changed
+start_date = today
 
 start_date.upto(today).each do |date|
   filename = "obs.everyman.#{date.strftime(format)}.pdf"
