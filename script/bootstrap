@@ -13,6 +13,7 @@ echo ''
 
 source "$DOTFILES_ROOT/script/helpers/printing.sh"
 source "$DOTFILES_ROOT/script/helpers/linking.sh"
+source "$DOTFILES_ROOT/script/helpers/filestuff.sh"
 
 ensure_bash () {
     info 'checking shell'
@@ -66,50 +67,14 @@ ensure_local_dir () {
     info 'checking local dir'
 
     local localdir="$HOME/.local"
-
-    if [[ -e $localdir ]]
-    then
-        info "$localdir exists"
-
-        if [[ -d $localdir ]]
-        then
-            success "$localdir is already a directory"
-        else
-            fail "$localdir exists and is not a directory"
-        fi
-    else
-        if ( mkdir $localdir )
-        then
-            success "made $localdir"
-        else
-            fail "could not make $localdir"
-        fi
-    fi
+    ensure_dir $localdir
 }
 
 ensure_config_dir () {
     info 'checking config dir'
 
     local configdir="$HOME/.config"
-
-    if [[ -e $configdir ]]
-    then
-        info "$configdir exists"
-
-        if [[ -d $configdir ]]
-        then
-            success "$configdir is already a directory"
-        else
-            fail "$configdir exists and is not a directory"
-        fi
-    else
-        if ( mkdir $configdir )
-        then
-            success "made $configdir"
-        else
-            fail "could not make $configdir"
-        fi
-    fi
+    ensure_dir $configdir
 }
 
 set_machine_profiles () {

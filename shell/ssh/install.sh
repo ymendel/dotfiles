@@ -4,22 +4,13 @@ set -e
 
 source "$DOTFILES_HOME/script/helpers/printing.sh"
 source "$DOTFILES_HOME/script/helpers/linking.sh"
+source "$DOTFILES_HOME/script/helpers/filestuff.sh"
 
 dirs=("$HOME/.ssh" "$HOME/.ssh/ctrl")
 for dir in ${dirs[@]}
 do
     info "checking $dir directory"
-    if [[ -d $dir ]]
-    then
-        success "$dir is a directory"
-    else
-        if (mkdir $dir)
-        then
-            success "$dir created"
-        else
-            fail "could not create $dir"
-        fi
-    fi
+    ensure_dir $dir
 done
 
 overwrite_all=false backup_all=false skip_all=false
