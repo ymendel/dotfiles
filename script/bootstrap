@@ -87,6 +87,31 @@ ensure_local_dir () {
     fi
 }
 
+ensure_config_dir () {
+    info 'checking config dir'
+
+    local configdir="$HOME/.config"
+
+    if [[ -e $configdir ]]
+    then
+        info "$configdir exists"
+
+        if [[ -d $configdir ]]
+        then
+            success "$configdir is already a directory"
+        else
+            fail "$configdir exists and is not a directory"
+        fi
+    else
+        if ( mkdir $configdir )
+        then
+            success "made $configdir"
+        else
+            fail "could not make $configdir"
+        fi
+    fi
+}
+
 set_machine_profiles () {
     info 'determining machine profile(s)'
 
@@ -125,6 +150,7 @@ install_deps () {
 ensure_bash
 install_dotfiles
 ensure_local_dir
+ensure_config_dir
 set_machine_profiles
 install_deps
 
