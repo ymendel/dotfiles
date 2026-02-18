@@ -12,14 +12,15 @@ set_prompt()
 
     PS1+="\h:\w"
 
-    add_prompt_git_info
+    add_prompt_repo_info
 
     PS1+=" \u\$ "
 
     export PS1
 }
 
-add_prompt_exit_code() {
+add_prompt_exit_code()
+{
     local ExitCode=$1
 
     if [[ $ExitCode == 0 ]]
@@ -30,7 +31,18 @@ add_prompt_exit_code() {
     fi
 }
 
-add_prompt_git_info() {
+add_prompt_repo_info()
+{
+  if [[ $PREFER_JJ_REPO_INFO ]]
+  then
+    add_prompt_jj_info
+  else
+    add_prompt_git_info
+  fi
+}
+
+add_prompt_git_info()
+{
     if (! in_git_repo)
     then
         return
@@ -214,6 +226,75 @@ prompt_git_stash_count()
         echo -n "⚑$StashCount"
     fi
 }
+
+see_jj_prompt()
+{
+    export PREFER_JJ_REPO_INFO=1
+}
+
+see_git_prompt()
+{
+    unset PREFER_JJ_REPO_INFO
+}
+
+add_prompt_jj_info()
+{
+    if (! in_jj_repo)
+    then
+        return
+    fi
+
+    PS1+=" ("
+    # PS1+="\[${Green}\]$(prompt_git_current_head)\[${ResetColor}\]"
+    # PS1+="\[${Magenta}\]$(prompt_git_rebasing_marker)\[${ResetColor}\]"
+    PS1+="@\[${Yellow}\]$(prompt_jj_current_change)\[${ResetColor}\]"
+
+    # local StatusInfo=$(prompt_git_status_info)
+
+    # prompt_git_branch_info "$StatusInfo"
+    # PS1+="\[${Red}\]${BranchInfo[behind]}\[${ResetColor}\]"
+    # PS1+="\[${Green}\]${BranchInfo[ahead]}\[${ResetColor}\]"
+    # PS1+="\[${Cyan}\]${BranchInfo[local]}\[${ResetColor}\]"
+
+    # PS1+="\[${Cyan}\]$(prompt_git_paused_marker)\[${ResetColor}\]"
+
+    # PS1+="|"
+
+    # local Dirty
+    # if [[ $GIT_PROMPT_DIRTY_BREAKDOWN ]]
+    # then
+    #     prompt_git_dirty_breakdown "$StatusInfo"
+    #     PS1+="\[${Red}\]${DirtyBreakdown[conflicted]}\[${ResetColor}\]"
+    #     PS1+="\[${Yellow}\]${DirtyBreakdown[staged]}\[${ResetColor}\]"
+    #     PS1+="\[${Red}\]${DirtyBreakdown[deleted]}\[${ResetColor}\]"
+    #     PS1+="\[${Green}\]${DirtyBreakdown[modified]}\[${ResetColor}\]"
+    #     PS1+="\[${Magenta}\]${DirtyBreakdown[renamed]}\[${ResetColor}\]"
+    #     PS1+="\[${Cyan}\]${DirtyBreakdown[untracked]}\[${ResetColor}\]"
+    #     Dirty=$(echo "${DirtyBreakdown[@]}" | tr -d ' ')
+    # else
+    #     Dirty=$(prompt_git_dirty_marker "$StatusInfo")
+    #     PS1+="\[${Red}\]${Dirty}\[${ResetColor}\]"
+    # fi
+
+    # local Stash=$(prompt_git_stash_count)
+    # PS1+="\[${Yellow}\]${Stash}\[${ResetColor}\]"
+
+    # local Clean=''
+    # if [[ "${Dirty}${Stash}" == '' ]]
+    # then
+    #     Clean='✔'
+    # fi
+    # PS1+="\[${Green}\]${Clean}\[${ResetColor}\]"
+
+    PS1+=")"
+
+}
+
+prompt_jj_current_change()
+{
+    jj show @ -T 'change_id.short()'
+}
+
 
 # add prompt commands
 # anything that may change over time
