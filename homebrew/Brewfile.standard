@@ -20,6 +20,8 @@ brew 'rust'
 brew 'tmux'
 brew 'universal-ctags'
 
+cask 'mark-text'
+
 # fonts
 cask 'font-fira-code'
 cask 'font-iosevka'
