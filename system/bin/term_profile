@@ -3,16 +3,38 @@
 osascript<<END
 set theArg to "$*"
 tell application "Terminal"
-    set defaultSettings to name of default settings
+    set defaultSettingsName to name of default settings
+    set currentSettingsName to name of current settings of first window
+
     if (theArg = "") then
-      return name of current settings of first window
+        return currentSettingsName
     else if (theArg = "default" or theArg = "reset") then
-      set current settings of first window to settings set defaultSettings
-    else if (theArg starts with defaultSettings) then
-      set current settings of first window to settings set theArg
+        set current settings of first window to settings set defaultSettingsName
+    else if (theArg = "list") then
+        set theList to {}
+        repeat with i from 1 to count settings set
+            set settingsName to settings set i's name
+            if (settingsName starts with defaultSettingsName) then
+                set end of theList to settingsName
+            end if
+        end repeat
+
+        repeat with listItem in theList
+            set listItem to listItem as string
+            set itemText to listItem
+            if (listItem is equal to defaultSettingsName)
+                set itemText to itemText & " (default)"
+            end if
+            if (listItem is equal to currentSettingsName)
+                set itemText to itemText & " *"
+            end if
+            log itemText
+        end repeat
+    else if (theArg starts with defaultSettingsName) then
+        set current settings of first window to settings set theArg
     else
-      set settingName to defaultSettings & " " & theArg
-      set current settings of first window to settings set settingName
+        set settingName to defaultSettingsName & " " & theArg
+        set current settings of first window to settings set settingName
     end if
 end tell
 END
