@@ -97,6 +97,8 @@
 	path = ~/.local/gitconfig
 [pull]
 	rebase = false
+[diff]
+	external = difft
 [merge]
 	conflictStyle = diff3
 	tool = vim_mergetool
