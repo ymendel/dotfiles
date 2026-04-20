@@ -141,6 +141,17 @@ prompt_git_branch_info()
     elif [[ ! $BranchInfoStr =~ \(no\ branch\) ]]
     then
         BranchInfo[local]=" ▼"
+
+        local BaseBranch=$(git_main_branch)
+        local MergeBase=$(git merge-base HEAD $BaseBranch)
+        local NumCommits=$(git rev-list --count HEAD ^$MergeBase)
+        if [[ $NumCommits ]]
+        then
+            if [[ $NumCommits -gt 0 ]]
+            then
+                BranchInfo[ahead]=" ↑${NumCommits}"
+            fi
+        fi
     fi
 }
 
