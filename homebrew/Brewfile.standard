@@ -54,3 +54,5 @@ brew 'mas'
 # figure out the right ping utility, something to take up the autoping mantle
 # mas 'autoping', id: 632347870
 mas 'CirclePing', id: 969990150
+
+mas 'QuickMD', id: 6757681819
