@@ -111,3 +111,5 @@
 	excludesfile = ~/.gitignore
 [rerere]
 	enabled = true
+[push]
+	autoSetupRemote = true
