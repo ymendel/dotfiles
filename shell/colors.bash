@@ -47,7 +47,10 @@ define_color_names() {
 
 }
 
-# do the color definitions only once
-if [[ ${#ColorNames[*]} = 0 || -z "$IntenseBlack" || -z "$ResetColor" ]]; then
-  define_color_names
+# don't define colors (using tput) outside of a capable terminal context
+if [ -n "$TERM" ] && [ "$TERM" != "dumb" ]; then
+    # do the color definitions only once
+    if [[ ${#ColorNames[*]} = 0 || -z "$IntenseBlack" || -z "$ResetColor" ]]; then
+        define_color_names
+    fi
 fi
