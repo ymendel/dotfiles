@@ -144,8 +144,14 @@ prompt_git_branch_info()
 
         local CurrentBranch=$(git rev-parse --abbrev-ref HEAD)
         local BaseBranch=$(git show-branch 2>/dev/null | grep '\(\*\|^-.*\[\)' | grep -v '\['$CurrentBranch'\([\^]\|~\d\+\)\?\]' | head -n1 | sed 's/.*\[\([^\^~]*\).*\].*/\1/;')
-        local MergeBase=$(git merge-base HEAD $BaseBranch)
-        local NumCommits=$(git rev-list --count HEAD ^$MergeBase)
+        if [ -n "$BaseBranch" ]
+        then
+            local MergeBase=$(git merge-base HEAD $BaseBranch)
+        fi
+        if [ -n "$MergeBase" ]
+        then
+            local NumCommits=$(git rev-list --count HEAD ^$MergeBase)
+        fi
         if [[ $NumCommits ]]
         then
             if [[ $NumCommits -gt 0 ]]
