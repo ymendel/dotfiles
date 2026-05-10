@@ -2,3 +2,4 @@
 .nvimrc
 .DS_Store
 .claude
+graphify-out/
