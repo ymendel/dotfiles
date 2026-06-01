@@ -143,7 +143,7 @@ prompt_git_branch_info()
         BranchInfo[local]=" ▼"
 
         local CurrentBranch=$(git rev-parse --abbrev-ref HEAD)
-        local BaseBranch=$(git show-branch 2>/dev/null | grep '\(\*\|^-.*\[\)' | grep -v '\['$CurrentBranch'\([\^]\|~\d\+\)\?\]' | head -n1 | sed 's/.*\[\([^\^~]*\).*\].*/\1/;')
+        local BaseBranch=$(git show-branch 2>/dev/null | grep '\(\*\|^-.*\[\)' | grep -v '\['$CurrentBranch'\([\^]\|~[0-9]\+\)\?\]' | head -n1 | sed 's/.*\[\([^\^~]*\).*\].*/\1/;')
         if [ -n "$BaseBranch" ]
         then
             local MergeBase=$(git merge-base HEAD $BaseBranch)
