@@ -10,11 +10,13 @@ set_prompt()
 
     add_prompt_exit_code $ExitCode
 
-    PS1+="\h:\w"
+    PS1+="\u@\h:\w"
 
     add_prompt_repo_info
 
-    PS1+=" \u\$ "
+    PS1+="\n"
+    PS1+="\[${Cyan}\][\t]\[${ResetColor}\]"
+    PS1+=" \$ "
 
     export PS1
 }
