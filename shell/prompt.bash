@@ -16,6 +16,7 @@ set_prompt()
 
     PS1+="\n"
     PS1+="\[${Cyan}\][\t]\[${ResetColor}\]"
+    add_prompt_duration
     PS1+=" \$ "
 
     export PS1
@@ -316,6 +317,62 @@ prompt_jj_current_change()
 }
 
 
+# command timing
+# requires bash 5+ for $EPOCHREALTIME
+
+__cmd_start_record()
+{
+    [[ -z $__cmd_armed ]] && return
+    __cmd_start=$EPOCHREALTIME
+    unset __cmd_armed
+}
+
+# chain our DEBUG trap with anything else's instead of clobbering
+# called from PROMPT_COMMAND so we re-chain if anything later (e.g. chruby) clobbered us
+# the existing trap is passed in because DEBUG isn't inherited into functions
+__install_debug_trap()
+{
+    local Existing=$1
+    case $Existing in
+        *__cmd_start_record*) return ;;
+    esac
+
+    if [[ -n $Existing ]]
+    then
+        Existing=${Existing#trap -- \'}
+        Existing=${Existing%\' DEBUG}
+        trap "__cmd_start_record; ${Existing}" DEBUG
+    else
+        trap '__cmd_start_record' DEBUG
+    fi
+}
+
+__cmd_arm()
+{
+    __cmd_armed=1
+}
+
+__format_duration()
+{
+    awk -v t="$1" 'BEGIN {
+        if (t < 1)    { exit }
+        if (t < 60)   { printf "%ds",     int(t + 0.5); exit }
+        if (t < 3600) { printf "%dm%ds",  int(t/60), int(t) % 60; exit }
+                        printf "%dh%dm",  int(t/3600), int((t % 3600) / 60)
+    }'
+}
+
+add_prompt_duration()
+{
+    [[ -z $__cmd_start ]] && return
+
+    local Elapsed=$(awk -v s="$__cmd_start" -v e="$EPOCHREALTIME" 'BEGIN { printf "%.3f", e - s }')
+    unset __cmd_start
+
+    local Formatted=$(__format_duration "$Elapsed")
+    [[ -n $Formatted ]] && PS1+=" \[${Cyan}\](+${Formatted})\[${ResetColor}\]"
+}
+
 # add prompt commands
 # anything that may change over time
 
@@ -350,3 +407,6 @@ prepend_prompt_command()
 prepend_prompt_command 'set_prompt'
 add_prompt_command 'set_git_main_branch'
 add_prompt_command 'window_title_user_host'
+# capture the existing DEBUG trap at top level; functions don't inherit DEBUG without functrace
+add_prompt_command '__install_debug_trap "$(trap -p DEBUG)"'
+add_prompt_command '__cmd_arm'  # arm last, so DEBUG only fires for the user's next command
