@@ -1,0 +1,52 @@
+#!/bin/sh
+# Remove .git/hooks/ contents in repos that defer to global core.hooksPath.
+# These files are inert once the global hooksPath points elsewhere — they
+# come from old `init.templateDir` copies (or git's default *.sample files)
+# and never run.
+#
+# Repos with a local core.hooksPath set are skipped — those have opted in
+# via `git hooks-override` (or manual config) and own their hooks dir.
+#
+# Dry-run by default; pass -f to actually delete.
+#
+# Usage:
+#   git hooks-clean [-f]            # current repo
+#   git hooks-clean [-f] DIR        # every git repo found under DIR
+
+set -e
+
+FORCE=0
+if [ "$1" = "-f" ]; then
+    FORCE=1
+    shift
+fi
+
+clean_repo() {
+    REPO=$1
+    HOOKS=$REPO/.git/hooks
+    [ -d "$HOOKS" ] || return 0
+
+    LOCAL=$(git -C "$REPO" config --local --get core.hooksPath 2>/dev/null || true)
+    if [ -n "$LOCAL" ]; then
+        echo "skip $REPO (local core.hooksPath: $LOCAL)"
+        return 0
+    fi
+
+    for f in "$HOOKS"/* "$HOOKS"/.[!.]*; do
+        [ -e "$f" ] || continue
+        if [ $FORCE -eq 1 ]; then
+            rm -f "$f"
+            echo "removed $f"
+        else
+            echo "would remove $f"
+        fi
+    done
+}
+
+if [ $# -eq 0 ]; then
+    clean_repo "$(git rev-parse --show-toplevel)"
+else
+    find "$1" -type d -name '.git' 2>/dev/null | while read -r gitdir; do
+        clean_repo "$(dirname "$gitdir")"
+    done
+fi

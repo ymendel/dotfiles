@@ -1,0 +1,40 @@
+#!/bin/sh
+# Localize hooks for this repo: populate .git/hooks/ with symlinks to the
+# central hooks and set local core.hooksPath so this repo uses .git/hooks/
+# instead of the global one. Replace any symlink with a real script to
+# customize that hook for this repo only.
+#
+# Usage: git hooks-override
+
+set -e
+
+CENTRAL=$(git config --global --get core.hooksPath || true)
+if [ -z "$CENTRAL" ]; then
+    echo "no global core.hooksPath set; nothing to override" >&2
+    exit 1
+fi
+
+# expand leading ~
+case "$CENTRAL" in
+    '~') CENTRAL=$HOME ;;
+    '~'/*) CENTRAL="$HOME/${CENTRAL#'~'/}" ;;
+esac
+
+if [ ! -d "$CENTRAL" ]; then
+    echo "central hooks dir does not exist: $CENTRAL" >&2
+    exit 1
+fi
+
+GIT_DIR=$(git rev-parse --git-dir)
+HOOKS=$GIT_DIR/hooks
+mkdir -p "$HOOKS"
+
+for hook in "$CENTRAL"/*; do
+    [ -f "$hook" ] || continue
+    name=$(basename "$hook")
+    ln -sf "$hook" "$HOOKS/$name"
+    echo "linked $HOOKS/$name -> $hook"
+done
+
+git config --local core.hooksPath "$HOOKS"
+echo "set local core.hooksPath to $HOOKS"

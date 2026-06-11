@@ -52,7 +52,7 @@
 	retcon = filter-branch
 	setup = !sh -c 'git clone $1 && cd `expr \"$1\" : \".*[:/]\\([a-zA-Z_]*\\).git\"` && git checkout -b work' -
 	top = rev-parse --show-toplevel
-	ctags = !.git/hooks/ctags
+	ctags = !~/.dotfiles/git/template/hooks/ctags
 	st = status
 	sts = status --short --branch --untracked-files=all
 	stat = !git diff --stat $(git merge-base HEAD \"$REVIEW_BASE\")
@@ -103,7 +103,6 @@
 	helper = osxkeychain
 [init]
 	defaultBranch = main
-	templatedir = ~/.dotfiles/git/template
 [include]
 	path = ~/.gitconfig.local
 	path = ~/.local/gitconfig
@@ -121,6 +120,7 @@
 	showUntrackedFiles = all
 [core]
 	excludesfile = ~/.gitignore
+	hooksPath = ~/.dotfiles/git/template/hooks
 [rerere]
 	enabled = true
 [push]
