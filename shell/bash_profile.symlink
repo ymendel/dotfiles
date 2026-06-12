@@ -1,4 +1,4 @@
 for f in bashrc
 do
-  test -r ~/.$f && source ~/.$f
+  [[ -r ~/.$f ]] && source ~/.$f
 done

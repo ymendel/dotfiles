@@ -10,5 +10,5 @@ done
 # (or the stuff that shouldn't be tracked publicly)
 for f in local/bashrc
 do
-  test -f ~/.$f && source ~/.$f
+  [[ -f ~/.$f ]] && source ~/.$f
 done
