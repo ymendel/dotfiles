@@ -3,3 +3,4 @@
 .DS_Store
 .claude
 graphify-out/
+tmp/
