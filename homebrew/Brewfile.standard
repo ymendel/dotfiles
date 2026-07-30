@@ -19,7 +19,6 @@ brew 'pnpm'
 brew 'ripgrep'
 brew 'ruby'
 brew 'rust'
-brew 'thefuck'
 brew 'tmux'
 brew 'universal-ctags'
 
