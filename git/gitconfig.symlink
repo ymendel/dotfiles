@@ -127,3 +127,5 @@
 	autoSetupRemote = true
 [fetch]
 	prune = true
+[credential "https://git.heroku.com"]
+	helper = !heroku git:credentials
