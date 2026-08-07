@@ -40,7 +40,10 @@
 	hack = !hack
 	ship = !ship
 	deleted = log --oneline --diff-filter=D --
-	logd = log --oneline --decorate
+	# numbered from 0 so I can see what N is for HEAD~N
+	# it's not perfect for all cases, hence the plain number
+	# and not something more, like "HEAD~N"
+	logd = !sh -c 'git log --oneline --decorate --color=always \"$@\" | nl -b a -v 0 -w 3 -s \"  \"' -
 	logg = log --graph --pretty=format:'%C(yellow)%h%C(reset) -%C(cyan)%d%C(reset) %s %Cgreen(%cr) %C(bold blue)<%an>%C(reset)' --abbrev-commit --date=relative
 	bw = branch --contains
 	diffw = diff --word-diff
@@ -85,6 +88,9 @@
 	bws = blame-with-subject
 	blame-follow = blame -w -C -C -C
 	spelunk = blame-follow
+[pager]
+	# shell aliases don't paginate on their own
+	logd = true
 [color]
 	status = auto
 	diff = auto
