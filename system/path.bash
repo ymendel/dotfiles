@@ -5,4 +5,4 @@ do
     PATH="$PATH:$d"
 done
 
-export PATH="$PATH:~/bin:~/scripts"
+export PATH="$PATH:$HOME/bin:$HOME/scripts:$HOME/.local/bin"
