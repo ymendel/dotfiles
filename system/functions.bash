@@ -33,8 +33,19 @@ flatten()
 
 go_to()
 {
-    local loc=`which $1`
-    cd `dirname $loc`
+    # `type -P` finds _only executables_ in PATH, so it comes back empty
+    # for aliases, functions, builtins… anything that doesn't have a home
+    # to `go_to`
+    # without this guard, typos (like `gt sts`) were complaining and sending me home
+    local location=$(type -P "$1")
+
+    if [[ -z $location ]]
+    then
+        echo "go_to: not an executable in PATH: $1" >&2
+        return 1
+    fi
+
+    cd "$(dirname "$location")"
 }
 alias gt=go_to
 

@@ -63,7 +63,14 @@ git_fetch_branch()
 
 gtt()
 {
-    cd `git top`
+    # if I'm not in a git repo, this will silently send me home
+    if in_git_repo
+    then
+        cd "$(git top)"
+    else
+        echo "gtt: not in a git repo" >&2
+        return 1
+    fi
 }
 
 git_blame_with_subject()

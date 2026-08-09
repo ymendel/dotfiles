@@ -23,6 +23,9 @@ alias fps=find_process
 alias where="command -v"
 alias so=sudo
 
+# I am never going to use `mg` (macOS's micro-emacs)
+alias mg=mv
+
 alias remove_ds_stores="find . -name ".DS_Store" -depth -exec rm {} \;"
 
 alias ql='qlmanage -p > /dev/null 2>&1'
