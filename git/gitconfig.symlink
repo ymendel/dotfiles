@@ -66,6 +66,9 @@
 	fbf = fetch-branch-force
 	pushf = push --force-with-lease
 	pf = pushf
+	# the quotes are so `;` works as command sequencing and not a config comment
+	push-other-branch = "!sh -c 'b=${1:?branch name required}; shift; git push \"$@\" origin \"$b:$b\"' -"
+	pob = push-other-branch
 	re-main = !git fetch-branch $MAIN_BRANCH
 	re = !git re-main
 	main = !git checkout $MAIN_BRANCH
