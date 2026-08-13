@@ -1,0 +1,5 @@
+# httpie treats this as its whole config dir and may write sessions or cookies
+# here. Only the config itself is ours to track.
+*
+!.gitignore
+!config.json

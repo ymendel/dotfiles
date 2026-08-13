@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+#
+# Prints the path to the demo wrapper library, so a demo script can source it
+# without hardcoding a dotfiles path:
+#
+#     source "$(demo-lib)"
+#
+set -euo pipefail
+
+lib="$(cd "$(dirname "${BASH_SOURCE[0]}")/../lib" && pwd -P)"
+printf '%s\n' "$lib/demo-wrapper.sh"
