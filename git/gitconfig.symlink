@@ -2,7 +2,7 @@
 [user]
 	name = Yossef Mendelssohn
 	email = ymendel@pobox.com
-# Per-directory identity override (uncomment and adjust per machine).
+# Per-directory identity override (add to local config and adjust per machine).
 # Use `gitdir/i:` (case-insensitive) — macOS filesystems will bite you otherwise.
 # Trailing slash matters: `gitdir/i:~/clients/acme/` matches any repo under that
 # directory; without the slash it's an exact match on the .git path.
@@ -112,11 +112,16 @@
 	helper = osxkeychain
 [init]
 	defaultBranch = main
-[include]
-	path = ~/.gitconfig.local
-	path = ~/.local/gitconfig
+[push]
+	autoSetupRemote = true
+[fetch]
+	prune = true
 [pull]
 	rebase = false
+[rebase]
+	autoStash = true
+[rerere]
+	enabled = true
 [diff]
 	external = difft
 [merge]
@@ -129,12 +134,19 @@
 	showUntrackedFiles = all
 [core]
 	excludesfile = ~/.gitignore
-	hooksPath = ~/.dotfiles/git/template/hooks
-[rerere]
-	enabled = true
-[push]
-	autoSetupRemote = true
-[fetch]
-	prune = true
 [credential "https://git.heroku.com"]
 	helper = !heroku git:credentials
+
+# an include only overrides what's above it, so everything up to here is
+# fair game for a machine to change
+[include]
+	path = ~/.gitconfig.local
+	path = ~/.local/gitconfig
+
+# and anything below it can't be. hooksPath lives here on purpose: it points
+# into these dotfiles, which are the same everywhere, and a local override
+# would fail silently — hooks would just quietly stop running.
+# a repo's own .git/config still wins, so per-project hooks are unaffected.
+# don't tidy this back up into the [core] above.
+[core]
+	hooksPath = ~/.dotfiles/git/template/hooks
