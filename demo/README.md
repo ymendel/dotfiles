@@ -33,7 +33,7 @@ numbers), `-w N` (auto-advance after N seconds) — plus `--unattended`.
 | Name | What it does |
 |---|---|
 | `say` | narration block above a command, dimmed, one argument per line |
-| `hold` | manual pause that ignores `PROMPT_TIMEOUT`, for advancing between steps |
+| `hold` | manual pause that ignores `PROMPT_TIMEOUT`, for advancing between steps, with an animated hint |
 | `demo_commands` | the demo's commands with the `pe` wrapper stripped, for the closing reveal |
 | `--unattended` | runs start to finish with no typing and no pauses, as a smoke test |
 
@@ -41,9 +41,22 @@ Knob precedence is flag, then environment, then the wrapper's default:
 
 | Knob | Default | Flag |
 |---|---|---|
-| `TYPE_SPEED` | 40 | `-d` unsets it |
+| `TYPE_SPEED` | 40 | `-d` empties it |
 | `PROMPT_TIMEOUT` | 1 | `-w N` |
 | `DEMO_PROMPT` | `$ ` | none |
+
+`hold`'s hint has its own knobs, none of which demo-magic knows about:
+
+| Knob | Default | What it does |
+|---|---|---|
+| `DEMO_HOLD_FRAMES` | `MARQUEE` | which frame set to animate — `BREATHE`, `CARET`, `ELLIPSIS` and `SPINNER` are the others |
+| `DEMO_HOLD_INTERVAL` | the chosen set's own | seconds between frames |
+| `DEMO_HOLD_HINT` | `ENTER` | the word beside the animation |
+| `DEMO_HOLD_COLOR` | `$GREY` | its colour |
+
+So `DEMO_HOLD_FRAMES=CARET ./demo.sh` switches for one run without editing anything. Add a set by
+declaring `DEMO_HOLD_FRAMES_<NAME>` and `DEMO_HOLD_INTERVAL_<NAME>` beside the others — the interval
+is stated per set, explicitly.
 
 ## Why the repairs exist
 
@@ -56,27 +69,36 @@ because the variable is set to demo-magic's default by then. The wrapper capture
 before sourcing and re-applies them after.
 
 **But the re-apply has to be conditional per knob, or it eats the command-line flag.** Fixing the
-above fell into this trap. Two of the three knows have a flag that `getopts` parses *during*
+above fell into this trap. Two of the three knobs have a flag that `getopts` parses *during*
 sourcing demo-magic. They need different detection:
 
 - `-d` **unsets** `TYPE_SPEED`, which is detectable after the fact — hence the guard on
-  `[[ -n "${TYPE_SPEED+set}" ]]`. If it's unset now, the flag was given and must win.
+  `[[ -n "${TYPE_SPEED+set}" ]]`. If it's unset now, the flag was given and must win. The wrapper
+  binds it back to empty immediately afterward, for the reason in the next repair, by which point
+  the detection has already happened.
 - `-w N` **assigns** `PROMPT_TIMEOUT`, and demo-magic's own default is already `0`, so `-w0`
   (deliberately manual) is indistinguishable from no flag at all once the source has run. The flag
   has to be noticed by scanning the arguments *before* sourcing, matching `-*w*` rather than exactly
   `-w` so the bundled forms count — `-dw5` as much as `-w5` and `-w 5`.
 - `DEMO_PROMPT` has no flag, so unconditional is correct there.
 
-**It is not `set -u` clean, and that breaks its own documented `-d` flag.** The `-d` handler runs
-`unset TYPE_SPEED`, and a later line tests `[[ -n "$TYPE_SPEED" ]]` — an unbound reference that
-aborts at source time under `set -u`, so any strict-mode script that sources demo-magic loses `-d`
-entirely. The wrapper relaxes nounset across the source and restores it after.
+**It is not `set -u` clean in two separate places, and that breaks its own documented `-d` flag.**
+The `-d` handler runs `unset TYPE_SPEED`, and two later lines then read that variable unguarded.
+Line 253 runs at *source* time, so a strict-mode script aborts while sourcing and loses `-d`
+entirely — the wrapper relaxes nounset across the source and restores it after. Line 107 runs inside
+`p` and `pe`, at *call* time, which the first repair cannot reach: the script survives the source
+and then dies on its first command instead. So once the wrapper has finished detecting the flag it
+binds `TYPE_SPEED` back to the empty string. Empty is precisely what that line's `-z` test is
+looking for, so `-d` keeps its meaning and there is nothing unbound left to trip over.
 
 **It gives you one pause where a demo wants two.** demo-magic's `wait` (inside `pe`) is bounded by
 `PROMPT_TIMEOUT`, which is right for the run-the-command step — a command should fire shortly after
 it finishes typing. Advancing to the *next* command should stay manual, so `hold` is a separate
-un-timed pause. This may actually be an enhancement rather than a bugfix, but it seems central
+untimed pause. This may actually be an enhancement rather than a bugfix, but it seems central
 enough to say here.
+
+This untimed pause is given an animated hint, so it can be distinguished from a situation where
+the demo has hung. There are a few animation choices, shown in a table above.
 
 **It sets the terminal on every command, including when there is no terminal.** `run_cmd` wraps each
 command in `stty -echoctl` / `stty echoctl`, so that a `^C` doesn't echo. With stdin closed — which
@@ -110,6 +132,20 @@ plus body, no headers" isn't expressible natively; and `--check-status` writes i
 only *if stdout is redirected*, so it fires in exactly the case that doesn't matter. Body-only by
 default is the usual answer, with a filter on the beats where a status code is the point.
 
+**demo-magic shadows the `wait` builtin.** It defines a function named `wait` — its own
+press-ENTER pause — which takes precedence over the builtin for everything sourced alongside it. So
+a bare `wait "$pid"` silently ignores its argument and blocks on a `read`, and anything that
+backgrounds a process and waits on it needs `builtin wait` instead. The animated `hold` hint is
+built on exactly that, and the first draft of it wanted a second ENTER for precisely this reason.
+
+**A demo script can't use `set -e`.** That same `wait` is `read -rst "$PROMPT_TIMEOUT"`, and a
+timed-out `read` returns 142. Timing out is what the read is *for*, so under `set -e` the first `pe`
+you don't answer within `PROMPT_TIMEOUT` kills the script — before it types the command, which makes
+it look like the demo broke rather than the shell option. The wrapper turns this from unlikely into
+certain: upstream defaults `PROMPT_TIMEOUT` to `0`, which takes the untimed `read -rs` branch and
+returns 0, while the wrapper's default of `1` is a timed read by design. `set -u` is fine — that one
+is repaired, above.
+
 ## Layout
 
 - `bin/demo-lib` — prints the wrapper's path, for `source "$(demo-lib)"`
@@ -131,6 +167,11 @@ it by replacing the file and re-reading the repairs above against it.
 
 `pv` is a hard dependency of simulated typing — demo-magic aborts without it whenever `TYPE_SPEED`
 is set.
+
+bash 4.3 or newer is a hard dependency of the wrapper, for the nameref that selects `hold`'s frame
+set. That rules out the 3.2 Apple still ships as `/bin/bash` and rules in anything from Homebrew, so
+write the shebang as `#!/usr/bin/env bash` — as the usage example above does — rather than
+hardcoding `/bin/bash`.
 
 ## Not here yet
 

@@ -89,6 +89,15 @@ if [[ -n "${TYPE_SPEED+set}" ]]; then
     else
         TYPE_SPEED="$DEMO_TYPE_SPEED_DEFAULT"
     fi
+else
+    # -d was given, and demo-magic implements that by unsetting the variable —
+    # but its own p and pe go on to read it at *call* time, unguarded
+    # (vendor/demo-magic.sh:107). Relaxing nounset across the source doesn't
+    # reach that, so a strict-mode demo script survives the source and then
+    # aborts on its first command. Bind it to the empty string: that is
+    # precisely what the -z test there is looking for, so the flag keeps its
+    # meaning and there is no longer an unbound reference to trip over.
+    TYPE_SPEED=""
 fi
 
 if [[ $__demo_prompt_timeout_flag == false ]]; then
@@ -146,13 +155,111 @@ say () {
 
 # demo-magic's own wait, used inside pe, is bounded by PROMPT_TIMEOUT.
 # That works for a pause between typing a command and executing it, but
-# there are times you want to a completely manual and explicit "wait until
+# there are times you want a completely manual and explicit "wait until
 # I say go". Use `hold` for that.
+#
+# When the pause prints nothing, it can look as if the demo has hung.
+# Letting `hold` animate a hint fixes that issue. The hint is on its
+# own line, and it gets wiped before the next command.
+#
+# Each animation "frame set" is defined here, with a list of frames and
+# an interval. Note that the frames don't _have_ to be the same width,
+# but staying the same width keeps the hint in place. So do that.
+# The interval is set explicitly because what feels right can depend
+# on more than simple frame information — like it could be about the
+# difference between frames, not just the number of frames.
+
+# Add a new "frame set" choice by defining two variables here:
+# - DEMO_HOLD_FRAMES_<name>   = an array of strings to rotate through
+# - DEMO_HOLD_INTERVAL_<name> = a (floating-point) number of seconds to wait between frames
+
+DEMO_HOLD_FRAMES_MARQUEE=('·  ' '·· ' '···' ' ··' '  ·' '   ')  # dots sweeping across
+DEMO_HOLD_INTERVAL_MARQUEE=0.15
+
+DEMO_HOLD_FRAMES_BREATHE=('▪  ' '▪▪ ' '▪▪▪' '▪▪ ')             # a bar expanding and contracting
+DEMO_HOLD_INTERVAL_BREATHE=0.2
+
+DEMO_HOLD_FRAMES_CARET=('▸' '▹')                                # a caret blinking
+DEMO_HOLD_INTERVAL_CARET=0.45
+
+DEMO_HOLD_FRAMES_ELLIPSIS=('   ' '.  ' '.. ' '...')             # ASCII only, nothing to render wrong
+DEMO_HOLD_INTERVAL_ELLIPSIS=0.20
+
+DEMO_HOLD_FRAMES_SPINNER=('⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏')  # familiar, but reads as "busy" rather than "your turn"
+DEMO_HOLD_INTERVAL_SPINNER=0.10
+
+# Which set to animate: any name above with the DEMO_HOLD_FRAMES_ prefix
+# dropped, so `DEMO_HOLD_FRAMES=CARET ./demo.sh` switches for one run.
+DEMO_HOLD_FRAMES="${DEMO_HOLD_FRAMES:-MARQUEE}"
+DEMO_HOLD_HINT="${DEMO_HOLD_HINT:-ENTER}"
+DEMO_HOLD_COLOR="${DEMO_HOLD_COLOR:-$GREY}"
+
+# DEMO_HOLD_INTERVAL is deliberately *not* given a default here. Leaving it
+# unset is what lets the chosen set's own interval apply.
+# It can be overridden at the command line if you don't want to use the set's
+# defined interval.
+
+# Runs in the background while hold blocks on read. Cleanup lives in the trap
+# rather than in hold, so `wait` guarantees the line is wiped before the next
+# command prints, and so a ^C through the demo can't leave the cursor hidden.
+__demo_hold_animate () {
+    trap 'printf "\r\033[K\033[?25h"; exit 0' TERM INT
+
+    # array has to be set by nameref
+    local -n frames="DEMO_HOLD_FRAMES_$DEMO_HOLD_FRAMES"
+    local per_set="DEMO_HOLD_INTERVAL_$DEMO_HOLD_FRAMES"
+    local interval="${DEMO_HOLD_INTERVAL:-${!per_set:-0.15}}"
+
+    local i=0
+    printf '\033[?25l'
+    while :; do
+        printf '\r%b%s %s%b\033[K' "$DEMO_HOLD_COLOR" "${frames[i]}" \
+            "$DEMO_HOLD_HINT" "$COLOR_RESET"
+        # post-increment with (( )) returns 1 when i is 0
+        # under set -e, that would kill the animator
+        i=$(( (i + 1) % ${#frames[@]} ))
+        # Backgrounding the sleep is what keeps the trap prompt: bash runs a
+        # trap while blocked in wait, but not while blocked in a foreground
+        # sleep — which would hold the wipe for a whole interval after ENTER.
+        sleep "$interval" &
+        builtin wait $! 2>/dev/null || true
+    done
+}
+
+# Note that because demo-magic has a function named `wait`, every wait-on-process
+# call has to be `builtin wait`
+# See above, and at the end of `hold`
+
 hold () {
     if [[ $DEMO_UNATTENDED == true ]]; then
         return 0
     fi
+    # check for a terminal on both ends
+    # It's not enough to check --unattended, because output can be directed separately
+    if [[ ! -t 0 || ! -t 1 ]]; then
+        read -rs
+        return 0
+    fi
+
+    # The actual animator runs in the background, which means any errors there
+    # aren't shown. Check for the animation info here first, and if it's wrong
+    # just warn and go with the default. Otherwise, the animation would be
+    # an empty frame set, and modulus of 0.
+    local named="DEMO_HOLD_FRAMES_$DEMO_HOLD_FRAMES"
+    if [[ -z ${!named+set} ]]; then
+        printf 'hold: no frame set named %s, falling back to MARQUEE\n' \
+            "$DEMO_HOLD_FRAMES" >&2
+        DEMO_HOLD_FRAMES=MARQUEE
+    fi
+
+    __demo_hold_animate &
+    local animator=$!
     read -rs
+    # Both guarded: the animator may already be gone, and a kill that lands
+    # before the trap installs makes wait report 143. Neither should abort a
+    # demo running under set -e.
+    kill "$animator" 2>/dev/null || true
+    builtin wait "$animator" 2>/dev/null || true
 }
 
 # The demo's commands with the pe wrapper stripped off, which can be useful
