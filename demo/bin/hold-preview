@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+#
+# See what `hold` actually looks like:
+#
+#     hold-preview
+#
+# Two parts. First it walks every frame set past you, one hold each, so you can
+# pick. Then it runs the shape a real demo has — narration, hold, command —
+# with whichever set the wrapper is configured for.
+#
+# ../test/run-checks.sh covers the terminal-less path only, because the hint
+# animates just when stdin and stdout are both terminals. This is the by-eye
+# counterpart for the path it can't reach.
+#
+# ENTER advances. ^C quits, and restores the cursor on the way out.
+
+# No `set -e` and no `set -u`. demo-magic tolerates neither, for two unrelated
+# reasons, and both abort on the first pe:
+#
+#   set -u — p/pe read TYPE_SPEED at call time (demo-magic.sh:107) and -d
+#            unsets it. The wrapper now binds it to empty, so this one is
+#            actually survivable — but only for the knobs it manages.
+#   set -e — p calls demo-magic's own `wait`, which is `read -rst
+#            "$PROMPT_TIMEOUT"`. Timing out is what that read is *for*, and a
+#            timed-out read returns 142, which set -e treats as fatal.
+set -o pipefail
+
+# `demo-lib` is on PATH in an interactive shell via the topic bin/ convention.
+# The fallback is only so this still runs if you invoke it from somewhere odd,
+# and it resolves the same way demo-lib itself does — from this file, not cwd.
+if command -v demo-lib >/dev/null 2>&1; then
+    source "$(demo-lib)"
+else
+    source "$(cd "$(dirname "${BASH_SOURCE[0]}")/../lib" && pwd -P)/demo-wrapper.sh"
+fi
+
+configured="$DEMO_HOLD_FRAMES"
+
+preview () {
+    DEMO_HOLD_FRAMES=$1
+    say "$1" "$2"
+    hold
+}
+
+say "Every frame set, one hold each, at its own default interval." \
+    "ENTER moves to the next."
+hold
+
+preview MARQUEE  "dots sweeping across"
+preview BREATHE  "a bar expanding and contracting"
+preview CARET    "a caret blinking — slower on purpose, two frames at 0.15 is a strobe"
+preview ELLIPSIS "ASCII only, nothing to render wrong"
+preview SPINNER  "the familiar one — note it reads as \"busy\" rather than \"your turn\""
+
+say "A name with no set behind it warns once and falls back, rather than" \
+    "failing silently in the background where you would never see it."
+DEMO_HOLD_FRAMES=NONESUCH
+hold
+
+DEMO_HOLD_FRAMES="$configured"
+say "Back to the configured set ($configured), for the shape a real demo has." \
+    "Watch the handoff — the hint wipes and the prompt lands on that same line."
+hold
+
+say "First, what this machine is"
+hold
+pe 'uname -sr'
+
+say "Then the bash it's running, which has to be 4.3 or newer for the nameref"
+hold
+pe 'bash --version | head -1'
+
+say "The hint text is a knob too, so it doesn't have to say ENTER"
+DEMO_HOLD_HINT='go on then'
+hold
+
+say "And an explicit DEMO_HOLD_INTERVAL overrides whatever the set prefers"
+DEMO_HOLD_HINT='crawling'
+DEMO_HOLD_INTERVAL=0.6
+hold
+
+say "That's everything."
+printf '\n'

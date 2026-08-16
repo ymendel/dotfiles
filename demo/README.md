@@ -149,6 +149,7 @@ is repaired, above.
 ## Layout
 
 - `bin/demo-lib` — prints the wrapper's path, for `source "$(demo-lib)"`
+- `bin/hold-preview` — walks every frame set past you, for picking one by eye
 - `lib/demo-wrapper.sh` — the repairs and helpers
 - `vendor/demo-magic.sh` — upstream, unmodified
 - `httpie-unattended/` — the httpie config dir used only by `--unattended`
@@ -158,7 +159,9 @@ Every repair above is a behavior an unrepaired demo-magic gets wrong, which make
 checkable. `test/run-checks.sh` does that — precedence for each knob across flag, environment and
 default, `-d` under strict mode, an unattended run end to end, and the httpie stdin trap in both
 directions. It covers the terminal-less path only. The live path is upstream's own body, reached
-whenever stdin is a terminal.
+whenever stdin is a terminal, along with `hold`'s hint, which animates only when both ends are.
+`bin/hold-preview` is the by-eye pass over that path — every frame set in turn, the unknown-set
+warning, then the shape a real demo has.
 
 Upstream is vendored rather than fetched. It ships no tags and no releases, so there is nothing to
 pin against, and it does still take commits — meaning a fetched copy could shift under the repairs,
