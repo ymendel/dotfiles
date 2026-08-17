@@ -1,0 +1,4 @@
+# One Homebrew file, google-cloud-sdk, registers three commands — gcloud, bq
+# and gsutil — and the lazy loader looks up one name at a time. So each of them
+# gets a file here, and whichever you reach for first sources the lot.
+source "$HOMEBREW_PREFIX/etc/bash_completion.d/google-cloud-sdk"

@@ -1,0 +1,2 @@
+# See the note in ./gcloud — one google-cloud-sdk file, three commands.
+source "$HOMEBREW_PREFIX/etc/bash_completion.d/google-cloud-sdk"

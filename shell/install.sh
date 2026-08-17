@@ -77,9 +77,28 @@ ensure_brew_bash () {
     ensure_specific_bash "$(brew --prefix)/bin/bash"
 }
 
+# shell/completion.bash switches off bash-completion's eager loading of
+# Homebrew's etc/bash_completion.d and points the lazy loader here instead. The
+# lazy loader wants a directory literally named `completions`, so one symlink
+# stands in for a link per command — and new formulae then show up in it for
+# free, with nothing to re-run.
+#
+# It can't be tracked in the repo, because its target is the Homebrew prefix, and
+# that's machine-dependent (or at least arch-dependent).
+link_homebrew_completions () {
+    local overwrite_all=false backup_all=false skip_all=false
+    local user_dir="$HOME/.local/share/homebrew-completions"
+
+    info 'linking homebrew completions for lazy loading'
+
+    mkdir -p "$user_dir"
+    link_file "$(brew --prefix)/etc/bash_completion.d" "$user_dir/completions"
+}
+
 if test $(which brew)
 then
     ensure_brew_bash
+    link_homebrew_completions
 else
     ensure_any_bash
 fi

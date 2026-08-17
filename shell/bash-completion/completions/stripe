@@ -1,0 +1,3 @@
+# Homebrew's file is stripe-completion.bash, and the lazy loader looks a
+# completion up by the command's own name — so it needs this to find it.
+source "$HOMEBREW_PREFIX/etc/bash_completion.d/stripe-completion.bash"

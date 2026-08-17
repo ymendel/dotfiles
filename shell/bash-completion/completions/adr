@@ -1,0 +1,3 @@
+# Homebrew's file is adr-tools, named for the formula rather than the command
+# it completes, so the lazy loader can't find it on its own.
+source "$HOMEBREW_PREFIX/etc/bash_completion.d/adr-tools"
