@@ -33,8 +33,9 @@ fi
 
 for ruby in "${rubies[@]}"
 do
-    # Silenced because a plain `gem` under 4.0.6 emits a screenful of rdoc
-    # already-initialized-constant warnings that have nothing to do with this.
+    # The exit status is the answer here, not the output — and a gem command will
+    # cheerfully prepend warnings about whatever else the ruby has lying around,
+    # which was a screenful of rdoc redefinitions until that got cleaned up.
     if chruby-exec "$ruby" -- gem list --installed --exact ruby-lsp > /dev/null 2>&1
     then
         success "ruby-lsp is already in $ruby"
