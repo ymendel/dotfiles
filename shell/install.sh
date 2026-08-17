@@ -95,10 +95,41 @@ link_homebrew_completions () {
     link_file "$(brew --prefix)/etc/bash_completion.d" "$user_dir/completions"
 }
 
+# The completion in shell/bash-completion/completions/heroku reads its list of
+# commands out of heroku's own cache, and only heroku can write that. Unlike the
+# path problem the completion works around, a stale list just misses whatever
+# commands are new, so regenerate it when the installed heroku is newer than the
+# list and leave it alone otherwise. `autocomplete:create` is the offline half of
+# `heroku autocomplete` (just files, no worries about login or API calls)
+build_heroku_completion_cache () {
+    local commands="$HOME/Library/Caches/heroku/autocomplete/commands"
+
+    if ! test $(which heroku)
+    then
+        return
+    fi
+
+    if [[ -f $commands && $commands -nt $(which heroku) ]]
+    then
+        success 'heroku completion cache is current'
+        return
+    fi
+
+    info 'building heroku completion cache — heroku is slow, give it a second'
+
+    if (heroku autocomplete:create)
+    then
+        success 'built heroku completion cache'
+    else
+        warn "couldn't build heroku completion cache"
+    fi
+}
+
 if test $(which brew)
 then
     ensure_brew_bash
     link_homebrew_completions
+    build_heroku_completion_cache
 else
     ensure_any_bash
 fi

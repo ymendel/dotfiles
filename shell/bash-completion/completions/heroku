@@ -1,0 +1,20 @@
+# Homebrew's heroku file doesn't complete anything. All it does is source a cache
+# under ~/Library, and that cache hardcodes the path of the heroku that wrote it —
+# down to the build sha of a client tree heroku unpacks inside its own Cellar
+# directory. Upgrade by either route, brew's or heroku's own, and that path is
+# gone, the `test -f` guarding it fails, and nothing gets registered. Silently.
+# Mine had been naming a 10.8.0 that hasn't been installed for a long time.
+#
+# Regenerating the cache only resets that clock, so skip its setup script and
+# source the completion function straight from opt/, which doesn't move.
+#
+# The two variables are the ones the function refuses to run without. The commands
+# list they point at is heroku's to write — shell/install.sh handles that.
+_heroku_autocomplete="$HOME/Library/Caches/heroku/autocomplete"
+
+HEROKU_AC_ANALYTICS_DIR="$_heroku_autocomplete/completion_analytics"
+HEROKU_AC_COMMANDS_PATH="$_heroku_autocomplete/commands"
+
+source "$HOMEBREW_PREFIX/opt/heroku/libexec/autocomplete-scripts/bash/heroku.bash"
+
+unset _heroku_autocomplete
