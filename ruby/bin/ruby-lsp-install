@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+#
+# Put ruby-lsp into a ruby, because a gem belongs to exactly one of them.
+#
+# Zed spawns a login shell in the project's directory and uses that shell's
+# environment to find and start a language server, so chruby_auto picks whatever
+# the project's .ruby-version asks for and ruby-lsp has to already be there. A copy
+# installed under a different ruby is not merely unused, it is invisible: compiled
+# extensions live under a per-ruby api directory, and since ruby-install builds
+# without --enable-shared while Homebrew builds with it, even two installs calling
+# themselves 4.0.6 disagree about which directory that is.
+#
+# ruby-lsp is deliberately not a Gemfile entry — it composes its own bundle to see
+# a project's gems, so this is the only install it gets.
+#
+# With no arguments it uses the ruby chruby has active. Name one or more versions
+# to install elsewhere. Already-installed rubies are skipped, so re-running is free.
+set -uo pipefail
+
+source "$DOTFILES_HOME/script/helpers/printing.sh"
+
+rubies=("$@")
+
+if [[ ${#rubies[@]} -eq 0 ]]
+then
+    if [[ -z ${RUBY_ROOT:-} ]]
+    then
+        fail "no ruby active and none named — that would land in Homebrew's ruby, which is the thing to avoid"
+    fi
+
+    rubies=("${RUBY_ROOT##*/}")
+fi
+
+for ruby in "${rubies[@]}"
+do
+    # Silenced because a plain `gem` under 4.0.6 emits a screenful of rdoc
+    # already-initialized-constant warnings that have nothing to do with this.
+    if chruby-exec "$ruby" -- gem list --installed --exact ruby-lsp > /dev/null 2>&1
+    then
+        success "ruby-lsp is already in $ruby"
+        continue
+    fi
+
+    info "installing ruby-lsp into $ruby"
+
+    if chruby-exec "$ruby" -- gem install ruby-lsp > /dev/null
+    then
+        success "installed ruby-lsp into $ruby"
+    else
+        warn "could not install ruby-lsp into $ruby"
+    fi
+done

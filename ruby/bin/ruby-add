@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+#
+# Install a ruby and give it a language server in the same breath.
+#
+# ruby-install has no post-install hook — 0.10.1 offers nothing but
+# -- CONFIGURE_OPTS — so joining the two steps has to happen out here, in something
+# I run instead of ruby-install. Which is the point: the trigger is the thing I was
+# going to do anyway, rather than a second command to remember afterwards.
+#
+# Anything after the version goes through to ruby-install, which is enough for the
+# -- CONFIGURE_OPTS form. ruby-install takes its own options before the version, so
+# for those call ruby-install directly and follow it with ruby-lsp-install.
+#
+# Ruby only, since the engine is hardcoded. `ruby-add jruby-9.4` would ask
+# ruby-install for a ruby of that version rather than for jruby.
+set -uo pipefail
+
+source "$DOTFILES_HOME/script/helpers/printing.sh"
+
+version="${1:-}"
+
+if [[ -z $version ]]
+then
+    fail 'usage: ruby-add VERSION [-- CONFIGURE_OPTS ...]'
+fi
+
+shift
+
+# --no-reinstall so that re-running for a ruby already on disk is a no-op rather
+# than a rebuild, which matches how ruby-lsp-install behaves.
+if ! ruby-install --no-reinstall ruby "$version" "$@"
+then
+    fail "ruby-install did not finish for $version"
+fi
+
+ruby-lsp-install "ruby-$version"
