@@ -15,13 +15,15 @@
 # Everything below goes in as a single-quoted -c argument, so it can't contain an
 # apostrophe. A quoted heredoc on stdin would lift that, and it's been tried: an
 # interactive shell reading stdin prints the prompt before every line it consumes,
-# which took the run from 1.4s to 10.6s and buried the ten result lines in prompt
+# which took the run from 1.4s to 10.6s and buried the result lines in prompt
 # escapes, continuation markers and a trailing `logout`. If the constraint ever
 # starts to grate, the way out is to move the body into its own file — not named
 # *.bash, or bashrc.symlink will source it at startup — and source that from -c.
 set -uo pipefail
 
 bash -lic '
+    startup_specs="$(complete -p 2>/dev/null)"
+
     check () {  # check <command> <route>
         local cmd="$1" route="$2"
 
@@ -31,10 +33,18 @@ bash -lic '
             return
         fi
 
-        # -D means nothing is registered yet, which is the point of lazy
+        # Registered before this check asked for it, which happens two ways worth
+        # telling apart: something loaded it at startup, defeating the whole point
+        # of lazy, or an earlier check pulled in a file that registers several
+        # commands at once. The snapshot taken above is what separates them.
         if complete -p "$cmd" > /dev/null 2>&1
         then
-            printf "  %-8s %-8s EAGER (registered before any tab)\n" "$cmd" "$route"
+            if printf "%s\n" "$startup_specs" | grep -q -- " $cmd$"
+            then
+                printf "  %-8s %-8s EAGER (registered at startup)\n" "$cmd" "$route"
+            else
+                printf "  %-8s %-8s SHARED (an earlier check registered it)\n" "$cmd" "$route"
+            fi
             return
         fi
 
@@ -61,12 +71,19 @@ bash -lic '
     check heroku shim
     check stripe shim
     check adr    shim
-    # These three have shims that never get reached, so EAGER is the expected
-    # result and not a regression: ~/.local/bashrc sources the completion.bash.inc
-    # out of a google-cloud-sdk in ~/Downloads, which registers all three while
-    # the shell is starting. That is the last eager completion load left here.
+    # One Homebrew file registers all three of these, so whichever is checked
+    # first reports ok and the other two report SHARED. That is the design working
+    # rather than a regression — see the note in bash-completion/completions/gcloud.
     check gcloud shim
     check bq     shim
     check gsutil shim
     check git    lazy
+
+    # Two the repo registers itself, because bashrc.symlink sources every *.bash
+    # and both of these are one: ruby/rake_completion.bash, and
+    # security/completion.bash, which runs `op completion bash` to get its source.
+    # So EAGER is the right answer for them, and having them here keeps that branch
+    # exercised instead of taking it on trust.
+    check rake   repo
+    check op     repo
 ' 2>&1 | grep -v 'job control\|terminal process group'
