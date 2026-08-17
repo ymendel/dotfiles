@@ -13,6 +13,20 @@
 # ruby-lsp is deliberately not a Gemfile entry — it composes its own bundle to see
 # a project's gems, so this is the only install it gets.
 #
+# The editor half of this is not tracked in here, because it lives in
+# ~/.config/zed/settings.json. Zed's Ruby extension reaches for solargraph unless
+# told otherwise, so installing the gem on a new machine changes nothing on its own:
+#
+#     "languages": {
+#       "Ruby": {
+#         "language_servers": ["ruby-lsp", "!solargraph", "..."],
+#       },
+#     },
+#
+# The bang disables solargraph and the "..." stands in for the rest of Zed's
+# defaults, both of which are its own notation rather than JSON doing something
+# clever.
+#
 # With no arguments it uses the ruby chruby has active. Name one or more versions
 # to install elsewhere. Already-installed rubies are skipped, so re-running is free.
 set -uo pipefail
