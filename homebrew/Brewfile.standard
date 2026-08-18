@@ -37,9 +37,6 @@ cask 'font-iosevka'
 # media
 brew 'gifsicle'
 brew 'imagemagick'
-cask 'licecap'
-# giphy capture?
-# gif brewery?
 
 # apps
 cask '1password'
@@ -57,9 +54,7 @@ cask 'rectangle'
 
 # Mac App Store
 brew 'mas'
-# I wish I could use this on a new computer
-# figure out the right ping utility, something to take up the autoping mantle
-# mas 'autoping', id: 632347870
 mas 'CirclePing', id: 969990150
+mas 'GIPHY CAPTURE', id: 668208984
 
 mas 'QuickMD', id: 6757681819
