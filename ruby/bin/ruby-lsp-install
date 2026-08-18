@@ -10,22 +10,45 @@
 # without --enable-shared while Homebrew builds with it, even two installs calling
 # themselves 4.0.6 disagree about which directory that is.
 #
-# ruby-lsp is deliberately not a Gemfile entry — it composes its own bundle to see
-# a project's gems, so this is the only install it gets.
+# That is only how it resolves with use_bundler off. Left on (its default) the
+# extension runs `bundle exec ruby-lsp` without first checking that the gem is in
+# the bundle, meaning any project with a Gemfile (uh, all of them?) fails with bundler's
+# own "command not found: ruby-lsp" and never consults PATH at all. The docs describe a
+# fallback to PATH and then to a global install, but that cascade needs the extension
+# built with its command_api feature, and the shipped build is not.
 #
-# The editor half of this is not tracked in here, because it lives in
-# ~/.config/zed/settings.json. Zed's Ruby extension reaches for solargraph unless
-# told otherwise, so installing the gem on a new machine changes nothing on its own:
+# ruby-lsp is deliberately not a Gemfile entry — it composes its own bundle to see
+# a project's gems, so this is the only install it gets, and that is exactly why
+# use_bundler *has* to be off (as opposed to just preferably off).
+#
+# The actual editor config has to be in ~/.config/zed/settings.json, and that is
+# currently untracked. For reasons. Zed's Ruby extension reaches for solargraph unless
+# told otherwise, so the config has to also have this added.
 #
 #     "languages": {
 #       "Ruby": {
-#         "language_servers": ["ruby-lsp", "!solargraph", "..."],
+#         "language_servers": ["ruby-lsp"],
+#       },
+#     },
+#     "lsp": {
+#       "ruby-lsp": {
+#         "settings": {
+#           "use_bundler": false,
+#         },
 #       },
 #     },
 #
-# The bang disables solargraph and the "..." stands in for the rest of Zed's
-# defaults, both of which are its own notation rather than JSON doing something
-# clever.
+#
+# Zed's documentation says to turn off solargraph and leave "..." in there, but what
+# that means in practice is that all the other servers registered for Ruby — kanayago
+# steep, sorbet, fuzzy-ruby-server — are still active and not installed. And then each
+# one reports its own failure. Just make this explicitly only ruby-lsp, and revisit
+# this if more are wanted later.
+#
+# Fortunately, ruby-lsp handles rubocop on its own, so not only is it not necessary to
+# add a rubocop server, it'd actually be detrimental because ruby-lsp handles this better
+# and more intelligently. (It pays attenton to whether rubocop is even part of the project,
+# for instance.)
 #
 # With no arguments it uses the ruby chruby has active. Name one or more versions
 # to install elsewhere. Already-installed rubies are skipped, so re-running is free.
