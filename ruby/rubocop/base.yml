@@ -1,0 +1,313 @@
+# Baseline Ruby style — core RuboCop only, no plugins, safe in any Ruby project.
+#
+# Copy into a project as .rubocop-base.yml and list it first in the project's
+# .rubocop.yml (see README.md). Most of the settings and their comments
+# come from rubocop-rails-omakase (v1.1.0), which is not inherited here on purpose,
+# since it depends on rubocop-rails, which pulls in activesupport and rack. That's
+# free in a Rails app, but not something wanted in a gem or a plain-Ruby project.
+#
+# For Rails projects, bring in rails.yml as well. That adds the plugin-dependent
+# omakase entries.
+#
+# Everything below is core RuboCop. As for omakase's plugin-dependent entries:
+# - Performance/FlatMap — in performance.yml
+# - two Rails entries dropped, since they were inert anyway (a disabled department
+#   beats a cop entry that sets only Include)
+
+inherit_mode:
+  merge:
+    - Exclude
+
+# NewCops turns on RuboCop's `pending` cops, as long as they're in departments
+# that are enabled. Since Style departments are off, in practice this means
+# Lint and Security take new cops as RuboCop releases them (which seem like
+# good departments to keep up on). It also silences the "cops were added but
+# are not configured" notice.
+AllCops:
+  NewCops: enable
+  SuggestExtensions: false
+
+# Style departments are disabled by default, with cops enabled one at a time below.
+Bundler:
+  Enabled: false
+Gemspec:
+  Enabled: false
+Layout:
+  Enabled: false
+Metrics:
+  Enabled: false
+Migration:
+  Enabled: false
+Naming:
+  Enabled: false
+Style:
+  Enabled: false
+
+# Bug-catching departments are the other way round: on, with RuboCop's defaults.
+# Any cop that turns out to be noise can be disabled by name.
+# Omakase is style-only, and leaves these off.
+Lint:
+  Enabled: true
+Security:
+  Enabled: true
+
+# Migration's one cop. Catches a `rubocop:disable` comment that names a cop without
+# its department (`SymbolProc` rather than `Style/SymbolProc`).
+Migration/DepartmentName:
+  Enabled: true
+
+# Align `when` with `end`
+Layout/CaseIndentation:
+  Enabled: true
+  EnforcedStyle: end
+
+# Align comments with method definitions
+Layout/CommentIndentation:
+  Enabled: true
+
+Layout/ElseAlignment:
+  Enabled: true
+
+Layout/EmptyLineAfterMagicComment:
+  Enabled: true
+
+Layout/EmptyLinesAroundBlockBody:
+  Enabled: true
+
+# In a regular class definition, no empty lines around the body
+Layout/EmptyLinesAroundClassBody:
+  Enabled: true
+
+# In a regular method definition, no empty lines around the body
+Layout/EmptyLinesAroundMethodBody:
+  Enabled: true
+
+# In a regular module definition, no empty lines around the body
+Layout/EmptyLinesAroundModuleBody:
+  Enabled: true
+
+# Align `end` with the matching keyword or starting expression except for
+# assignments, where it should be aligned with the LHS.
+Layout/EndAlignment:
+  Enabled: true
+  EnforcedStyleAlignWith: variable
+
+# Under omakase, this is left disabled for indenting methods under `private` (for
+# private-only concerns). The house rule is very much not that — same indentation
+# level throughout, blank line after the keyword — and `normal` is the style that
+# enforces that.
+Layout/IndentationConsistency:
+  Enabled: true
+  EnforcedStyle: normal
+
+# Detect hard tabs, no hard tabs
+Layout/IndentationStyle:
+  Enabled: true
+
+# Two spaces, no tabs (for indentation)
+#
+# Omakase disables this because it doesn't behave properly with indented
+# private-only concerns. That's solved by simply not indenting under `private`
+# (see Layout/IndentationConsistency, above). A method indented under `private`
+# gets flagged by both cops.
+Layout/IndentationWidth:
+  Enabled: true
+
+Layout/LeadingCommentSpace:
+  Enabled: true
+
+Layout/SpaceAfterColon:
+  Enabled: true
+
+Layout/SpaceAfterComma:
+  Enabled: true
+
+Layout/SpaceAroundEqualsInParameterDefault:
+  Enabled: true
+
+Layout/SpaceAroundKeyword:
+  Enabled: true
+
+# Use `foo { bar }` not `foo{ bar }`.
+Layout/SpaceBeforeBlockBraces:
+  Enabled: true
+
+Layout/SpaceBeforeComma:
+  Enabled: true
+
+Layout/SpaceBeforeFirstArg:
+  Enabled: true
+
+# Use `->(x, y) { x + y }` not `-> (x, y) { x + y }`
+Layout/SpaceInLambdaLiteral:
+  Enabled: true
+
+# Use `[ a, [ b, c ] ]` not `[a, [b, c]]`
+# Use `[]` not `[ ]`
+Layout/SpaceInsideArrayLiteralBrackets:
+  Enabled: true
+  EnforcedStyle: space
+  EnforcedStyleForEmptyBrackets: no_space
+
+# Use `%w[ a b ]` not `%w[ a   b ]`.
+Layout/SpaceInsideArrayPercentLiteral:
+  Enabled: true
+
+# Use `foo { bar }` not `foo {bar}`.
+# Use `foo { }` not `foo {}`.
+Layout/SpaceInsideBlockBraces:
+  Enabled: true
+  EnforcedStyleForEmptyBraces: space
+
+# Use `{ a: 1 }` not `{a:1}`.
+# Use `{}` not `{  }`.
+Layout/SpaceInsideHashLiteralBraces:
+  Enabled: true
+  EnforcedStyle: space
+  EnforcedStyleForEmptyBraces: no_space
+
+# Use `foo(bar)` not `foo( bar )`
+Layout/SpaceInsideParens:
+  Enabled: true
+
+# Requiring a space is not yet supported as of 1.91.0
+# Use `%w[ foo ]` not `%w[foo]`
+Layout/SpaceInsidePercentLiteralDelimiters:
+  Enabled: false
+  #EnforcedStyle: space
+
+# Use `hash[:key]` not `hash[ :key ]`
+Layout/SpaceInsideReferenceBrackets:
+  Enabled: true
+
+# Exactly one newline at end of file
+Layout/TrailingEmptyLines:
+  Enabled: true
+
+# No trailing whitespace
+Layout/TrailingWhitespace:
+  Enabled: true
+
+Lint/RedundantStringCoercion:
+  Enabled: true
+
+# Use my_method(my_arg) not my_method( my_arg ) or my_method my_arg
+Lint/RequireParentheses:
+  Enabled: true
+
+Lint/UriEscapeUnescape:
+  Enabled: true
+
+# We generally prefer &&/|| but like low-precedence and/or in context
+Style/AndOr:
+  Enabled: false
+
+# Prefer Foo.method over Foo::method
+Style/ColonMethodCall:
+  Enabled: true
+
+Style/DefWithParentheses:
+  Enabled: true
+
+# Use Ruby >= 1.9 syntax for hashes. Prefer { a: :b } over { :a => :b }
+Style/HashSyntax:
+  Enabled: true
+  EnforcedShorthandSyntax: either
+
+# Defining a method with parameters needs parentheses
+Style/MethodDefParentheses:
+  Enabled: true
+
+Style/ParenthesesAroundCondition:
+  Enabled: true
+
+Style/PercentLiteralDelimiters:
+  Enabled: true
+  PreferredDelimiters:
+    default: "()"
+    "%i": "[]"
+    "%I": "[]"
+    "%r": "{}"
+    "%w": "[]"
+    "%W": "[]"
+
+# Use quotes for string literals when they are enough
+Style/RedundantPercentQ:
+  Enabled: false
+
+Style/RedundantReturn:
+  Enabled: true
+  AllowMultipleReturnValues: true
+
+Style/Semicolon:
+  Enabled: true
+  AllowAsExpressionSeparator: true
+
+Style/StabbyLambdaParentheses:
+  Enabled: true
+
+# Use `"foo"` not `'foo'` unless escaping is required
+#
+# Omakase scopes this to a Rails tree (app/ config/ lib/ test/ Gemfile), which in a
+# gem would miss spec/, exe/, Rakefile and the gemspec. Left unscoped here so it
+# applies to the whole tree. rails.yml puts omakase's scope back.
+Style/StringLiterals:
+  Enabled: true
+  EnforcedStyle: double_quotes
+
+# ---------------------------------------------------------------------------
+# House preferences beyond omakase
+# ---------------------------------------------------------------------------
+
+# Trailing comma after the last element of a multiline literal or argument list.
+# Omakase enables the two literal cops, but leaves EnforcedStyleForMultiline at
+# RuboCop's default of `no_comma`, which is the exact opposite of this. Omakase
+# never enables the arguments cop at all, so it gets Enabled here.
+Style/TrailingCommaInArrayLiteral:
+  Enabled: true
+  EnforcedStyleForMultiline: consistent_comma
+
+Style/TrailingCommaInHashLiteral:
+  Enabled: true
+  EnforcedStyleForMultiline: consistent_comma
+
+Style/TrailingCommaInArguments:
+  Enabled: true
+  EnforcedStyleForMultiline: consistent_comma
+
+# Never numbered block parameters (`_1`, `_2`) — always an explicit named one.
+# `it` is the same thing with a slightly nicer-looking name — get rid of it.
+Style/NumberedParameters:
+  Enabled: true
+  EnforcedStyle: disallow
+
+Style/ItBlockParameter:
+  Enabled: true
+  EnforcedStyle: disallow
+
+# `words.map(&:upcase)` over `words.map { |word| word.upcase }`.
+Style/SymbolProc:
+  Enabled: true
+
+# Gems get a version constraint. Much like Layout/SpaceInsidePercentLiteralDelimiters
+# above, 1.91.0 can check that a version is present, but not the operator. I _usually_
+# (almost always) want to use `~>`, but there are legitimate reasons to use other
+# operators. For now, just require the version. Operator is something to consider later.
+# cf. https://github.com/rubocop/rubocop/issues/7669
+Bundler/GemVersion:
+  Enabled: true
+  EnforcedStyle: required
+
+# ---------------------------------------------------------------------------
+# House preferences that currently cannot be enforced
+# (no cop exists, possibly because they are vague and hard to see)
+# ---------------------------------------------------------------------------
+
+# - instance-oriented design over class methods
+# - no metaprogramming
+# - `Data.define` over `Struct.new`
+# - non-trivial defaults out of method signatures
+# - kwargs over positional args
+# - symbol keys in hashes
+# - prepositional constructors (e.g. `.for`, `.of`, `.from`, and/or those as prefixes)
+# - alphabetizing where order doesn't matter

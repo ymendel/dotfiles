@@ -1,0 +1,24 @@
+# Performance cops
+#
+# Its own file for the same reason as minitest.yml: base.yml is core RuboCop only,
+# and these need rubocop-performance. That plugin depends only on rubocop,
+# rubocop-ast and lint_roller (no activesupport), so it's cheap and easy to take
+# on, wherever you want it.
+#
+# Copy into the project as .rubocop-performance.yml, list it after .rubocop-base.yml
+# in the project's .rubocop.yml, and add rubocop-performance to the Gemfile. See
+# README.md.
+
+plugins:
+  - rubocop-performance
+
+Performance:
+  Enabled: false
+  Exclude:
+    - "test/**/*"
+
+# Omakase's one Performance cop. `map { ... }.flatten(1)` becomes `flat_map`. A bare
+# `.flatten` is left alone, since it flattens all the way down and `flat_map`
+# doesn't (that's EnabledForFlattenWithoutParams, off by default).
+Performance/FlatMap:
+  Enabled: true

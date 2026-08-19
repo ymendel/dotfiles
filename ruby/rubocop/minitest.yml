@@ -1,0 +1,188 @@
+# Minitest cops
+#
+# This is its own file rather than a section of base.yml, mostly for purity's
+# sake. The whole premise of base.yml is that it's pure rubocop, no plugins,
+# and these need rubocop-minitest. Sure, that's an easy plugin to bring in
+# with light deps, but it's still something. And not all projects use Minitest,
+# anyway.
+#
+# Copy into the project as .rubocop-minitest.yml, list it after the others in the
+# project's .rubocop.yml, and add rubocop-minitest to the Gemfile. See README.md.
+
+plugins:
+  - rubocop-minitest
+
+Minitest:
+  Enabled: false
+
+# A test declared after a `private` keyword is a private method, and Minitest
+# collects only public ones. That means that test is silently skipped, with
+# whatever consequences that follow — e.g. the suite is falsely green.
+#
+# This is pending as of 0.41.0. This is just a warning, and there's no
+# autocorrection — not really something that can be easily corrected
+# without judgement, anyway.
+Minitest/NonPublicTestMethod:
+  Enabled: true
+
+# ---------------------------------------------------------------------------
+# Tests that don't test what they look like they test
+# ---------------------------------------------------------------------------
+
+# `assert(expected, actual)` where `assert_equal` was meant. The second argument
+# is the failure message, so this passes whenever `expected` is truthy.
+Minitest/AssertWithExpectedArgument:
+  Enabled: true
+
+# An assertion that can only ever pass, or only ever fail.
+Minitest/UselessAssertion:
+  Enabled: true
+
+# Assertions inside an `assert_raises` block, after the line that raises. They
+# never run.
+Minitest/UnreachableAssertion:
+  Enabled: true
+
+# `assert_raises(FooError, /message/)` looks like it checks the message, but
+# nothing is matched against the regexp. Match against the exception that
+# `assert_raises` returns instead.
+Minitest/AssertRaisesWithRegexpArgument:
+  Enabled: true
+
+# One statement in an `assert_raises` block, so it's clear what's expected
+# to raise. With more, any of the statements could be raising that error
+# and passing the test.
+Minitest/AssertRaisesCompoundBody:
+  Enabled: true
+
+# A test class inheriting from another test class runs the parent's tests again.
+Minitest/DuplicateTestRun:
+  Enabled: true
+
+# A test method defined outside a test class, which nothing runs.
+Minitest/NonExecutableTestMethod:
+  Enabled: true
+
+# A method with assertions but no `test_` prefix, which Minitest never runs.
+Minitest/TestMethodName:
+  Enabled: true
+
+# `return` in a test, where `skip` would say the test didn't really run.
+Minitest/ReturnInTestMethod:
+  Enabled: true
+
+# An `ensure` that still runs when the test is skipped, so teardown happens
+# for setup that never did.
+Minitest/SkipEnsure:
+  Enabled: true
+
+# ---------------------------------------------------------------------------
+# The specific assertion over `assert` or `refute` with an expression
+# ---------------------------------------------------------------------------
+#
+# Yes, you can do anything with `assert`, but the failure message is "Expected
+# false to be truthy." `assert_includes` shows the collection and what wasn't in
+# it, `assert_nil` shows what it got instead, &c.
+#
+# Left out on purpose:
+# - AssertTruthy, RefuteFalse — `Safe: false`, and rightly so. `assert_equal(true,
+#   actual)` is stricter than `assert(actual)`, so the "fix" weakens the test.
+# - AssertPredicate, RefutePredicate, AssertOperator, RefuteOperator — they may
+#   give good failure messages, but `assert_predicate(user, :valid?)` is just weird,
+#   and `assert_operator(expected, :<, actual)` is just bizarre.
+
+Minitest/AssertEmpty:
+  Enabled: true
+Minitest/RefuteEmpty:
+  Enabled: true
+
+Minitest/AssertEqual:
+  Enabled: true
+Minitest/RefuteEqual:
+  Enabled: true
+
+Minitest/AssertInDelta:
+  Enabled: true
+Minitest/RefuteInDelta:
+  Enabled: true
+
+Minitest/AssertIncludes:
+  Enabled: true
+Minitest/RefuteIncludes:
+  Enabled: true
+
+Minitest/AssertInstanceOf:
+  Enabled: true
+Minitest/RefuteInstanceOf:
+  Enabled: true
+
+Minitest/AssertKindOf:
+  Enabled: true
+Minitest/RefuteKindOf:
+  Enabled: true
+
+Minitest/AssertMatch:
+  Enabled: true
+Minitest/RefuteMatch:
+  Enabled: true
+
+Minitest/AssertNil:
+  Enabled: true
+Minitest/RefuteNil:
+  Enabled: true
+
+Minitest/AssertPathExists:
+  Enabled: true
+Minitest/RefutePathExists:
+  Enabled: true
+
+Minitest/AssertRespondTo:
+  Enabled: true
+Minitest/RefuteRespondTo:
+  Enabled: true
+
+Minitest/AssertSame:
+  Enabled: true
+Minitest/RefuteSame:
+  Enabled: true
+
+# `assert_output("", "") { ... }` becomes `assert_silent { ... }`, and capturing
+# `$stdout` by hand becomes `assert_output`.
+Minitest/AssertOutput:
+  Enabled: true
+Minitest/AssertSilent:
+  Enabled: true
+
+# ---------------------------------------------------------------------------
+# Test hygiene
+# ---------------------------------------------------------------------------
+
+# Assertions belong in the test, not in `setup` or `teardown`.
+Minitest/AssertionInLifecycleHook:
+  Enabled: true
+
+# Lifecycle hooks in the order they run: `before_setup`, `setup`, `after_setup`,
+# then the teardowns.
+Minitest/LifecycleHooksOrder:
+  Enabled: true
+
+# `skip` says why.
+Minitest/SkipWithoutReason:
+  Enabled: true
+
+# Test files are named `test_*.rb` or `*_test.rb`.
+Minitest/TestFileName:
+  Enabled: true
+
+# `assert_raises` names the exception it expects.
+Minitest/UnspecifiedException:
+  Enabled: true
+
+# `assert_equal(expected, actual)` in that order, so the failure message has
+# "Expected" and "Actual" the right way round.
+Minitest/LiteralAsActualArgument:
+  Enabled: true
+
+# No explicit `nil` failure message, which is the default anyway.
+Minitest/RedundantMessageArgument:
+  Enabled: true

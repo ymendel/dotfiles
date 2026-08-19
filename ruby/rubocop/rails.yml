@@ -1,0 +1,46 @@
+# Ruby style for a Rails app — the Rails plugin, on top of base.yml.
+#
+# Copy into the project as .rubocop-rails.yml, list it after .rubocop-base.yml in
+# the project's .rubocop.yml, and add rubocop-rails to the Gemfile. See README.md.
+#
+# base.yml is omakase's content already, so this is just the handful of omakase
+# entries that need its plugins (rather than inheriting omakase and having base.yml
+# override nearly all of it). Omakase's Performance cop is in performance.yml.
+
+plugins:
+  - rubocop-rails
+
+# Adds to RuboCop's default excludes (vendor/, node_modules/, &c.) rather than
+# replacing them, thanks to base.yml's inherit_mode.
+AllCops:
+  Exclude:
+    - "data/**/*"
+
+# Loading a plugin enables its cops by default, so turn the department off the way
+# base.yml does for core, and enable cops one at a time.
+Rails:
+  Enabled: false
+
+# ActiveSupport adds `assert_not`, and omakase prefers that, while leaving the cop
+# that would enforce it inert. House style is `refute`, the idiomatic Minitest
+# negative, and this cop supports that.
+Rails/RefuteMethods:
+  Enabled: true
+  EnforcedStyle: refute
+
+# `remove_column :users, :legacy_id, :integer` — without the type, db:rollback can't
+# reconstruct the column. This cop covers that and the rest of the irreversible
+# `change` operations.
+Rails/ReversibleMigration:
+  Enabled: true
+
+# base.yml leaves Style/StringLiterals unscoped. Omakase limits double quotes to
+# "app code" only — app/, config/, lib/, test/, and Gemfile. That's fine for most
+# any Rails app. To widen it to the whole tree, delete this.
+Style/StringLiterals:
+  Include:
+    - "app/**/*"
+    - "config/**/*"
+    - "lib/**/*"
+    - "test/**/*"
+    - "Gemfile"
