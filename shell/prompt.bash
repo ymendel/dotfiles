@@ -319,7 +319,9 @@ prompt_jj_current_change()
 
 # command timing
 # requires bash 5+ for $EPOCHREALTIME
-
+# The start time comes from the DEBUG trap because that fires before a command
+# runs. PS0 is the other pre-command hook, but it's a prompt *string* that gets
+# printed.
 __cmd_start_record()
 {
     [[ -z $__cmd_armed ]] && return
@@ -327,9 +329,27 @@ __cmd_start_record()
     unset __cmd_armed
 }
 
-# chain our DEBUG trap with anything else's instead of clobbering
-# called from PROMPT_COMMAND so we re-chain if anything later (e.g. chruby) clobbered us
-# the existing trap is passed in because DEBUG isn't inherited into functions
+# However, DEBUG fires before every command, and that includes the ones in
+# PROMPT_COMMAND itself. So use this flag to gate recording. Without it, the
+# start time would be reset (to now) on the way to drawing each prompt.
+__cmd_arm()
+{
+    __cmd_armed=1
+}
+
+# What is all this about? Well, DEBUG is a shared global that's a single value
+# (not a list, not a string with : or ; separators), and you have to be careful
+# to not clobber what's there.
+#
+# This runs from PROMPT_COMMAND rather than at load time, to pick up whatever's
+# there every time. And because of that, you want to ensure the same new trap
+# isn't added over and over.
+#
+# Specific case here — ruby/chruby.bash adds the chruby-auto trap, and it sorts
+# ahead of this.
+#
+# And because DEBUG isn't inherited into functions, the existing value has to be
+# passed in. Now doesn't all of that make sense?
 __install_debug_trap()
 {
     local Existing=$1
@@ -345,11 +365,6 @@ __install_debug_trap()
     else
         trap '__cmd_start_record' DEBUG
     fi
-}
-
-__cmd_arm()
-{
-    __cmd_armed=1
 }
 
 __format_duration()
@@ -407,6 +422,5 @@ prepend_prompt_command()
 prepend_prompt_command 'set_prompt'
 add_prompt_command 'set_git_main_branch'
 add_prompt_command 'window_title_user_host'
-# capture the existing DEBUG trap at top level; functions don't inherit DEBUG without functrace
-add_prompt_command '__install_debug_trap "$(trap -p DEBUG)"'
+add_prompt_command '__install_debug_trap "$(trap -p DEBUG)"'  # see __install_debug_trap for why this is passed in
 add_prompt_command '__cmd_arm'  # arm last, so DEBUG only fires for the user's next command
