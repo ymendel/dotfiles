@@ -104,7 +104,14 @@ install_deps () {
     info "installing dependencies"
 
     # get output from updot, but end on the specific EOT character
-    if ( bin/updot | while read -r data && [[ $(printf '%02X' \'${data:0:1}) != "04" ]] ; do info "$data"; done )
+    bin/updot | while read -r data && [[ $(printf '%02X' \'${data:0:1}) != "04" ]] ; do info "$data"; done
+
+    # Hey, did you know that the pipeline status is the very end, so checking this
+    # just said whether the while loop found that EOT character? I wasn't ever
+    # going to get updot's status with a simple check. PIPESTATUS to the rescue.
+    # NOTE: PIPESTATUS only sticks around to the next command. Let nothing come
+    # between these two.
+    if [[ ${PIPESTATUS[0]} -eq 0 ]]
     then
         success "dependencies installed"
     else
