@@ -6,5 +6,40 @@ set -e
 
 cd "$(dirname $0)"/..
 
-# find the installers and run them iteratively
-find . -name install.sh -exec sh -c "{}" \;
+source script/helpers/printing.sh
+
+# find the installers and run them iteratively.
+#
+# This should be a `find -exec`, right? WRONG! BSD's `\;` form exits 0, always.
+# So any installer could fail, and there'd be no indication. (Note: there is an
+# `-exec ... +` form that does propagate the return status, but that batches
+# everything into one call. I'm trying to run these separately.)
+#
+# So what to do? Just loop it, baby.
+# Making sure to use process substitution instead a pipe, so it runs in this
+# shell and can record what happened.
+failed=()
+
+while IFS= read -r installer
+do
+    if ! sh -c "$installer"
+    then
+        failed+=("$installer")
+    fi
+done < <(find . -name install.sh)
+
+# Instead of stopping at the first failure, keep on going. All of the installers
+# are independent (or they _should_ be), so I don't need one failed installer
+# blocking a bunch of others. Set up as much as possible, and tell me what didn't
+# work.
+if [[ ${#failed[@]} -gt 0 ]]
+then
+    echo ''
+
+    for installer in "${failed[@]}"
+    do
+        warn "$installer did not finish"
+    done
+
+    fail "${#failed[@]} of the installers did not finish"
+fi
