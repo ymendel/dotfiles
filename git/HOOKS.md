@@ -22,6 +22,32 @@ every repo picks up the change immediately, for its next hook fire.
 - `ctags` — regenerate ctags for the repo (excludes javascript and sql, see `--languages`)
 - `post-checkout`, `post-commit`, `post-merge` — run `ctags`
 - `post-rewrite` — if the action is a rebase, run `post-merge`
+- `pre-commit` — refuse a commit that stages a settings file carrying a credential (below)
+
+## `pre-commit` — no credentials in a settings file
+
+`pre-commit` refuses a commit that stages a file whose name ends in `settings.json`
+(or `settings.json.symlink`, thanks to the convention in my dotfiles) holding a
+key named like a credential and with a non-empty value. It never reports the value,
+just path/line/key. This is the first (and so far, only) hook that can stop something.
+
+It was created for Zed, which handles its config itself, and has `context_servers`
+entries that take credentials inline, like y'know maybe a GitHub Personal Access
+Token. And since I'd like to track my Zed config like so much else, I have to deal
+with that. At least until ([zed#26043](https://github.com/zed-industries/zed/discussions/26043)
+or something like it changes the landscape.
+
+GitHub push protection would be nice to use here, but all I can use in a personal
+repo is the recognized-provider-pattern. "Generic patterns" would do it for me,
+if I could use it. So hook it is!
+
+Since Zed's settings file is JSONC (allows fancy things like comments, trailing
+commas, readability), the check is a text scan rather than parsing — `jq` doesn't
+handle JSONC. So this may raise some false positives, which at least is safer than
+false negatives.
+
+If you really want to get around this, there's `git commit --no-verify`. But possibly
+just make it not flag something legit instead.
 
 ## Per-repo customization: `git hooks-override`
 

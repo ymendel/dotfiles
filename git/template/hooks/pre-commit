@@ -1,0 +1,40 @@
+#!/bin/sh
+#
+# Refuse to commit a settings file that carries a credential.
+#
+# Specifically this was created for Zed, which will write to its settings file
+# on its own, and has entries (like `context_servers`) that will take credentials
+# inline, in plain text. No thanks.
+#
+# Check on https://github.com/zed-industries/zed/discussions/26043 periodically
+# and see if this can be stopped (although it could become a safety net for other
+# settings files).
+
+keywords='token|secret|password|passwd|api[_-]?key|access[_-]?key|private[_-]?key|credential|authorization'
+key_re="\"[A-Za-z0-9_-]*(${keywords})[A-Za-z0-9_-]*\""
+assignment_re="${key_re}[[:space:]]*:[[:space:]]*\"[^\"]"
+
+staged=$(git diff --cached --name-only --diff-filter=ACM | grep -E 'settings\.json(\.symlink)?$')
+
+if [ -z "$staged" ]; then
+  exit 0
+fi
+
+# report path, line number, and key — *never* value
+report=$(printf '%s\n' "$staged" | while IFS= read -r path; do
+  # use text scan instead of parsing, because Zed config is JSONC and `jq` doesn't do that
+  git show ":$path" | grep -inE "$assignment_re" | while IFS= read -r hit; do
+    printf '  %s:%s  %s\n' \
+      "$path" \
+      "${hit%%:*}" \
+      "$(printf '%s\n' "$hit" | grep -oiE "$key_re" | head -1)"
+  done
+done)
+
+if [ -n "$report" ]; then
+  printf '\npre-commit: credential-shaped key in a staged settings file:\n\n%s\n' "$report" >&2
+  printf '\nRemove the value, or commit with --no-verify if it is deliberate.\n\n' >&2
+  exit 1
+fi
+
+exit 0
