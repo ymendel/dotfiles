@@ -1,4 +1,4 @@
-# link (symlink, not hard link) one path to another, with some optionality
+# Link (symlink, not hard link) one path to another, with some optionality
 # (overwrite, backup, skip), and some cleverness (if the link is already
 # correct, skip and move on).
 #
@@ -117,4 +117,30 @@ link_tree () {
             link_file "$src" "$dst"
         done < <(find "$dir" -type f)
     done
+}
+
+# Do all the linking!
+#   - all *.symlink files into $HOME with a dot prepended
+#     (eg. git/gitconfig.symlink → ~/.gitconfig)
+#   - every topic's config/ tree into CONFIG_HOME
+#
+# This gets done on first clone/bootstrap, but also on every `updot` (via
+# script/install, via system/install.sh), so newly-added config files get
+# linked on the next run.
+#
+# NOTE: needs the same variables `link_file` does (`overwrite_all`, `backup_all`, `skip_all`),
+# plus `DOTFILES_ROOT` and `CONFIG_HOME`.
+# Those *_all flags stay the caller's to declare, by design. One answer there
+# should cover all the linking in the run, even whatever that caller adds to
+# the mix.
+link_dotfiles () {
+    local src dst
+
+    for src in $(find $DOTFILES_ROOT -name '*.symlink' -type f)
+    do
+        dst="$HOME/.$(basename ${src%.symlink})"
+        link_file $src $dst
+    done
+
+    link_tree config "$CONFIG_HOME"
 }

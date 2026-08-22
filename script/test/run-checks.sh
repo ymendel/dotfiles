@@ -1,17 +1,19 @@
 #!/usr/bin/env bash
 #
-# Checks link_tree, the nested-config linking used for anything wanting a path
-# instead of a $HOME dotfile:
+# Checks the linking helpers: link_tree, which puts a topic's config/ tree at a
+# nested path, and link_dotfiles, which does that plus the *.symlink files:
 #
 #     script/test/run-checks.sh
 #
 # Builds a fake DOTFILES_ROOT rather than running bootstrap, which would try to
-# chsh and install packages.
+# chsh and install packages. link_dotfiles reads $HOME and CONFIG_HOME as well,
+# so those get redirected too — getting that wrong would link into the real home
+# directory.
 #
-# Two callers link config trees — script/bootstrap and system/install.sh — so
-# some of this checks that both of them still hold up their end, which no
-# runtime check here would catch: this file sources the helpers itself, so it
-# can't notice a caller that forgot to.
+# Two callers do the linking — script/bootstrap and system/install.sh — so some
+# of this checks that both still go through the shared helper, which no runtime
+# check here would catch: this file sources the helpers itself, so it can't
+# notice a caller that forgot to.
 #
 # Deliberately not set -e: a failing check should report, not abort the run.
 
@@ -107,6 +109,40 @@ check "no duplicates, no backups" "3" "$(find "$dest" -type l | wc -l | tr -d ' 
 check "no .backup left behind" "0" \
     "$(find "$dest" -name '*.backup' | wc -l | tr -d ' ')"
 
+mkdir -p "$DOTFILES_ROOT/git"
+printf 'a\n' > "$DOTFILES_ROOT/git/gitconfig.symlink"
+
+mkdir -p "$DOTFILES_ROOT/shell"
+printf 'b\n' > "$DOTFILES_ROOT/shell/tmux.conf.symlink"
+
+mkdir -p "$DOTFILES_ROOT/media/cam"
+printf 'c\n' > "$DOTFILES_ROOT/media/cam/buried.symlink"
+
+fake_home="$(mktemp -d)"
+fake_config="$(mktemp -d)"
+
+# Both $HOME and CONFIG_HOME redirected, per the note at the top of the file.
+run_dotfiles () {
+    ( HOME="$fake_home"; CONFIG_HOME="$fake_config"; link_dotfiles ) \
+        >/dev/null 2>&1 </dev/null
+}
+
+run_dotfiles
+
+echo "== link_dotfiles puts *.symlink files in \$HOME behind a dot"
+check "plain name" "$DOTFILES_ROOT/git/gitconfig.symlink" \
+    "$(target "$fake_home/.gitconfig")"
+check "name carrying its own dots" "$DOTFILES_ROOT/shell/tmux.conf.symlink" \
+    "$(target "$fake_home/.tmux.conf")"
+check "nesting flattens to the basename" "$DOTFILES_ROOT/media/cam/buried.symlink" \
+    "$(target "$fake_home/.buried")"
+
+echo "== link_dotfiles covers the config trees in the same pass"
+check "config tree came along" "$DOTFILES_ROOT/editing/config/zed/settings.json" \
+    "$(target "$fake_config/zed/settings.json")"
+check "and nothing landed outside the two fake roots" "3" \
+    "$(find "$fake_home" -type l | wc -l | tr -d ' ')"
+
 echo "== CONFIG_HOME, the root both callers link into"
 check "defaults to ~/.config" "$HOME/.config" \
     "$(unset XDG_CONFIG_HOME; sourced_config_home)"
@@ -116,17 +152,26 @@ check "honors XDG_CONFIG_HOME when set" "/tmp/xdg-somewhere-else" \
 # An empty root would build paths from / rather than failing, so the thing worth
 # guarding is that every caller has CONFIG_HOME in scope at all — which means
 # sourcing filestuff.sh, where ensure_dir lives too.
-echo "== both callers hold up link_tree's end of the deal"
+echo "== both callers hold up the helpers' end of the deal"
 check "bootstrap sources filestuff" "yes" \
     "$(mentions "$repo/script/bootstrap" 'helpers/filestuff.sh')"
 check "system/install.sh sources filestuff" "yes" \
     "$(mentions "$repo/system/install.sh" 'helpers/filestuff.sh')"
-check "bootstrap links config trees" "yes" \
-    "$(mentions "$repo/script/bootstrap" 'link_tree config')"
-check "system/install.sh links config trees" "yes" \
-    "$(mentions "$repo/system/install.sh" 'link_tree config')"
 
-rm -rf "$DOTFILES_ROOT" "$dest"
+# The loop used to be copied into both callers. Guard against it coming back.
+echo "== the linking itself lives in one place"
+check "the helper links config trees" "yes" \
+    "$(mentions "$scriptdir/helpers/linking.sh" 'link_tree config')"
+check "bootstrap goes through link_dotfiles" "yes" \
+    "$(mentions "$repo/script/bootstrap" 'link_dotfiles')"
+check "system/install.sh goes through link_dotfiles" "yes" \
+    "$(mentions "$repo/system/install.sh" 'link_dotfiles')"
+check "bootstrap has no symlink loop of its own" "no" \
+    "$(mentions "$repo/script/bootstrap" "symlink' -type f")"
+check "system/install.sh has none either" "no" \
+    "$(mentions "$repo/system/install.sh" "symlink' -type f")"
+
+rm -rf "$DOTFILES_ROOT" "$dest" "$fake_home" "$fake_config"
 
 printf '\n  %d passed, %d failed\n' "$pass" "$fail"
 [[ $fail -eq 0 ]]

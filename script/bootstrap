@@ -52,19 +52,15 @@ ensure_bash () {
 install_dotfiles () {
     info 'installing dotfiles'
 
+    # link_* need these to exist
+    # one answer for every question to the end of the linking
     local overwrite_all=false backup_all=false skip_all=false
 
+    # make the ~/.dotfiles link separately — that's the bootstrapping
     link_file $DOTFILES_ROOT "$HOME/.dotfiles"
 
-    for src in $(find $DOTFILES_ROOT -name '*.symlink' -type f)
-    do
-        dst="$HOME/.$(basename ${src%.symlink})"
-        link_file $src $dst
-    done
-
-    # link the config file trees as well as the simple symlink files
-    # keep this here to follow along with overwrite/backup/skip all
-    link_tree config "$CONFIG_HOME"
+    # link the rest of the dotfiles
+    link_dotfiles
 }
 
 ensure_local_dir () {
