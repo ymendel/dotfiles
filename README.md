@@ -43,7 +43,12 @@ understand and handle with this separation.
   instead of `.bash` to avoid being loaded automatically.
 - _topic_/**\*.symlink**: Any file ending in `.symlink` gets symlinked into `$HOME` with a prepended `.` (e.g. `git/gitconfig.symlink` → `~/.gitconfig`)
   This lets all of these files stay versioned in the dotfiles repository, but still be useful in their expected locations.
-  These files are symlinked by `script/bootstrap` (not `updot`).
+  These files are symlinked by both `script/bootstrap` and `script/install` (which is run by `updot`).
+- _topic_/**config/**: Anything under here gets symlinked into `$XDG_CONFIG_HOME` (`~/.config` when that isn't set),
+  keeping whatever path it had below `config/` (e.g. `editing/config/zed/settings.json` → `~/.config/zed/settings.json`).
+  Note that it's the _files_ that are linked, and not the _directory_, because that directory might be used by something
+  else. As with the **\*.symlink** files, these are symlinked by both `script/bootstrap` and `script/install` (which
+  is run by `updot`).
 - **~/.local/bashrc**: This file will be sourced if it exists, allowing you to have special per-machine differences.
 
 ## Rejuvenation

@@ -8,6 +8,7 @@ DOTFILES_ROOT=$(pwd -P)
 
 source "$DOTFILES_HOME/script/helpers/printing.sh"
 source "$DOTFILES_HOME/script/helpers/linking.sh"
+source "$DOTFILES_HOME/script/helpers/filestuff.sh"
 
 link_dotfiles () {
     info 'linking dotfiles'
@@ -19,6 +20,10 @@ link_dotfiles () {
         dst="$HOME/.$(basename ${src%.symlink})"
         link_file $src $dst
     done
+
+    # link the config file trees as well as the simple symlink files
+    # keep this here to follow along with overwrite/backup/skip all
+    link_tree config "$CONFIG_HOME"
 }
 
 link_dotfiles

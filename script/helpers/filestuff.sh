@@ -1,3 +1,6 @@
+# I'm always going to be using ~/.config, but I might as well pretend to care about XDG
+CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+
 ensure_dir () {
     local dir=$1
 

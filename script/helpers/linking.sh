@@ -1,3 +1,8 @@
+# link (symlink, not hard link) one path to another, with some optionality
+# (overwrite, backup, skip), and some cleverness (if the link is already
+# correct, skip and move on).
+#
+# NOTE: this _requires_ a few variables in scope: `overwrite_all`, `backup_all`, `skip_all`
 link_file () {
     local src=$1 dst=$2
 
@@ -81,4 +86,35 @@ does_link_match () {
     else
         false
     fi
+}
+
+# Look for <subdir> under every topic, and then link all the files in there
+# to <root>/ with the same path. e.g. editing/config/zed/settings.json goes to
+# $root/zed/settings.json
+#
+# The _files_ are linked, rather than the _directory_, because something else
+# might be using the directory for its own reasons.
+#
+# Uses `link_file` internally, so all of its behavior applies — notably, it
+# needs `overwrite_all`, `backup_all`, and `skip_all` in scope.
+link_tree () {
+    local subdir=$1 root=$2
+    local dir src rel dst
+
+    for dir in "$DOTFILES_ROOT"/*/"$subdir"
+    do
+        # check if the dir is actually a directory, because an unmatched glob
+        # stays literal
+        [[ -d $dir ]] || continue
+
+        # process substitution lets this run in the current shell
+        while IFS= read -r src
+        do
+            rel="${src#"$dir"/}"
+            dst="$root/$rel"
+
+            ensure_dir "$(dirname "$dst")"
+            link_file "$src" "$dst"
+        done < <(find "$dir" -type f)
+    done
 }

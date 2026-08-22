@@ -61,6 +61,10 @@ install_dotfiles () {
         dst="$HOME/.$(basename ${src%.symlink})"
         link_file $src $dst
     done
+
+    # link the config file trees as well as the simple symlink files
+    # keep this here to follow along with overwrite/backup/skip all
+    link_tree config "$CONFIG_HOME"
 }
 
 ensure_local_dir () {
@@ -73,8 +77,7 @@ ensure_local_dir () {
 ensure_config_dir () {
     info 'checking config dir'
 
-    local configdir="$HOME/.config"
-    ensure_dir $configdir
+    ensure_dir "$CONFIG_HOME"
 }
 
 set_machine_profiles () {
@@ -120,9 +123,9 @@ install_deps () {
 }
 
 ensure_bash
-install_dotfiles
 ensure_local_dir
 ensure_config_dir
+install_dotfiles
 set_machine_profiles
 install_deps
 
