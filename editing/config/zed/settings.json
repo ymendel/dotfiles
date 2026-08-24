@@ -1,0 +1,90 @@
+// Zed settings
+//
+// For information on how to configure Zed, see the Zed
+// documentation: https://zed.dev/docs/configuring-zed
+//
+// To see all of Zed's default settings without changing your
+// custom settings, run the `open default settings` command
+// from the command palette or from `Zed` application menu.
+{
+  "autosave": {
+    "after_delay": {
+      "milliseconds": 1000
+    }
+  },
+  "global_lsp_settings": {
+    "button": false
+  },
+  "proxy": "",
+  "document_folding_ranges": "off",
+  "semantic_tokens": "combined",
+  "redact_private_values": true,
+  // Default value
+  // "private_files": ["**/.env*", "**/*.pem", "**/*.key", "**/*.cert", "**/*.crt", "**/secrets.yml"]
+  "cli_default_open_behavior": "new_window",
+  "project_panel": {
+    "dock": "left",
+  },
+  "outline_panel": {
+    "dock": "left",
+  },
+  "collaboration_panel": {
+    "dock": "left",
+  },
+  "git_panel": {
+    "tree_view": false,
+    "dock": "left",
+  },
+  "disable_ai": false,
+  "git": {
+    "blame": {
+      "show_avatar": false,
+    },
+  },
+  "use_smartcase_search": true,
+  // ruby-lsp rather than solargraph, which is the extension's default. Both are
+  // gems, so either has to exist for whichever ruby a project's .ruby-version
+  // names — see ruby/bin/ruby-lsp-install in the dotfiles. ruby-lsp is the one
+  // that composes its own bundle instead of wanting a Gemfile entry per project,
+  // which is why use_bundler has to be off: left on it runs `bundle exec ruby-lsp`
+  // and bundler correctly reports a gem that was never meant to be in the bundle.
+  // The list is closed — no "..." — because that wildcard re-enables every Ruby
+  // server any installed extension registers, and none of the others are installed.
+  "languages": {
+    "Ruby": {
+      "language_servers": ["ruby-lsp"],
+    },
+  },
+  "lsp": {
+    "ruby-lsp": {
+      "settings": {
+        "use_bundler": false,
+      },
+    },
+  },
+  "inlay_hints": {
+    "enabled": true,
+  },
+  "show_whitespaces": "trailing",
+  "indent_guides": {
+    "background_coloring": "disabled",
+    "coloring": "indent_aware",
+  },
+  "vim": {
+    "use_smartcase_find": true,
+    "toggle_relative_line_numbers": false,
+  },
+  "minimap": {
+    "show": "auto",
+  },
+  "relative_line_numbers": "disabled",
+  "theme": {
+    "mode": "dark",
+    "light": "One Light",
+    "dark": "One Dark",
+  },
+  "buffer_font_family": "Fira Code",
+  "vim_mode": true,
+  "ui_font_size": 16,
+  "buffer_font_size": 16,
+}
