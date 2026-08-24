@@ -9,6 +9,16 @@ link_file () {
     local overwrite= backup= skip=
     local action=
 
+    # If the link is dangling (the source has moved), `-e` reads as absent, the
+    # whole existence check gets skipped, and the `ln -s` at the end fails with
+    # "File exists". Since the link is pointing nowhere, just remove it. It'll
+    # be relinked afterwards.
+    if [ -L "$dst" ] && [ ! -e "$dst" ]
+    then
+        rm "$dst"
+        success "removed dangling $dst"
+    fi
+
     if [ -e "$dst" ]
     then
         if [ "$skip_all" == "false" ]

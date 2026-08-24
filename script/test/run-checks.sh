@@ -109,6 +109,26 @@ check "no duplicates, no backups" "3" "$(find "$dest" -type l | wc -l | tr -d ' 
 check "no .backup left behind" "0" \
     "$(find "$dest" -name '*.backup' | wc -l | tr -d ' ')"
 
+# What a moved config file leaves behind: the previous run's link, still pointing
+# at the old path. `-e` follows it and calls it absent, so link_file used to skip
+# its existence check entirely and then fail on `ln -s`. Own dest dir, so the
+# link counts above stay about what they were written for.
+echo "== a link left dangling by a move gets repaired"
+moved="$(mktemp -d)"
+mkdir -p "$DOTFILES_ROOT/vcs/config"
+printf 'v\n' > "$DOTFILES_ROOT/vcs/config/tool.conf"
+ln -s "$DOTFILES_ROOT/vcs/moved-away.conf" "$moved/tool.conf"
+
+check "the fixture is a link that resolves to nothing" "yes" \
+    "$([[ -L $moved/tool.conf && ! -e $moved/tool.conf ]] && echo yes || echo no)"
+
+( link_tree config "$moved" ) >/dev/null 2>&1 </dev/null
+
+check "relinked to where the file lives now" "$DOTFILES_ROOT/vcs/config/tool.conf" \
+    "$(target "$moved/tool.conf")"
+check "the dead link was not backed up" "0" \
+    "$(find "$moved" -name '*.backup' | wc -l | tr -d ' ')"
+
 mkdir -p "$DOTFILES_ROOT/git"
 printf 'a\n' > "$DOTFILES_ROOT/git/gitconfig.symlink"
 
