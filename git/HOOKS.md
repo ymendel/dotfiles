@@ -23,13 +23,14 @@ every repo picks up the change immediately, for its next hook fire.
 - `post-checkout`, `post-commit`, `post-merge` — run `ctags`
 - `post-rewrite` — if the action is a rebase, run `post-merge`
 - `pre-commit` — refuse a commit that stages a settings file carrying a credential (below)
+- `pre-push` — refuse a push carrying a commit made by `git pause` (below)
 
 ## `pre-commit` — no credentials in a settings file
 
 `pre-commit` refuses a commit that stages a file whose name ends in `settings.json`
 (or `settings.json.symlink`, thanks to the convention in my dotfiles) holding a
 key named like a credential and with a non-empty value. It never reports the value,
-just path/line/key. This is the first (and so far, only) hook that can stop something.
+just path/line/key. This and `pre-push` are the hooks here that can stop something.
 
 It was created for Zed, which handles its config itself, and has `context_servers`
 entries that take credentials inline, like y'know maybe a GitHub Personal Access
@@ -55,6 +56,22 @@ would still be caught. Only add things to `benign_keys`, *do not* put restrictio
 
 If you really want to get around this, there's `git commit --no-verify`. But possibly
 just make it not flag something legit instead.
+
+## `pre-push` — no pushing a paused commit
+
+`git pause` commits everything so work can be parked, and it passes `--no-verify` on
+purpose — parking work shouldn't have to satisfy any guards.
+
+But this is just a checkpoint, and it's not meant to leave the local machine. So now
+a `pre-push` that refuses a push carrying the `PAUSED: ` commit-subject marker. And
+it checks every commit, of course, not just the tip.
+
+Since git rejects the whole push on a non-zero exit, there is no way to allow some
+refs and refuse others. So on refusal, this names the ref and the commit so it's
+clear what the offense is.
+
+Just like the commit hook, you can get around this with `git push --no-verify`.
+Don't do that.
 
 ## Per-repo customization: `git hooks-override`
 

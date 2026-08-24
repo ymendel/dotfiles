@@ -1,0 +1,65 @@
+#!/bin/sh
+#
+# Refuse to push a commit made by `git pause`.
+#
+# I get a lot of good out of `git pause`, but it is very much a checkpoint
+# and not real history. It's more of a branch-based stash, really. That's
+# why it uses `--no-verify`, because if I park something I shouldn't have
+# worry about any sort of pre-commit guards.
+#
+# That's fine for local stuff, but I've already been slightly embarassed
+# before by accidentally pushing up a pause commit. And now that I have
+# a pre-commit hook that attempts to stop me from committing any creds
+# where I shouldn't, I _really_ don't need to accidentally push them.
+#
+# This checks every commit, not just the tip.
+#
+# git hands the remote's name as $1 and its URL as $2
+# then stdin is one line per ref:
+# <local ref> <local sha> <remote ref> <remote sha>
+
+remote_name=$1
+
+# A ref being created or deleted arrives as all-zeros in place of a sha. And
+# since the width differs between sha versions, test the content.
+is_all_zeros () {
+    case "$1" in
+        *[!0]*) return 1 ;;
+        *) return 0 ;;
+    esac
+}
+
+report=$(while read -r local_ref local_sha remote_ref remote_sha
+do
+    if is_all_zeros "$local_sha"
+    then
+        # deleting a ref sends no commits to inspect
+        continue
+    fi
+
+    if is_all_zeros "$remote_sha"
+    then
+        # A new branch has no remote to diff against, so take what this ref has,
+        # less whatever the remote has. On a first push, that's just the whole
+        # history — which is exactly what should be checked.
+        subjects=$(git log --format='%h %s' "$local_sha" --not --remotes="$remote_name")
+    else
+        subjects=$(git log --format='%h %s' "$remote_sha..$local_sha")
+    fi
+
+    printf '%s\n' "$subjects" \
+        | grep -E '^[0-9a-f]+ PAUSED: ' \
+        | while IFS= read -r hit
+    do
+        printf '  %s  %s\n' "$local_ref" "$hit"
+    done
+done)
+
+if [ -n "$report" ]
+then
+    printf '\npre-push: refusing to push a paused commit:\n\n%s\n' "$report" >&2
+    printf '\nRun `git resume` to take it back off, or push with --no-verify if it is deliberate.\n\n' >&2
+    exit 1
+fi
+
+exit 0
