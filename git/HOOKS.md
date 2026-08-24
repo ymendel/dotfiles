@@ -46,6 +46,13 @@ commas, readability), the check is a text scan rather than parsing — `jq` does
 handle JSONC. So this may raise some false positives, which at least is safer than
 false negatives.
 
+Speaking of false positives, Zed got me with `semantic_tokens` (which is just a rendering
+setting, nothing serious). So the hook has a `benign_keys` list for names that are truly
+just fine. Those keys are matched whole, where the keyword list matches in part. That is,
+the keyword list has `token` and that caught `semantic_tokens`. But `other_semantic_tokens`
+would still be caught. Only add things to `benign_keys`, *do not* put restrictions on
+`keywords`.
+
 If you really want to get around this, there's `git commit --no-verify`. But possibly
 just make it not flag something legit instead.
 

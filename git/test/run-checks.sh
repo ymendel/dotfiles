@@ -93,6 +93,13 @@ check "an empty value is not a credential" "allowed" \
     "$(verdict "$(attempt zed/settings.json '{ "github_personal_access_token": "" }')")"
 check "a non-settings file is out of scope" "allowed" \
     "$(verdict "$(attempt notes/scratch.json "{ \"api_key\": \"$token\" }")")"
+check "a benign credential-shaped name is allowed" "allowed" \
+    "$(verdict "$(attempt zed/settings.json '{ "semantic_tokens": "combined" }')")"
+check "a benign name is matched whole, not as a substring" "blocked" \
+    "$(verdict "$(attempt zed/settings.json "{ \"my_semantic_tokens\": \"$token\" }")")"
+check "a benign name does not cover the rest of its line" "blocked" \
+    "$(verdict "$(attempt zed/settings.json \
+        "{ \"semantic_tokens\": \"combined\", \"api_key\": \"$token\" }")")"
 
 echo "== the other two places Zed takes a credential"
 check "an Authorization header is blocked" "blocked" \
