@@ -33,7 +33,12 @@ link_file () {
         then
             prompt "File already exists: $dst ($(basename "$src")), what do you want to do?\n\
             [s]kip, [S]kip all, [o]verwrite, [O]verwrite all, [b]ackup, [B]ackup all?"
-            read -n 1 action
+
+            # at EOF (a pipe, cron, `</dev/null`) `read` returns 1, and since
+            # the callers run under `set -e`, that would stop the whole run
+            # right in the middle, unhelpfully. So let it just fall through
+            # to the empty-answer case, which actually reports a failure to link.
+            read -n 1 action || true
 
             case "$action" in
                 o )
@@ -117,15 +122,20 @@ link_tree () {
         # stays literal
         [[ -d $dir ]] || continue
 
-        # process substitution lets this run in the current shell
-        while IFS= read -r src
+        # The file list arrives on fd 3, deliberately not on stdin. A plain
+        # `done < <(find ...)` redirects stdin for the whole loop *body*, so
+        # link_file's prompt would read this already-drained find output and take
+        # EOF for an answer. Process substitution still runs the loop in the
+        # current shell, and fd redirection works on the bash 3.2 that bootstrap
+        # gets before Homebrew is installed — where `mapfile` does not exist.
+        while IFS= read -r src <&3
         do
             rel="${src#"$dir"/}"
             dst="$root/$rel"
 
             ensure_dir "$(dirname "$dst")"
             link_file "$src" "$dst"
-        done < <(find "$dir" -type f)
+        done 3< <(find "$dir" -type f)
     done
 }
 

@@ -20,13 +20,17 @@ source script/helpers/printing.sh
 # shell and can record what happened.
 failed=()
 
-while IFS= read -r installer
+# Deliberately putting the list on fd 3 and not stdin. The plain `done < <(find ...)`
+# redirected stdin for the entire loop body, and any installer that asked a
+# question (like the linking prompt) would read the already-drained `find`
+# output and take EOF for an answer. Hwoops!
+while IFS= read -r installer <&3
 do
     if ! sh -c "$installer"
     then
         failed+=("$installer")
     fi
-done < <(find . -name install.sh)
+done 3< <(find . -name install.sh)
 
 # Instead of stopping at the first failure, keep on going. All of the installers
 # are independent (or they _should_ be), so I don't need one failed installer

@@ -5,6 +5,14 @@
 #
 #     script/test/run-checks.sh
 #
+# Run it under both bashes. bootstrap does its linking before it installs
+# Homebrew, so these helpers have to work on the macOS 3.2 as well as on the 5.x
+# that `env bash` finds once Homebrew is there — which rules out `mapfile` and
+# anything else post-3.2:
+#
+#     bash script/test/run-checks.sh
+#     /bin/bash script/test/run-checks.sh
+#
 # Builds a fake DOTFILES_ROOT rather than running bootstrap, which would try to
 # chsh and install packages. link_dotfiles reads $HOME and CONFIG_HOME as well,
 # so those get redirected too — getting that wrong would link into the real home
@@ -129,6 +137,44 @@ check "relinked to where the file lives now" "$DOTFILES_ROOT/vcs/config/tool.con
 check "the dead link was not backed up" "0" \
     "$(find "$moved" -name '*.backup' | wc -l | tr -d ' ')"
 
+# link_file asks its question on stdin, so the file list must not arrive there
+# too. link_tree used to feed the loop from `< <(find ...)`, whose redirect
+# covers the body — the prompt then read the drained find output and saw EOF,
+# so no answer could ever be given. Only zed/settings.json exists at these
+# destinations, so it is the one file that prompts and the one answer is its.
+echo "== an answer given at the prompt actually lands"
+overwritten="$(mktemp -d)"
+mkdir -p "$overwritten/zed"
+printf 'PRE-EXISTING\n' > "$overwritten/zed/settings.json"
+printf 'o' | ( link_tree config "$overwritten" ) >/dev/null 2>&1
+
+check "[o]verwrite replaced the file with the link" \
+    "$DOTFILES_ROOT/editing/config/zed/settings.json" \
+    "$(target "$overwritten/zed/settings.json")"
+
+preserved="$(mktemp -d)"
+mkdir -p "$preserved/zed"
+printf 'PRE-EXISTING\n' > "$preserved/zed/settings.json"
+printf 'b' | ( link_tree config "$preserved" ) >/dev/null 2>&1
+
+check "[b]ackup linked over it" "$DOTFILES_ROOT/editing/config/zed/settings.json" \
+    "$(target "$preserved/zed/settings.json")"
+check "[b]ackup kept the original" "1" \
+    "$(find "$preserved" -name '*.backup' | wc -l | tr -d ' ')"
+
+# `set -e` on purpose here: it is what both real callers run under, and it is
+# what turns an unguarded `read` at EOF into an abort with nothing printed.
+echo "== a prompt with nobody to answer it fails out loud"
+unanswered="$(mktemp -d)"
+mkdir -p "$unanswered/zed"
+printf 'PRE-EXISTING\n' > "$unanswered/zed/settings.json"
+eof_output="$( ( set -e; link_tree config "$unanswered" ) 2>&1 </dev/null )"
+
+check "it says which link it could not make" "yes" \
+    "$([[ "$eof_output" == *"couldn't link"* ]] && echo yes || echo no)"
+check "and it left the existing file alone" "NOT-A-LINK" \
+    "$(target "$unanswered/zed/settings.json")"
+
 mkdir -p "$DOTFILES_ROOT/git"
 printf 'a\n' > "$DOTFILES_ROOT/git/gitconfig.symlink"
 
@@ -177,6 +223,16 @@ check "bootstrap sources filestuff" "yes" \
     "$(mentions "$repo/script/bootstrap" 'helpers/filestuff.sh')"
 check "system/install.sh sources filestuff" "yes" \
     "$(mentions "$repo/system/install.sh" 'helpers/filestuff.sh')"
+
+# script/install runs each installer from inside a loop, and an installer can ask
+# a question — linking does. Running script/install for real here would install
+# packages, so this guards the shape instead: the list comes off fd 3, which is
+# what leaves stdin free for the installer to read from.
+echo "== the installer loop leaves stdin free"
+check "script/install reads its list on fd 3" "yes" \
+    "$(mentions "$repo/script/install" 'read -r installer <&3')"
+check "and fills fd 3 rather than stdin" "yes" \
+    "$(mentions "$repo/script/install" 'done 3< <(find')"
 
 # The loop used to be copied into both callers. Guard against it coming back.
 echo "== the linking itself lives in one place"
