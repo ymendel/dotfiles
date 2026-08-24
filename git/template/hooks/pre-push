@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Refuse to push a commit made by `git pause`.
+# Refuse to push a commit made by `git pause`, or one carrying a credential.
 #
 # I get a lot of good out of `git pause`, but it is very much a checkpoint
 # and not real history. It's more of a branch-based stash, really. That's
@@ -12,13 +12,30 @@
 # a pre-commit hook that attempts to stop me from committing any creds
 # where I shouldn't, I _really_ don't need to accidentally push them.
 #
-# This checks every commit, not just the tip.
+# This is a bit of belt-and-suspenders coverage on the credentials as well
+# as the 'PAUSED: ' market, but it's not like `--no-verify` can't be used
+# at other times.
 #
-# git hands the remote's name as $1 and its URL as $2
-# then stdin is one line per ref:
-# <local ref> <local sha> <remote ref> <remote sha>
+# This checks every commit, not just the tip, because history is important.
+# A pause commit buried under later work is just as unwanted, and a credential
+# that turns up in one commit and is taken out again in the next still goes
+# up with the push that carries both.
+
+# ensure credentials lib exists, or else everything will just be let through
+lib="$(dirname "$0")/lib/credentials.sh"
+if [ ! -r "$lib" ]
+then
+    printf '\npre-push: cannot read %s, so nothing is being checked. Refusing.\n\n' "$lib" >&2
+    exit 1
+fi
+. "$lib"
 
 remote_name=$1
+
+# stdin only reads once, and there are two passes to make over it
+# one line per ref
+# <local ref> <local sha> <remote ref> <remote sha>
+refs=$(cat)
 
 # A ref being created or deleted arrives as all-zeros in place of a sha. And
 # since the width differs between sha versions, test the content.
@@ -29,7 +46,22 @@ is_all_zeros () {
     esac
 }
 
-report=$(while read -r local_ref local_sha remote_ref remote_sha
+# What this push would add to the remote, as revision arguments. Both callers
+# expand it unquoted on purpose, since the new-branch form is several arguments
+# rather than one.
+push_range () {  # push_range <local sha> <remote sha>
+    if is_all_zeros "$2"
+    then
+        # A new branch has no remote to diff against, so take what this ref has,
+        # less whatever the remote has. On a first push, that's just the whole
+        # history — which is exactly what should be checked.
+        printf '%s --not --remotes=%s\n' "$1" "$remote_name"
+    else
+        printf '%s..%s\n' "$2" "$1"
+    fi
+}
+
+paused_report=$(printf '%s\n' "$refs" | while read -r local_ref local_sha remote_ref remote_sha
 do
     if is_all_zeros "$local_sha"
     then
@@ -37,17 +69,7 @@ do
         continue
     fi
 
-    if is_all_zeros "$remote_sha"
-    then
-        # A new branch has no remote to diff against, so take what this ref has,
-        # less whatever the remote has. On a first push, that's just the whole
-        # history — which is exactly what should be checked.
-        subjects=$(git log --format='%h %s' "$local_sha" --not --remotes="$remote_name")
-    else
-        subjects=$(git log --format='%h %s' "$remote_sha..$local_sha")
-    fi
-
-    printf '%s\n' "$subjects" \
+    git log --format='%h %s' $(push_range "$local_sha" "$remote_sha") \
         | grep -E '^[0-9a-f]+ PAUSED: ' \
         | while IFS= read -r hit
     do
@@ -55,10 +77,56 @@ do
     done
 done)
 
-if [ -n "$report" ]
+credential_report=$(printf '%s\n' "$refs" | while read -r local_ref local_sha remote_ref remote_sha
+do
+    if is_all_zeros "$local_sha"
+    then
+        continue
+    fi
+
+    # Check each commit on its own, so a credential that appears and then goes away
+    # over the range is still caught. Sure, that's a couple of git calls per commit,
+    # but that's no big deal on any normal push. Just maybe annoying on the
+    # first push of a _long_ history.
+    git rev-list --abbrev-commit $(push_range "$local_sha" "$remote_sha") \
+        | while IFS= read -r sha
+    do
+        # Only what this commit changed. It's not like something on the remote
+        # already is something to worry about now.
+        #
+        # `--root` lets the repo's very first commit list its files
+        #
+        # NOTE: diff-tree lists nothing for a merge commit, so a credential
+        # introduced while resolving a conflict gets past this. Don't do that.
+        git diff-tree --no-commit-id --name-only -r --root --diff-filter=ACM "$sha" \
+            | credential_settings_paths \
+            | while IFS= read -r path
+        do
+            git show "$sha:$path" | credential_scan | while IFS= read -r found
+            do
+                printf '  %s  %s:%s\n' "$sha" "$path" "$found"
+            done
+        done
+    done
+done)
+
+if [ -n "$paused_report" ] || [ -n "$credential_report" ]
 then
-    printf '\npre-push: refusing to push a paused commit:\n\n%s\n' "$report" >&2
-    printf '\nRun `git resume` to take it back off, or push with --no-verify if it is deliberate.\n\n' >&2
+    printf '\npre-push: refusing this push.\n' >&2
+
+    if [ -n "$paused_report" ]
+    then
+        printf '\nPaused commits — run `git resume` to take one back off:\n\n%s\n' \
+            "$paused_report" >&2
+    fi
+
+    if [ -n "$credential_report" ]
+    then
+        printf '\nCredential-shaped keys in a settings file being pushed:\n\n%s\n' \
+            "$credential_report" >&2
+    fi
+
+    printf '\nPush with --no-verify if it is deliberate.\n\n' >&2
     exit 1
 fi
 

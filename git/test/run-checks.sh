@@ -57,15 +57,25 @@ zeros=0000000000000000000000000000000000000000
 
 paused_subject='PAUSED: Use `git resume` to continue working.'
 
+fixture () {  # fixture <dir> — an empty repo, central hooks kept out of it
+    git -C "$1" init --quiet
+    # so only the push being tested runs anything
+    mkdir -p "$1/.nohooks"
+    git -C "$1" config core.hooksPath "$1/.nohooks"
+}
+
+commit_at () {  # commit_at <dir> <path> <content> <subject>
+    mkdir -p "$1/$(dirname "$2")"
+    printf '%s\n' "$3" > "$1/$2"
+    git -C "$1" add -- "$2"
+    git -C "$1" commit --quiet -m "$4"
+}
+
 history () {  # history <dir> <subject>... — one commit per subject
     local dir=$1 subject
     shift
 
-    git -C "$dir" init --quiet
-    # keep the central hooks out of the fixture's own commits, so only the push
-    # being tested runs anything
-    mkdir -p "$dir/.nohooks"
-    git -C "$dir" config core.hooksPath "$dir/.nohooks"
+    fixture "$dir"
 
     for subject in "$@"
     do
@@ -202,6 +212,127 @@ history "$dir" 'first' "$paused_subject"
 check "a new branch carrying a pause commit is blocked" "blocked" \
     "$(verdict "$(attempt_push "$dir" "$(at "$dir" HEAD)" "$zeros")")"
 rm -rf "$dir"
+
+echo "== pre-push — the credential pre-commit never saw"
+# An ordinary subject on purpose: this is the `--no-verify` commit that isn't a
+# pause, which pre-commit skipped and the paused check above would never catch.
+dir="$(mktemp -d)"
+fixture "$dir"
+commit_at "$dir" README.md 'hello' 'first'
+commit_at "$dir" zed/settings.json "{ \"github_personal_access_token\": \"$token\" }" \
+    'add my zed config'
+result="$(attempt_push "$dir" "$(at "$dir" HEAD)" "$(at "$dir" HEAD~1)")"
+check "a pushed credential is blocked" "blocked" "$(verdict "$result")"
+check "the report names the key" "yes" \
+    "$([[ "$(body "$result")" == *github_personal_access_token* ]] && echo yes || echo no)"
+check "the report names the file" "yes" \
+    "$([[ "$(body "$result")" == *zed/settings.json* ]] && echo yes || echo no)"
+check "the report does not echo the value" "yes" \
+    "$([[ "$(body "$result")" != *"$token"* ]] && echo yes || echo no)"
+rm -rf "$dir"
+
+echo "== pre-push — the pause commit that swept up a credential"
+# `git add --all` and `--no-verify` together, which is the case both checks exist
+# for. Both should have something to say about it.
+dir="$(mktemp -d)"
+fixture "$dir"
+commit_at "$dir" README.md 'hello' 'first'
+commit_at "$dir" zed/settings.json "{ \"github_personal_access_token\": \"$token\" }" \
+    "$paused_subject"
+result="$(attempt_push "$dir" "$(at "$dir" HEAD)" "$(at "$dir" HEAD~1)")"
+check "it is blocked" "blocked" "$(verdict "$result")"
+check "the paused commit gets its own section" "yes" \
+    "$([[ "$(body "$result")" == *"Paused commits"* ]] && echo yes || echo no)"
+check "so does the credential" "yes" \
+    "$([[ "$(body "$result")" == *"Credential-shaped keys"* ]] && echo yes || echo no)"
+rm -rf "$dir"
+
+echo "== pre-push — a credential the range still carries"
+# Gone by the tip, but the push publishes the commit that had it.
+dir="$(mktemp -d)"
+fixture "$dir"
+commit_at "$dir" README.md 'hello' 'first'
+commit_at "$dir" zed/settings.json "{ \"api_key\": \"$token\" }" 'oops'
+commit_at "$dir" zed/settings.json '{ "api_key": "" }' 'took it back out'
+check "added and then removed is still blocked" "blocked" \
+    "$(verdict "$(attempt_push "$dir" "$(at "$dir" HEAD)" "$(at "$dir" HEAD~2)")")"
+rm -rf "$dir"
+
+echo "== pre-push — credentials that are not this push's problem"
+# Already on the remote, so already published. Reporting it forever would block
+# every later push without unpublishing anything.
+dir="$(mktemp -d)"
+fixture "$dir"
+commit_at "$dir" zed/settings.json "{ \"api_key\": \"$token\" }" 'already up there'
+commit_at "$dir" README.md 'hello' 'later work'
+check "one already on the remote is left alone" "allowed" \
+    "$(verdict "$(attempt_push "$dir" "$(at "$dir" HEAD)" "$(at "$dir" HEAD~1)")")"
+rm -rf "$dir"
+
+echo "== pre-push — what must still go through"
+dir="$(mktemp -d)"
+fixture "$dir"
+commit_at "$dir" README.md 'hello' 'first'
+commit_at "$dir" zed/settings.json '{ "vim_mode": true }' 'settings, no creds'
+check "a settings file without a credential" "allowed" \
+    "$(verdict "$(attempt_push "$dir" "$(at "$dir" HEAD)" "$(at "$dir" HEAD~1)")")"
+rm -rf "$dir"
+
+dir="$(mktemp -d)"
+fixture "$dir"
+commit_at "$dir" README.md 'hello' 'first'
+commit_at "$dir" zed/settings.json '{ "semantic_tokens": "combined" }' 'rendering'
+check "a benign credential-shaped name" "allowed" \
+    "$(verdict "$(attempt_push "$dir" "$(at "$dir" HEAD)" "$(at "$dir" HEAD~1)")")"
+rm -rf "$dir"
+
+dir="$(mktemp -d)"
+fixture "$dir"
+commit_at "$dir" README.md 'hello' 'first'
+commit_at "$dir" notes/scratch.json "{ \"api_key\": \"$token\" }" 'not a settings file'
+check "a credential outside a settings file is out of scope" "allowed" \
+    "$(verdict "$(attempt_push "$dir" "$(at "$dir" HEAD)" "$(at "$dir" HEAD~1)")")"
+rm -rf "$dir"
+
+echo "== neither guard runs without its matching"
+# The dangerous failure here is the quiet one. No lib means no patterns, and no
+# patterns matches nothing — which is indistinguishable from finding nothing. This
+# is the shape `git hooks-override` used to produce, since it skipped directories
+# and left the hooks in .git/hooks/ with no lib/ beside them.
+bare="$(mktemp -d)"
+cp "$hooks/pre-commit" "$hooks/pre-push" "$bare/"
+
+dir="$(mktemp -d)"
+fixture "$dir"
+commit_at "$dir" README.md 'hello' 'first'
+
+check "pre-push refuses" "1" \
+    "$(printf '%s %s %s %s\n' refs/heads/main "$(at "$dir" HEAD)" refs/heads/main "$zeros" \
+        | GIT_DIR="$dir/.git" GIT_WORK_TREE="$dir" sh "$bare/pre-push" origin "$dir" \
+        >/dev/null 2>&1; echo $?)"
+check "pre-commit refuses" "1" \
+    "$(git -C "$dir" -c core.hooksPath="$bare" commit --quiet --allow-empty -m 'check' \
+        >/dev/null 2>&1; echo $?)"
+
+rm -rf "$bare" "$dir"
+
+# And the fix, run for real rather than grepped for. GIT_CONFIG_GLOBAL stands in
+# for the global config that hooks-override reads its central path out of, so this
+# never touches the real one.
+echo "== hooks-override brings lib/ along, so an overridden repo still has it"
+fake_global="$(mktemp -d)"
+printf '[core]\n\thooksPath = %s\n' "$hooks" > "$fake_global/gitconfig"
+
+dir="$(mktemp -d)"
+fixture "$dir"
+GIT_CONFIG_GLOBAL="$fake_global/gitconfig" GIT_DIR="$dir/.git" GIT_WORK_TREE="$dir" \
+    sh "$here/../bin/git-hooks-override" >/dev/null 2>&1
+
+check "the hooks got linked" "yes" \
+    "$([[ -e "$dir/.git/hooks/pre-push" ]] && echo yes || echo no)"
+check "and so did the library they source" "yes" \
+    "$([[ -e "$dir/.git/hooks/lib/credentials.sh" ]] && echo yes || echo no)"
+rm -rf "$fake_global" "$dir"
 
 printf '\n  %d passed, %d failed\n' "$pass" "$fail"
 [[ $fail -eq 0 ]]

@@ -23,7 +23,8 @@ every repo picks up the change immediately, for its next hook fire.
 - `post-checkout`, `post-commit`, `post-merge` — run `ctags`
 - `post-rewrite` — if the action is a rebase, run `post-merge`
 - `pre-commit` — refuse a commit that stages a settings file carrying a credential (below)
-- `pre-push` — refuse a push carrying a commit made by `git pause` (below)
+- `pre-push` — refuse a push carrying a paused commit, or a credential (below)
+- `lib/credentials.sh` — the credential matching, shared by the two above
 
 ## `pre-commit` — no credentials in a settings file
 
@@ -48,16 +49,21 @@ handle JSONC. So this may raise some false positives, which at least is safer th
 false negatives.
 
 Speaking of false positives, Zed got me with `semantic_tokens` (which is just a rendering
-setting, nothing serious). So the hook has a `benign_keys` list for names that are truly
-just fine. Those keys are matched whole, where the keyword list matches in part. That is,
-the keyword list has `token` and that caught `semantic_tokens`. But `other_semantic_tokens`
-would still be caught. Only add things to `benign_keys`, *do not* put restrictions on
-`keywords`.
+setting, nothing serious). So the hook has a `credential_benign_keys` list for names that
+are truly just fine. Those keys are matched whole, where the keyword list matches in part.
+That is, the keyword list has `token` and that caught `semantic_tokens`. But
+`other_semantic_tokens` would still be caught. Only add things to
+`credential_benign_keys`, *do not* put restrictions on `credential_keywords`.
+
+Both of those lists, and the scan that uses them, live in `lib/credentials.sh` rather than
+in this hook — `pre-push` needs exactly the same matching, and one copy of a pattern list
+is enough. The `credential_` prefix is because it's sourced into a hook with names of its
+own.
 
 If you really want to get around this, there's `git commit --no-verify`. But possibly
 just make it not flag something legit instead.
 
-## `pre-push` — no pushing a paused commit
+## `pre-push` — no pushing a paused commit, or a credential
 
 `git pause` commits everything so work can be parked, and it passes `--no-verify` on
 purpose — parking work shouldn't have to satisfy any guards.
@@ -66,9 +72,21 @@ But this is just a checkpoint, and it's not meant to leave the local machine. So
 a `pre-push` that refuses a push carrying the `PAUSED: ` commit-subject marker. And
 it checks every commit, of course, not just the tip.
 
+`pre-push` also does the credential check, same as `pre-commit`. Since `--no-verify`
+is possible in other instances _and_ the `git add --all` may pick up something that
+nothing has ever looked at yet, check again on push just to be sure.
+
+Again, this checks every commit — in thise case, each commit's changes. That means
+if a credential was added in one commit and removed in another, the push still gets
+refused.
+
+Important note: `git diff-tree` reports nothing for a merge commit, so a credential
+introduced while resolving a conflict gets past this. Don't do that.
+
 Since git rejects the whole push on a non-zero exit, there is no way to allow some
 refs and refuse others. So on refusal, this names the ref and the commit so it's
-clear what the offense is.
+clear what the offense is — and the two kinds of problem get their own sections, since
+they want different fixes.
 
 Just like the commit hook, you can get around this with `git push --no-verify`.
 Don't do that.
@@ -87,6 +105,9 @@ local `core.hooksPath` to `.git/hooks/`. The repo now uses its own hooks
 dir, but un-customized hooks still resolve to the central files (so they
 keep auto-updating). Replace any symlink with a real script to override
 that hook locally.
+
+`lib/` gets linked along with the hooks, because the two guards source it relative
+to their own location and would otherwise come up empty when run from `.git/hooks/`.
 
 To undo: `git config --unset core.hooksPath` and (optionally) clear the
 symlinks. The global `hooksPath` takes over again.

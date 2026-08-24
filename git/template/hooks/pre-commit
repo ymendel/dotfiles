@@ -9,20 +9,19 @@
 # Check on https://github.com/zed-industries/zed/discussions/26043 periodically
 # and see if this can be stopped (although it could become a safety net for other
 # settings files).
+#
+# A shared lib handles the checks, shared between here and pre-push. If you want
+# to `--no-verify`, you'll have to do it twice.
 
-keywords='token|secret|password|passwd|api[_-]?key|access[_-]?key|private[_-]?key|credential|authorization'
-key_re="\"[A-Za-z0-9_-]*(${keywords})[A-Za-z0-9_-]*\""
-assignment_re="${key_re}[[:space:]]*:[[:space:]]*\"[^\"]"
+# ensure credentials lib exists, or else everything will just be let through
+lib="$(dirname "$0")/lib/credentials.sh"
+if [ ! -r "$lib" ]; then
+  printf '\npre-commit: cannot read %s, so nothing is being checked. Refusing.\n\n' "$lib" >&2
+  exit 1
+fi
+. "$lib"
 
-# Settings names that just _look_ to be credential-shaped. Matched whole, so
-# something that only contains one of these (e.g. `my_semantic_tokens) is still
-# flagged. Add to this. *DO NOT* narrow `keywords` to skip things. And don't use
-# `--no-verify` to skip things (unless you really want to accept what you're
-# giving up.)
-benign_keys='semantic_tokens'
-benign_re="^\"(${benign_keys})\"$"
-
-staged=$(git diff --cached --name-only --diff-filter=ACM | grep -E 'settings\.json(\.symlink)?$')
+staged=$(git diff --cached --name-only --diff-filter=ACM | credential_settings_paths)
 
 if [ -z "$staged" ]; then
   exit 0
@@ -30,16 +29,8 @@ fi
 
 # report path, line number, and key — *never* value
 report=$(printf '%s\n' "$staged" | while IFS= read -r path; do
-  # use text scan instead of parsing, because Zed config is JSONC and `jq` doesn't do that
-  git show ":$path" | grep -inE "$assignment_re" | while IFS= read -r hit; do
-    # every credential-shaped key on the line, not just the first, so a
-    # benign one sitting ahead of a real one doesn't speak for the whole line
-    flagged=$(printf '%s\n' "$hit" \
-      | grep -oiE "$key_re" \
-      | grep -viE "$benign_re" \
-      | head -1)
-    [ -n "$flagged" ] || continue
-    printf '  %s:%s  %s\n' "$path" "${hit%%:*}" "$flagged"
+  git show ":$path" | credential_scan | while IFS= read -r found; do
+    printf '  %s:%s\n' "$path" "$found"
   done
 done)
 

@@ -30,8 +30,19 @@ HOOKS=$GIT_DIR/hooks
 mkdir -p "$HOOKS"
 
 for hook in "$CENTRAL"/*; do
-    [ -f "$hook" ] || continue
     name=$(basename "$hook")
+
+    # Directories come along whole. lib/ holds code the hooks source relative to
+    # their own location, so it has to sit beside them here too — otherwise a
+    # hook run from .git/hooks/ can't find it. `-n` so an existing link gets
+    # replaced rather than followed into.
+    if [ -d "$hook" ]; then
+        ln -sfn "$hook" "$HOOKS/$name"
+        echo "linked $HOOKS/$name -> $hook"
+        continue
+    fi
+
+    [ -f "$hook" ] || continue
     ln -sf "$hook" "$HOOKS/$name"
     echo "linked $HOOKS/$name -> $hook"
 done
