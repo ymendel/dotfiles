@@ -20,6 +20,8 @@ ensure_specific_bash () {
     then
         info "need to add $the_bash to /etc/shells"
 
+        # need the chown and chmod to get the file in the right shape
+        # otherwise it's whatever the tmpfile had
         if (awk -v "bash=$the_bash" '/\/bash$/ && !x {print bash; x++} {print}' /etc/shells > /tmp/shells && sudo mv /tmp/shells /etc/shells && sudo chown root /etc/shells && sudo chmod 644 /etc/shells)
         then
             success "added $the_bash"

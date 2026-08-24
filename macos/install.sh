@@ -13,6 +13,11 @@ fi
 echo "› sudo softwareupdate -i -a"
 sudo softwareupdate -i -a
 
+# run rather than sourced, since this exits early on "already enabled"
+# and that would just end this script, too
+touchidFile="$(dirname $0)/ensure_touchid_sudo.sh"
+[[ -x $touchidFile ]] && "$touchidFile"
+
 defaultsFile="$(dirname $0)/set_defaults.sh"
 echo "› setting defaults"
 [[ -f $defaultsFile ]] && source $defaultsFile
