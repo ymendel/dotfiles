@@ -1,0 +1,40 @@
+# NOTE: this is _readline_ config, so it applies everywhere readline
+# is used — like psql and irb, as well as bash
+
+# I normally use ctrl-r for the substring search, but this is useful too:
+# type something, and up/down only goes through the history that starts
+# with that.
+#
+# terminal sends \eOA in application cursor mode, otherwise \e[A otherwise
+# bind both, so I don't miss it sometimes
+"\e[A": history-search-backward
+"\eOA": history-search-backward
+"\e[B": history-search-forward
+"\eOB": history-search-forward
+
+# NOTE: ctrl-p and ctrl-n still give the old plain sequential history
+
+# if I recall a line and edit it but don't run it, throw the edit away
+# rather than keeping it in the history buffer
+# I hate that edit being there
+set revert-all-at-newline on
+
+# make ctrl-r and completion both case-insensitive
+set search-ignore-case on
+set completion-ignore-case on
+
+# one tab to list the options instead of two
+set show-all-if-ambiguous on
+
+# don't repeat what I've already typed when completing mid-word
+set skip-completed-text on
+
+# ls-style colors in the completion list
+set colored-stats on
+set colored-completion-prefix on
+
+set bell-style none
+
+# a newline in pasted text is text, not "run this"
+# (this has been the default for a good while, but I want to be explicit)
+set enable-bracketed-paste on
