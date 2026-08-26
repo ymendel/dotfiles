@@ -35,10 +35,30 @@
     "tree_view": false,
     "dock": "left",
   },
+  "file_finder": {
+    "file_icons": true,
+    // this defaults to "small", and that's a fixed narrow width that truncates long paths
+    // options are small, medium, large, xlarge, full
+    //
+    // NOTE: this is _only_ for the file_finder, not the other modals (like
+    // command palette and project symbols)
+    "modal_max_width": "medium",
+    // I do sometimes what some things that are gitignored, but with some of my
+    // projects, "all" would just suck.
+    //
+    // Another choice is "indexed", which is never show ignored
+    // "smart" means show the files when the a worktree's root is ignored
+    "include_ignored": "smart",
+  },
   "disable_ai": false,
   "git": {
     "blame": {
+      // this is only for the gutter, not end-of-line inline blame (which has no avatar)
       "show_avatar": false,
+    },
+    "inline_blame": {
+      "enabled": true,
+      "show_commit_summary": false,
     },
   },
   "use_smartcase_search": true,
@@ -54,9 +74,28 @@
     "Ruby": {
       "language_servers": ["ruby-lsp"],
     },
+
+    // This is actually a default, and then Zed turns it back off for Markdown
+    // so a two-space hard line break can stay around. No thanks.
+    "Markdown": {
+      "remove_trailing_whitespace_on_save": true,
+    },
   },
   "lsp": {
     "ruby-lsp": {
+      "initialization_options": {
+        "featuresConfiguration": {
+          // for whatever reason, ruby-lsp has every inlay hint off by default
+          // but I want 'em
+          //
+          // as of this writing, there are only two hints, but I want more if
+          // they show up …unless they turn out to be annoying, in which case
+          // I'll turn them off
+          "inlayHint": {
+            "enableAll": true,
+          },
+        },
+      },
       "settings": {
         "use_bundler": false,
       },
@@ -64,6 +103,11 @@
   },
   "inlay_hints": {
     "enabled": true,
+    // let me turn the hints off, temporarily
+    "toggle_on_modifiers_press": {
+      "control": true,
+      "alt": true,
+    },
   },
   "show_whitespaces": "trailing",
   "indent_guides": {
@@ -77,6 +121,25 @@
   "minimap": {
     "show": "auto",
   },
+  // I want to see how brackets match up. Also, pretty colors.
+  "colorize_brackets": true,
+  "linked_edits": true,
+  "diagnostics": {
+    "inline": {
+      "enabled": true,
+    },
+  },
+  // Can you believe the default is "one_page"? Why would I want that?
+  // This gives just a little bit of space, rather than no scroll at all.
+  "scroll_beyond_last_line": "vertical_scroll_margin",
+  "sticky_scroll": {
+    "enabled": true,
+  },
+  "which_key": {
+    "enabled": true,
+    // tried 1000ms, and that felt too long
+    "delay_ms": 400,
+  },
   "relative_line_numbers": "disabled",
   "theme": {
     "mode": "dark",
@@ -84,6 +147,13 @@
     "dark": "One Dark",
   },
   "buffer_font_family": "Fira Code",
+  "buffer_font_features": {
+    // this is a default, but I want it explicit
+    // ligatures are good
+    "calt": true,
+    // more-specific options go here, if I want them
+    // I currently don't
+  },
   "vim_mode": true,
   "ui_font_size": 16,
   "buffer_font_size": 16,
