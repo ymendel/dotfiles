@@ -1,0 +1,41 @@
+// Zed keymap
+//
+// For information on binding keys, see the Zed
+// documentation: https://zed.dev/docs/key-bindings
+//
+// To see the default key bindings run `zed: open default keymap`
+// from the command palette.
+[
+  // no relative line numbers by default, just when I toggle them on
+  {
+    "context": "Editor",
+    "bindings": {
+      "ctrl-n": "editor::ToggleRelativeLineNumbers",
+    },
+  },
+
+  // For some reason, Zed puts the git panel on ctrl-shift-g, where the other
+  // panels are all cmd-shift-something.
+  // - e = project
+  // - b = outline
+  // - d = debug
+  // - f = search
+  //
+  // So make it cmd-shift-g, and take the other binding off.
+  //
+  // Note that `unbind` is real and yet undocumented. The documentation only.
+  // describes `null`, which actually completely blocks the action, whereas
+  // `unbind` drops a mapping and lets a lower-priority match happen.
+  {
+    "context": "Workspace",
+    "bindings": {
+      "cmd-shift-g": "git_panel::ToggleFocus",
+    },
+  },
+  {
+    "context": "Workspace",
+    "unbind": {
+      "ctrl-shift-g": "git_panel::ToggleFocus",
+    },
+  },
+]
