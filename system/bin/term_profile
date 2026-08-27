@@ -1,40 +1,56 @@
 #!/bin/sh
 
-osascript<<END
-set theArg to "$*"
-tell application "Terminal"
-    set defaultSettingsName to name of default settings
-    set currentSettingsName to name of current settings of first window
+# Note for below, if you're as unfamiliar with some AppleScript
+# behavior as I am: comparison/equality is case-insensitive.
+# That is, these are both true:
+# - "somestring" = "SOMESTRING"
+# - "SOMESTRING" starts with "some"
+osascript - "$*" <<'END'
+on run argv
+    set theArg to item 1 of argv
+    tell application "Terminal"
+        set defaultSettingsName to name of default settings
+        set currentSettingsName to name of current settings of first window
 
-    if (theArg = "") then
-        return currentSettingsName
-    else if (theArg = "default" or theArg = "reset") then
-        set current settings of first window to settings set defaultSettingsName
-    else if (theArg = "list") then
-        set theList to {}
-        repeat with i from 1 to count settings set
-            set settingsName to settings set i's name
-            if (settingsName starts with defaultSettingsName) then
-                set end of theList to settingsName
-            end if
-        end repeat
+        if (theArg = "") then
+            return currentSettingsName
+        else if (theArg = "default" or theArg = "reset") then
+            set current settings of first window to settings set defaultSettingsName
+        else if (theArg = "list") then
+            set theList to {}
+            repeat with i from 1 to count settings set
+                set settingsName to settings set i's name
+                if (settingsName starts with defaultSettingsName) then
+                    set end of theList to settingsName
+                end if
+            end repeat
 
-        repeat with listItem in theList
-            set listItem to listItem as string
-            set itemText to listItem
-            if (listItem is equal to defaultSettingsName)
-                set itemText to itemText & " (default)"
-            end if
-            if (listItem is equal to currentSettingsName)
-                set itemText to itemText & " *"
-            end if
-            log itemText
-        end repeat
-    else if (theArg starts with defaultSettingsName) then
-        set current settings of first window to settings set theArg
-    else
-        set settingName to defaultSettingsName & " " & theArg
-        set current settings of first window to settings set settingName
-    end if
-end tell
+            set outLines to {}
+            repeat with listItem in theList
+                -- need `as string` to get a real value rather than a reference
+                set listItem to listItem as string
+                set itemText to listItem
+                if (listItem is equal to defaultSettingsName)
+                    set itemText to itemText & " (default)"
+                end if
+                if (listItem is equal to currentSettingsName)
+                    set itemText to itemText & " *"
+                end if
+                set end of outLines to itemText
+            end repeat
+
+            -- return the lines, so the listing goes to stdout
+            -- `log` goes to stderr
+            set AppleScript's text item delimiters to linefeed
+            return outLines as text
+        else if (theArg starts with defaultSettingsName) then
+            set current settings of first window to settings set theArg
+        else
+            -- the arg didn't start with the default settings name, so it's
+            -- a bare variant — prepend the default to get the real name
+            set settingName to defaultSettingsName & " " & theArg
+            set current settings of first window to settings set settingName
+        end if
+    end tell
+end run
 END
