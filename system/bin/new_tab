@@ -1,20 +1,19 @@
 #!/bin/sh
 
-CWD=`pwd`
-case $1 in
-/*)
-  DIR=$1
-  ;;
-*)
-  DIR=$CWD/$1
-  ;;
-esac
+# to be safe, the path should be absolute before being handed off to Terminal
+# nicely, this normalizes the path _and_ fails early if the path is bad
+DIR=$(cd "${1:-.}" && pwd) || exit 1
 
-osascript<<END
-set thePath to "$DIR"
-set thePath to (POSIX path of thePath as string)
-tell application "Terminal"
-  tell application "System Events" to tell process "Terminal" to keystroke "t" using command down
-  do script with command "cd " & quoted form of thePath in window 1
-end tell
+osascript - "$DIR" <<'END'
+on run argv
+  tell application "Terminal"
+    -- `do script` makes a window — Terminal has no vocab for making a tab
+    -- so that means UI scripting again — do the cmd-t to make a tab
+    -- then `do script` aims at that tab
+    tell application "System Events" to tell process "Terminal" to keystroke "t" using command down
+    do script with command "cd " & quoted form of (item 1 of argv) in window 1
+  end tell
+  -- return nothing, so the `do script` result isn't printed
+  return
+end run
 END

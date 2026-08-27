@@ -4,6 +4,12 @@ num_desktops=${1:-9}
 
 # from https://apple.stackexchange.com/questions/407422/create-a-new-space-using-a-keyboard-shortcut-in-macos-big-sur
 # and massaged a bit
+
+# NOTE: Apple has never exposed a scripting dictionary for Spaces, so this
+# UI scripting is all I can do. Unfortunately, as you can see, it is a real
+# mess. And any OS update could change all of this. If that happens, Xcode's
+# Accessibility Inspector will help me fix this a lot better than the poking
+# and experimenting that I'd have to do otherwise.
 osascript<<END
 do shell script "open -a 'Mission Control'"
 delay 0.5
@@ -20,5 +26,6 @@ tell application "System Events"
     end tell
 end tell
 delay 0.5
+-- 53 is escape, to close Mission Control
 tell application "System Events" to key code 53
 END
