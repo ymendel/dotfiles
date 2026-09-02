@@ -48,6 +48,7 @@ cask 'krisp'
 cask 'mailplane'
 cask 'slack'
 cask 'rectangle'
+cask 'zed'
 
 # these seem to only get the pkg, not the app
 # cask 'homebrew/cask-drivers/logitech-camera-settings'  # ugh so ugly, but fine I guess

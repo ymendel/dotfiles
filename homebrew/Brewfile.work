@@ -11,4 +11,3 @@ cask 'ngrok'
 
 # good pair-programming
 cask 'pop-app'
-cask 'zed'

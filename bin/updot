@@ -25,6 +25,10 @@ while test $# -gt 0; do
         "-h"|"--help")
             displayUsageAndExit
             ;;
+        # TODO: probably remove this
+        # I never actually use it, and in fact forgot about it entirely.
+        # Rethink this when/if a suite of commands is made, rather than just
+        # `updot` on its own.
         "-e"|"--edit")
             exec "$EDITOR" "$dotfilesDir"
             exit

@@ -1,0 +1,7 @@
+# Zed writes settings by atomic replace, and it canonicalizes the symlink first,
+# so its temp file gets created next to the *real* target -- in here. A crash
+# mid-write leaves one behind, and `git cia` would commit it without asking.
+#
+# Deliberately not in config/zed/, since link_tree finds every file under
+# config/ and would symlink this into ~/.config/zed/.
+config/zed/.tmp*
