@@ -1,4 +1,10 @@
+# just like the ~/.local/bashrc check in bashrc, even though
+# we know this is going to exist
+# it's just a nice pattern
 for f in bashrc
 do
-  [[ -r ~/.$f ]] && source ~/.$f
+  if [[ -r ~/.$f ]]
+  then
+    source ~/.$f
+  fi
 done

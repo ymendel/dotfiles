@@ -8,7 +8,14 @@ done
 
 # pull in the local settings only for this machine
 # (or the stuff that shouldn't be tracked publicly)
+#
+# specifically using this `if` rather than the `&&` I had before.
+# As it turns out, the `&&` left behind the 1 exit status if
+# ~/.local/bashrc was missing, and that's not always necessary.
 for f in local/bashrc
 do
-  [[ -f ~/.$f ]] && source ~/.$f
+  if [[ -f ~/.$f ]]
+  then
+    source ~/.$f
+  fi
 done
