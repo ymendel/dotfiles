@@ -22,7 +22,7 @@ my $tmp = "/tmp";
 # multiplied by this magic number:
 my $hist_magic = 257;
 
-$ENV{PATH} = '/usr/bin:/bin:/usr/local/bin';
+$ENV{PATH} = '/usr/bin:/bin:/opt/homebrew/bin:/usr/local/bin';
 $ENV{BASH_ENV} = '';
 
 

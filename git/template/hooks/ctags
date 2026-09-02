@@ -1,6 +1,10 @@
 #!/bin/sh
 set -e
-PATH="/usr/local/bin:$PATH"
+# since hooks get a bare environment, homebrew didn't have a chance
+# to set up its env / path
+# be explicit about both prefixes rather than ask homebrew, because
+# we don't know where it is anyway
+PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 dir="`git rev-parse --git-dir`"
 trap 'rm -f "$dir/$$.tags"' EXIT
 git ls-files | \
