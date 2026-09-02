@@ -6,12 +6,14 @@ then
 fi
 
 # The Brewfile handles Homebrew-based app and library installs, but there may
-# still be updates and installables in the Mac App Store. There's a nifty
-# command line interface to it that we can use to just install everything, so
-# yeah, let's do that.
-
-echo "› sudo softwareupdate -i -a"
-sudo softwareupdate -i -a
+# still be updates and installables in the Mac App Store. Now, installing
+# everything seemed like a good idea, but as it so happens, that includes
+# major OS upgrades. Trying to be choosier now.
+#
+# run rather than sourced, for the same early-exit reason as touchid, below
+updatesFile="$(dirname $0)/install_software_updates.sh"
+echo "› software updates"
+[[ -x $updatesFile ]] && "$updatesFile"
 
 # run rather than sourced, since this exits early on "already enabled"
 # and that would just end this script, too
