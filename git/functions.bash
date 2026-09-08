@@ -101,8 +101,8 @@ gtt()
 
 git_blame_with_subject()
 {
-    git blame -s $* | while read hash filename rest;
+    git blame -s "$@" | while read -r hash filename rest;
     do
-      printf "%-9s %-50.50s | %s\n" $hash "$(git log -1 --pretty=%s $hash)" "$rest";
+      printf "%-9s %-50.50s | %s\n" "$hash" "$(git log -1 --pretty=%s "$hash")" "$rest";
     done
 }
