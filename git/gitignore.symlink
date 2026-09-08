@@ -2,5 +2,6 @@
 .nvimrc
 .DS_Store
 .claude
+.zed
 graphify-out/
 tmp/
