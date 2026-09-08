@@ -53,18 +53,19 @@ git_clean_merged()
     # sometimes a repo has branches other than "the main one" to keep around
     # one example is an integration branch behind the production branch
     # protect those branches with `git config --add config.keep-branch <name>`
-    local -A keep=( ["$main"]=1 )
-    local branch
-    while read -r branch
-    do
-        keep["$branch"]=1
-    done < <(git config --get-all config.keep-branch)
+    local -a keep
+    mapfile -t keep < <(git config --get-all config.keep-branch)
 
-    local -a doomed=()
-    while read -r branch
+    local -a exclude=( "--exclude=refs/heads/$main" )
+    local branch
+    for branch in "${keep[@]}"
     do
-        [[ -v keep["$branch"] ]] || doomed+=("$branch")
-    done < <(git branch --merged "$main" --format='%(refname:short)')
+        exclude+=( "--exclude=refs/heads/$branch" )
+    done
+
+    local -a doomed
+    mapfile -t doomed < <(git for-each-ref --merged="$main" "${exclude[@]}" \
+        --format='%(refname:short)' refs/heads/)
 
     [[ ${#doomed[@]} -gt 0 ]] || return 0
 
