@@ -34,7 +34,10 @@ understand and handle with this separation.
 
 ### Locations
 
-- **script/**: This is the location for scripts and commands that handle the dotfiles project itself, like `script/bootstrap`
+- **script/**: This is the location for scripts and commands that handle the dotfiles project itself, like `script/bootstrap`.
+  Note that `script/bootstrap` runs _before_ Homebrew is installed, so anything in here — and anything it sources — has to work
+  on the `/bin/bash` that macOS ships, which is _still_ 3.2. That means no `mapfile`, no namerefs, and no associative arrays.
+  Everything loaded later (viz. the _topic_/**\*.bash** files) gets Homebrew's bash and can use all of it.
 - **bin/**: This gets added to the `$PATH` and anything in here is available to run everywhere. This is a sort of general, catch-all
   location for commands and utilities that don't fit elsewhere. Also, `updot` lives here. ([see below](#updot))
 - _topic_/**bin/**: These directories also get added to the `$PATH`, for topic-related commands that will be made available to run everywhere.
