@@ -13,4 +13,4 @@ fi
 # Mathias does it with that osascript, but why not killall instead?
 killall "System Preferences" &>/dev/null
 
-find $(dirname $0) -name *.defaults | while read defaults; do source ${defaults} ; done
+find "$(dirname "$0")" -name '*.defaults' | while read -r defaults; do source "$defaults" ; done

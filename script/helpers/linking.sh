@@ -156,10 +156,10 @@ link_tree () {
 link_dotfiles () {
     local src dst
 
-    for src in $(find $DOTFILES_ROOT -name '*.symlink' -type f)
+    for src in $(find "$DOTFILES_ROOT" -name '*.symlink' -type f)
     do
-        dst="$HOME/.$(basename ${src%.symlink})"
-        link_file $src $dst
+        dst="$HOME/.$(basename "${src%.symlink}")"
+        link_file "$src" "$dst"
     done
 
     link_tree config "$CONFIG_HOME"

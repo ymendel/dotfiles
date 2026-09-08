@@ -1,9 +1,9 @@
 export DOTFILES_HOME="$HOME/.dotfiles"
 
 # source all .bash files nested anywhere in the dotfiles
-for f in $(find -H $DOTFILES_HOME -name *.bash -type f | sort)
+for f in $(find -H "$DOTFILES_HOME" -name '*.bash' -type f | sort)
 do
-  source $f
+  source "$f"
 done
 
 # pull in the local settings only for this machine

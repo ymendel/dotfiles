@@ -6,7 +6,7 @@ then
     export PATH="$HOMEBREW_PREFIX/sbin:$PATH"
 fi
 
-for d in $(find -H $DOTFILES_HOME -name bin -type d)
+for d in $(find -H "$DOTFILES_HOME" -name bin -type d)
 do
     PATH="$PATH:$d"
 done
