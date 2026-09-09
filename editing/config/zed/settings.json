@@ -82,6 +82,15 @@
     },
   },
   "lsp": {
+    // bash-language-server only follows `source` lines by default, but that's not
+    // how the files in my dotfiles get loaded. Turn this on so go-to-def works.
+    "bash-language-server": {
+      "settings": {
+        "bashIde": {
+          "includeAllWorkspaceSymbols": true,
+        },
+      },
+    },
     "ruby-lsp": {
       "initialization_options": {
         "featuresConfiguration": {
