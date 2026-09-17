@@ -1,0 +1,140 @@
+#!/usr/bin/env bash
+
+# Turn a video into a GIF small enough to actually share.
+#
+# Plain `ffmpeg -i in.mov out.gif` quantizes against a fixed web palette and
+# comes out huge and blotchy. This builds a palette from the source instead,
+# tuned for screen recordings. See the notes on the filter at the bottom.
+
+set -euo pipefail
+
+PROGRAM="$(basename "$0")"
+
+WIDTH=480
+FPS=15
+DITHER=none
+
+usage() {
+    cat <<USAGE
+Usage: $PROGRAM [options] <input> [output]
+
+Turn a video into a GIF. Output defaults to the input's name with a .gif
+extension, in the current directory.
+
+Options:
+  -w, --width SIZE     scale to this width, either in pixels or proportion (like 50%)
+                       aspect ratio stays constant (default: $WIDTH)
+  -f, --fps FRAMES     frames per second (default: $FPS)
+  -d, --dither MODE    none, sierra2_4a, bayer, floyd_steinberg, atkinson,
+                       heckbert, sierra2, sierra3, burkes (default: $DITHER)
+  -h, --help           show this message
+
+Width and frame rate are what matter for file size. If the GIF comes
+out too big, reach for them before anything else.
+
+The dither default suits screen recordings. For gradient-heavy or
+photographic sources, try --dither sierra2_4a.
+USAGE
+}
+
+require_value() {
+    if [[ -z "${2:-}" ]]
+    then
+        echo "$PROGRAM: $1 needs a value" >&2
+        exit 1
+    fi
+}
+
+while [[ $# -gt 0 ]]
+do
+    case "$1" in
+        -w|--width)
+            require_value "$1" "${2:-}"
+            WIDTH="$2"
+            shift 2
+            ;;
+        -f|--fps)
+            require_value "$1" "${2:-}"
+            FPS="$2"
+            shift 2
+            ;;
+        -d|--dither)
+            require_value "$1" "${2:-}"
+            DITHER="$2"
+            shift 2
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        -*)
+            echo "$PROGRAM: unknown option: $1" >&2
+            usage >&2
+            exit 1
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
+
+# ffmpeg handles width, both as pixels and percentage
+# pixels is the plain number, but percentage needs to be expressed using math
+# (`iw` is input width)
+if [[ "$WIDTH" =~ ^([0-9]+(\.[0-9]+)?)%$ ]]
+then
+    SCALE_WIDTH="iw*${BASH_REMATCH[1]}/100"
+elif [[ "$WIDTH" =~ ^[0-9]+$ ]]
+then
+    SCALE_WIDTH="$WIDTH"
+else
+    echo "$PROGRAM: --width wants pixels (480) or a percentage (50%), got: $WIDTH" >&2
+    exit 1
+fi
+
+if [[ ! "$FPS" =~ ^[0-9]+(\.[0-9]+)?$ ]]
+then
+    echo "$PROGRAM: --fps wants a number, got: $FPS" >&2
+    exit 1
+fi
+
+case "$DITHER" in
+    none|bayer|heckbert|floyd_steinberg|sierra2|sierra2_4a|sierra3|burkes|atkinson)
+        ;;
+    *)
+        echo "$PROGRAM: --dither doesn't know: $DITHER" >&2
+        exit 1
+        ;;
+esac
+
+if [[ $# -lt 1 ]]
+then
+    usage >&2
+    exit 1
+fi
+
+INPUT="$1"
+
+if [[ $# -ge 2 ]]
+then
+    OUTPUT="$2"
+else
+    OUTPUT="$(basename "${INPUT%.*}").gif"
+fi
+
+if [[ ! -f "$INPUT" ]]
+then
+    echo "$PROGRAM: no such file: $INPUT" >&2
+    exit 1
+fi
+
+# fps comes before scale so the scaler only touches the kept frames
+#
+# dither defaults to `none` because most of what I care about at the
+# moment is screengrabs, and they turn out best (smallest) with no
+# dithering
+FILTER="[0:v] fps=${FPS},scale=${SCALE_WIDTH}:-1:flags=lanczos,split [a][b];"
+FILTER+="[a] palettegen [p];"
+FILTER+="[b][p] paletteuse=dither=${DITHER}"
+
+exec ffmpeg -hide_banner -i "$INPUT" -filter_complex "$FILTER" "$OUTPUT"
