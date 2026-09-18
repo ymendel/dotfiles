@@ -38,3 +38,8 @@ set bell-style none
 # a newline in pasted text is text, not "run this"
 # (this has been the default for a good while, but I want to be explicit)
 set enable-bracketed-paste on
+
+# ctrl-x ctrl-p appends ` | less` to the line and runs it. Mostly for `--help`
+# output, which is long and doesn't page itself. LESS has -F, so this is safe
+# to hit on something short.
+"\C-x\C-p": "\C-e | less\C-m"
