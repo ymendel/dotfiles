@@ -30,3 +30,8 @@ _git_fb()                   { __git_complete_local_branch_arg; }
 _git_fetch_branch()         { __git_complete_local_branch_arg; }
 _git_fbf()                  { __git_complete_local_branch_arg; }
 _git_fetch_branch_force()   { __git_complete_local_branch_arg; }
+
+# The other piece of git completion lives in shell/bash-completion/completions/git:
+# completing an abbreviated SHA (`git show f1ec<TAB>`). It can't live here, because
+# it wraps one of git's own functions and so has to be defined after git's
+# completion loads — which happens lazily, long after this file is sourced.

@@ -1,0 +1,89 @@
+# Unlike the other files here, git's completion is named for the command already
+# and the lazy loader finds it without help. This shadows it — our completions
+# directory comes first in BASH_COMPLETION_USER_DIR — so that the override below
+# lands *after* git's own definitions. Anything defined at shell startup instead
+# gets clobbered whenever the loader gets around to git.
+source "$HOMEBREW_PREFIX/share/bash-completion/completions/git"
+
+# git completes refs and nothing else, so an abbreviated SHA has no candidate list
+# to draw on at all and `git show f1ec<TAB>` sits there. Objects matching a prefix
+# come from `git rev-parse --disambiguate`, which is the same machinery behind
+# `--abbrev` working out how few digits it can get away with.
+#
+# Two guards on the word being completed, both cheap:
+#
+#   - at least four hex digits, which is git's own MINIMUM_ABBREV. It bounds the
+#     candidate list too — four digits is 1/65536 of the object space, so even a
+#     ten-million-object repo averages a couple of hundred matches.
+#   - hex only, so `git show mai<TAB>` reaching for `main` never pays for an
+#     object lookup.
+#
+# --disambiguate lists every object, blobs and trees included, and `git show` on a
+# blob succeeds and prints the file. A mistaken completion would therefore show you
+# the wrong thing rather than failing, hence the filter down to commits and tags.
+__git_complete_shas ()
+{
+    local pfx="$1" cur_="$2" sfx="$3"
+    local object type matches=
+
+    if [[ ! "$cur_" =~ ^[0-9a-f]{4,}$ ]]
+    then
+        return
+    fi
+
+    # NOTE: this completes to the full 40 characters, unambiguous but long
+    # and maybe annoying. It's possible to add a `git rev-parse --short` to
+    # the pipeline, but that could hurt more than it helps. I don't know
+    # all the SHAs.
+    while read -r object type
+    do
+        case "$type" in
+            commit|tag) matches="$matches$pfx$object$sfx"$'\n' ;;
+        esac
+    done < <(__git rev-parse --disambiguate="$cur_" |
+             __git cat-file --batch-check='%(objectname) %(objecttype)')
+
+    __gitcomp_direct_append "$matches"
+}
+
+# Capture git's implementation under a second name so the wrapper below can call
+# it. `declare -f` prints the whole definition, so stripping just the leading name
+# leaves `() { ... }` to re-attach to a name of our choosing — strip the parens too
+# and eval reads it as a command followed by a brace group, which *runs* the body.
+# The guard matters: without it a second source would capture the wrapper as the
+# upstream and recurse forever.
+if ! declare -F __git_upstream_complete_refs >/dev/null
+then
+    __git_upstream_refs_definition="$(declare -f __git_complete_refs)"
+    eval "__git_upstream_complete_refs ${__git_upstream_refs_definition#__git_complete_refs}"
+    unset __git_upstream_refs_definition
+fi
+
+# Every rev-position completion funnels through here — show, log, diff, checkout,
+# rebase, cherry-pick — which is why the SHAs go in at this seam rather than in a
+# per-subcommand `_git_<name>`. Upstream runs first and sets COMPREPLY, so this is
+# purely additive: nothing that completes today stops completing.
+__git_complete_refs ()
+{
+    local arg pfx= cur_="$cur" sfx=" " mode=refs remote=
+
+    __git_upstream_complete_refs "$@" || return
+
+    for arg in "$@"
+    do
+        case "$arg" in
+            --pfx=*)    pfx="${arg##--pfx=}" ;;
+            --cur=*)    cur_="${arg##--cur=}" ;;
+            --sfx=*)    sfx="${arg##--sfx=}" ;;
+            --mode=*)   mode="${arg##--mode=}" ;;
+            --remote=*) remote="${arg##--remote=}" ;;
+        esac
+    done
+
+    # --mode=heads and --mode=remote-heads are asking for branches specifically
+    # (`git switch`, `git branch`), and --remote asks after another repo's refs.
+    if [ "$mode" = refs ] && [ -z "$remote" ]
+    then
+        __git_complete_shas "$pfx" "$cur_" "$sfx"
+    fi
+}
