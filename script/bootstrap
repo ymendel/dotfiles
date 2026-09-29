@@ -15,40 +15,6 @@ source "$DOTFILES_ROOT/script/helpers/printing.sh"
 source "$DOTFILES_ROOT/script/helpers/linking.sh"
 source "$DOTFILES_ROOT/script/helpers/filestuff.sh"
 
-ensure_bash () {
-    info 'checking shell'
-
-    if [[ "$SHELL" =~ /bash$ ]]
-    then
-        success "shell is already a bash"
-        return
-    fi
-
-    info "shell is '$SHELL'; switching to bash"
-
-    # I don't want to figure out preference order here
-    # so put multiple bashes in preference order in /etc/shells
-    local bashes=$(grep -e /bash$ /etc/shells)
-
-    for bash in ${bashes[@]}
-    do
-        if [ -x $bash ]
-        then
-            info "trying '$bash'"
-            if (chsh -s $bash)
-            then
-                success "changed shell to '$bash'"
-                info "open a new terminal for best results"
-                return
-            else
-                warn "problem trying to change shell to '$bash'"
-            fi
-        fi
-    done
-
-    fail "could not change shell"
-}
-
 install_dotfiles () {
     info 'installing dotfiles'
 
@@ -118,11 +84,11 @@ install_deps () {
     fi
 }
 
-ensure_bash
 ensure_local_dir
 ensure_config_dir
 install_dotfiles
 set_machine_profiles
+# NOTE: do _not_ try to ensure-bash here. It will result in disappointment.
 install_deps
 
 echo ''

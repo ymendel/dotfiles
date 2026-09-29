@@ -20,12 +20,17 @@ ensure_specific_bash () {
     then
         info "need to add $the_bash to /etc/shells"
 
+        local tmpfile
+        tmpfile=$(mktemp)
+
         # need the chown and chmod to get the file in the right shape
         # otherwise it's whatever the tmpfile had
-        if (awk -v "bash=$the_bash" '/\/bash$/ && !x {print bash; x++} {print}' /etc/shells > /tmp/shells && sudo mv /tmp/shells /etc/shells && sudo chown root /etc/shells && sudo chmod 644 /etc/shells)
+        if (awk -v "bash=$the_bash" '/\/bash$/ && !x {print bash; x++} {print}' /etc/shells > "$tmpfile" && sudo mv "$tmpfile" /etc/shells && sudo chown root /etc/shells && sudo chmod 644 /etc/shells)
         then
             success "added $the_bash"
         else
+            # clean up if mv didn't do it
+            rm -f "$tmpfile"
             fail "couldn't add $the_bash"
         fi
     fi
@@ -42,16 +47,6 @@ ensure_specific_bash () {
 }
 
 ensure_any_bash () {
-    info 'checking shell'
-
-    if [[ "$SHELL" =~ /bash$ ]]
-    then
-        success "shell is already a bash"
-        return
-    fi
-
-    info "shell is '$SHELL'; switching to bash"
-
     # I don't want to figure out preference order here
     # so put multiple bashes in preference order in /etc/shells
     local bashes=$(grep -e /bash$ /etc/shells)
@@ -60,7 +55,16 @@ ensure_any_bash () {
     do
         if [ -x $bash ]
         then
-            info "trying '$bash'"
+            # I want the first one that's actually there, instead of really
+            # just any old bash. (Specifically, "old bash" is the concern.
+            # /bin/bash is 3.2. What am I going to do with that?)
+            if [[ $SHELL == "$bash" ]]
+            then
+                success "shell is preferred bash — $bash"
+                return
+            fi
+
+            info "shell is '$SHELL' — trying '$bash'"
             if (chsh -s $bash)
             then
                 success "changed shell to '$bash'"
