@@ -26,6 +26,15 @@ fi
 
 shift
 
+# ruby 4.0.x won't build on macOS 26 against the macOS 27 SDK. configure decides
+# dup3 and pipe2 are there, they come out weakly linked and NULL at runtime, and
+# miniruby segfaults the moment the build runs it to make builtin_binary.rbbin.
+# Seeding the autoconf cache stops configure defining them.
+# https://bugs.ruby-lang.org/issues/22311
+#
+# Drop these once a ruby release carries the fix. 4.0.7 doesn't.
+export ac_cv_func_dup3=no ac_cv_func_pipe2=no
+
 # --no-reinstall so that re-running for a ruby already on disk is a no-op rather
 # than a rebuild, which matches how ruby-lsp-install behaves.
 if ! ruby-install --no-reinstall ruby "$version" "$@"
