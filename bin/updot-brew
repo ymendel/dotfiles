@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+#
+# The Homebrew part of `updot`: install/update Homebrew itself, then
+# `brew bundle` every Brewfile that applies to this machine.
+# Extracted from `updot` so it can be run on its own
+
+set -e
+
+# prompt for password immediately, instead of waiting for later
+sudo -v
+
+# keep-alive: update existing `sudo` time stamp until this command is done
+while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+
+export DOTFILES_HOME="$HOME/.dotfiles"
+
+# Install homebrew
+$DOTFILES_HOME/homebrew/install.sh 2>&1
+
+# Ensure brew is in PATH *now*, wherever it was installed
+source $DOTFILES_HOME/homebrew/shellenv.bash
+
+# Upgrade homebrew
+echo "› brew update"
+brew update
+
+# Brewfiles include some Intel-only stuff, so ensure Rosetta before
+# the installation
+$DOTFILES_HOME/macos/ensure_rosetta.sh
+
+# if a cask is already installed in some other way
+# (like a work machine with some provisioned apps)
+# let `brew bundle install` go by with the "warning" error code of 1
+# cf. https://github.com/Homebrew/brew/issues/12361
+set +e
+
+profiles=('standard')
+profiles+=($(cat "$HOME/.local/machine_profiles" 2>/dev/null))
+for profile in ${profiles[@]}
+do
+    brewfile="$DOTFILES_HOME/homebrew/Brewfile.${profile}"
+    if [[ -f $brewfile ]]
+    then
+        echo "› brew bundle ${profile}"
+        brew bundle install --file=$brewfile --no-upgrade
+        bundleStatus=$?
+
+        if [ $bundleStatus -gt 1 ]; then
+          exit $bundleStatus
+        fi
+    fi
+done
+
+# and we're back to our normal "errors are errors"
+set -e
+
+brewfile="$HOME/.local/Brewfile"
+if [[ -f $brewfile ]]
+then
+    echo "› brew bundle local"
+    brew bundle install --file=$brewfile --no-upgrade
+fi

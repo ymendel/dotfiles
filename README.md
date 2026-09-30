@@ -95,6 +95,12 @@ Run this script occasionally to keep your system and environment up-to-date.
 the current contents of the repository. It also (by design) doesn't update already-installed Homebrew formulae. Those can
 be handled separately with `brew`.
 
+`updot brew` does only the Homebrew part: install/update Homebrew, then `brew bundle` each
+Brewfile that applies to this machine.
+
+(Note: That is some `git`-style subcommand handling, where it calls `updot-brew`. You can make
+your own subcommands by creating `updot-*` executables. Have fun!)
+
 ## Appreciation
 
 This organization was largely inspired by [Zach Holman](http://github.com/holman) and his wonderful dotfiles repo.

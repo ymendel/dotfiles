@@ -7,17 +7,32 @@ set -e
 
 command="$(basename $0)"
 parentDir="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd -P)"
-dotfilesDir="$(cd "$( dirname "$parentDir" )" && pwd -P)"
 
-displayUsageAndExit() {
+displayUsage() {
     echo "$command -- dotfiles management"
     echo ""
     echo "Usage: $command [options]"
+    echo "       $command <subcommand>"
+    echo ""
+    echo "Subcommands:"
+    echo "  brew          Only the Homebrew part (same as updot-brew)"
     echo ""
     echo "Options:"
-    echo "  -e, --edit    Open dotfiles directory for editing"
     echo "  -h, --help    Show this help message and exit"
-    exit
+}
+
+# 0 when asked for (-h), 2 for a usage error (which also sends it to stderr)
+displayUsageAndExit() {
+    local status=${1:-0}
+
+    if [[ $status -eq 0 ]]
+    then
+        displayUsage
+    else
+        displayUsage >&2
+    fi
+
+    exit $status
 }
 
 while test $# -gt 0; do
@@ -25,17 +40,21 @@ while test $# -gt 0; do
         "-h"|"--help")
             displayUsageAndExit
             ;;
-        # TODO: probably remove this
-        # I never actually use it, and in fact forgot about it entirely.
-        # Rethink this when/if a suite of commands is made, rather than just
-        # `updot` on its own.
-        "-e"|"--edit")
-            exec "$EDITOR" "$dotfilesDir"
-            exit
+        # git-style: `updot brew` runs `updot-brew`
+        [^-]*)
+            if [[ -x "$parentDir/$command-$1" ]]
+            then
+                subcommand="$parentDir/$command-$1"
+                shift
+                exec "$subcommand" "$@"
+            fi
+
+            echo "Invalid subcommand: $1" >&2
+            displayUsageAndExit 2
             ;;
         *)
-            echo "Invalid option: $1"
-            displayUsageAndExit
+            echo "Invalid option: $1" >&2
+            displayUsageAndExit 2
             ;;
     esac
     shift
@@ -49,51 +68,11 @@ while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 
 export DOTFILES_HOME="$HOME/.dotfiles"
 
-# Install homebrew
-$DOTFILES_HOME/homebrew/install.sh 2>&1
+$DOTFILES_HOME/bin/updot-brew
 
-# Ensure brew is in PATH *now*, wherever it was installed
+# updot-brew put brew in its own PATH, not this one, and the installers
+# need it too
 source $DOTFILES_HOME/homebrew/shellenv.bash
-
-# Upgrade homebrew
-echo "› brew update"
-brew update
-
-# Brewfiles include some Intel-only stuff, so ensure Rosetta before
-# the installation
-$DOTFILES_HOME/macos/ensure_rosetta.sh
-
-# if a cask is already installed in some other way
-# (like a work machine with some provisioned apps)
-# let `brew bundle install` go by with the "warning" error code of 1
-# cf. https://github.com/Homebrew/brew/issues/12361
-set +e
-
-profiles=('standard')
-profiles+=($(cat "$HOME/.local/machine_profiles" 2>/dev/null))
-for profile in ${profiles[@]}
-do
-    brewfile="$DOTFILES_HOME/homebrew/Brewfile.${profile}"
-    if [[ -f $brewfile ]]
-    then
-        echo "› brew bundle ${profile}"
-        brew bundle install --file=$brewfile --no-upgrade
-
-        if [ $? -gt 1 ]; then
-          exit $?
-        fi
-    fi
-done
-
-# and we're back to our normal "errors are errors"
-set -e
-
-brewfile="$HOME/.local/Brewfile"
-if [[ -f $brewfile ]]
-then
-    echo "› brew bundle local"
-    brew bundle install --file=$brewfile --no-upgrade
-fi
 
 # Install software
 echo "› $DOTFILES_HOME/script/install"
