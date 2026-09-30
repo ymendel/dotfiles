@@ -25,5 +25,5 @@ echo "› setting defaults"
 [[ -f $defaultsFile ]] && source $defaultsFile
 
 echo ''
-echo "MacOS defaults written. Note that some of these changes require a logout/restart to take effect."
+echo "MacOS defaults written. Log out or restart to see these take effect."
 echo ''

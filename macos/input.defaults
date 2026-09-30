@@ -9,8 +9,8 @@ defaults -currentHost write com.apple.AppleMultitouchTrackpad Clicking -bool tru
 defaults -currentHost write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
 
 # map bottom right corner to right-click (for this user and the login screen)
-defaults write com.apple.AppleMultitouch.trackpad TrackpadCornerSecondaryClick -int 2
-defaults write com.apple.AppleMultitouch.trackpad TrackpadRightClick -bool true
+defaults write com.apple.AppleMultitouchTrackpad TrackpadCornerSecondaryClick -int 2
+defaults write com.apple.AppleMultitouchTrackpad TrackpadRightClick -bool true
 defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadCornerSecondaryClick -int 2
 defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadRightClick -bool true
 defaults -currentHost write NSGlobalDomain com.apple.trackpad.trackpadCornerClickBehavior -int 1

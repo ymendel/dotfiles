@@ -47,13 +47,18 @@ the things worth knowing before you start.
   `FIXME` comment in that file if you care.
 - **The first run takes a long time.** Homebrew formulae and casks, App Store apps, and
   a Ruby that `ruby-install` builds from source all land in the same run.
+- **Log out or restart at the end** — which the macOS installer will tell you to do anyway.
+  Several of the defaults won't take effect until a particular app is restarted, and some
+  of those apps are things like Dock and Finder and SystemUIServer — pretty annoying to
+  quit/restart. Some others really won't take effect until login, so the surest course of
+  action is to just restart the computer.
 
 ## Organization
 
 ### Topics
 
 This is separated into _topic_ directories. Instead of a single large file (or a small set of large files) to handle everything,
-things are broken up into small directories and files (viz. `git`, `ruby`, `system`, `shell`, `macos`). I find it easier to 
+things are broken up into small directories and files (viz. `git`, `ruby`, `system`, `shell`, `macos`). I find it easier to
 understand and handle with this separation.
 
 ### Locations
