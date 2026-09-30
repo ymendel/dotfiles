@@ -3,7 +3,17 @@
 defaults write com.apple.terminal SecureKeyboardEntry -bool true
 
 # use my modified version of the Pro theme by default in Terminal.app
-# TODO: determine if it really works to set this before the setting is known
-#   or if the open needs to come first again (with the sleep added back)
+#
+# FIXME: This doesn't take on a fresh machine. Only setting it manually afterwards
+# seems to work. Things to consider:
+#
+# - all of the installers are gathered and run without a guaranteed order, and a separate
+#   installer is what imports the profiles. "Yossef" may not even exist when this is first run
+#
+# - this whole thing runs in Terminal.app, which may well write its own preferences back
+#   when it quits. If so, there's really no good way to make this work from within
+#   updot or script/bootstrap or anything like that
+#
+# Leaving this here, but listing the default-profile–setting manual step in README
 defaults write com.apple.Terminal "Default Window Settings" -string "Yossef"
 defaults write com.apple.Terminal "Startup Window Settings" -string "Yossef"

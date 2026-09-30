@@ -24,6 +24,30 @@ git clone https://github.com/ymendel/dotfiles.git
 cd dotfiles
 script/bootstrap
 ```
+
+### On a new machine
+
+`script/bootstrap` does most of the work. These are the parts it can't do, along with
+the things worth knowing before you start.
+
+- **Consider the username carefully** If anything is copied over from another machine
+  and expects a certain absolute path, using a different username is an easy way to
+  mess that all up. Despite being `ymendel` in many places (including GitHub), I tend
+  to use `yossef` as a username on my personal machine.
+- **Install Xcode Command Line Tools** Nicely, this will automatically happen the first
+  time `git` is run, so the `git clone` will take care of this. Then Homebrew may well
+  install them again.
+- **Sign in to the App Store** `brew bundle` runs `mas`, which needs to authenticate on
+  the App Store. It's not _necessary_ to do this step before bootstrapping, but it does
+  save a prompt-and-wait later.
+- **Terminal profiles install by being opened** and this leaves four Terminal windows
+  to be closed. This is expected.
+- **Set the default Terminal profile by hand** once those profiles are imported.
+  `macos/terminal/terminal.defaults` tries to do this, but it doesn't work. Read the
+  `FIXME` comment in that file if you care.
+- **The first run takes a long time.** Homebrew formulae and casks, App Store apps, and
+  a Ruby that `ruby-install` builds from source all land in the same run.
+
 ## Organization
 
 ### Topics
