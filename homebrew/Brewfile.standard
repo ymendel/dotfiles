@@ -22,11 +22,10 @@ brew 'ripgrep'
 brew 'ruby-install'
 brew 'rust'
 brew 'spark'
+brew 'terminal-notifier'
 brew 'tmux'
 brew 'universal-ctags'
 brew 'uv'
-
-cask 'mark-text'
 
 # fonts
 cask 'font-fira-code'
@@ -46,6 +45,7 @@ cask 'mailplane'
 cask 'slack'
 cask 'rectangle'
 cask 'zed'
+cask 'zoom'
 
 # these seem to only get the pkg, not the app
 # cask 'homebrew/cask-drivers/logitech-camera-settings'  # ugh so ugly, but fine I guess
