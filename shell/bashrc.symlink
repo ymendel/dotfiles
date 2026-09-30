@@ -1,5 +1,9 @@
 export DOTFILES_HOME="$HOME/.dotfiles"
 
+# anything that should be available to every topic file, sourced by name
+# because the loop below goes in sorted order
+source "$DOTFILES_HOME/shell/prelude.sh"
+
 # source all .bash files nested anywhere in the dotfiles
 for f in $(find -H "$DOTFILES_HOME" -name '*.bash' -type f | sort)
 do

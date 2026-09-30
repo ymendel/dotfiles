@@ -82,6 +82,7 @@ understand and handle with this separation.
   else. As with the **\*.symlink** files, these are symlinked by both `script/bootstrap` and `script/install` (which
   is run by `updot`).
 - **~/.local/bashrc**: This file will be sourced if it exists, allowing you to have special per-machine differences.
+- **~/bin**, **~/scripts**, **~/.local/bin**: These get added to the `$PATH` as well — each one only if it exists.
 
 ## Rejuvenation
 
