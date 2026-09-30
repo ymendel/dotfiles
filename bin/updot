@@ -59,6 +59,10 @@ source $DOTFILES_HOME/homebrew/shellenv.bash
 echo "› brew update"
 brew update
 
+# Brewfiles include some Intel-only stuff, so ensure Rosetta before
+# the installation
+$DOTFILES_HOME/macos/ensure_rosetta.sh
+
 # if a cask is already installed in some other way
 # (like a work machine with some provisioned apps)
 # let `brew bundle install` go by with the "warning" error code of 1
