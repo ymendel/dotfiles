@@ -24,5 +24,9 @@ defaults write com.apple.systempreferences AppleIntlCustomFormat -dict-add "Appl
 # and the menu bar clock
 defaults write com.apple.menuextra.clock DateFormat -string 'HH:mm'
 
-# set timezone - see `sudo systemsetup -listtimezones` for other values
-sudo systemsetup -settimezone "America/New_York" > /dev/null
+# I want time zone to follow location, just in case I travel
+# This is hard to set reliably, so check for it and complain if it's not set
+if [[ "$(defaults read /Library/Preferences/com.apple.timezone.auto Active 2>/dev/null)" != 1 ]]
+then
+    echo "  automatic time zone is off — turn it on in System Settings > General > Date & Time"
+fi

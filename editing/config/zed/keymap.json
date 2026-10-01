@@ -38,4 +38,12 @@
       "ctrl-shift-g": "git_panel::ToggleFocus",
     },
   },
+
+  // shift-enter in the terminal sends escape+return
+  {
+    "context": "Terminal",
+    "bindings": {
+      "shift-enter": ["terminal::SendText", "\u001b\r"],
+    },
+  },
 ]
