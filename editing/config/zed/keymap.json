@@ -39,6 +39,15 @@
     },
   },
 
+  // Zed's go-to-line is ctrl-g, but vim mode takes ctrl-g for vim::ShowLocation
+  // (same as vim itself). Put go-to-line back, in the same context vim uses.
+  {
+    "context": "VimControl && !menu",
+    "bindings": {
+      "ctrl-g": "go_to_line::Toggle",
+    },
+  },
+
   // shift-enter in the terminal sends escape+return
   {
     "context": "Terminal",
