@@ -87,9 +87,11 @@
 	merged = !sh -c 'git merge-base --is-ancestor ${1:-HEAD} ${2:-$MAIN_BRANCH}' -
 	clean-merged = !bash -ic 'git_clean_merged'
 	# merge the PR only if its head is local HEAD, so nothing unpushed gets left behind
-	merge-pr = "!sh -c 'if [ -n \"$(git status --porcelain)\" ]; then echo \"working tree is not clean, commit and push first\" >&2; exit 1; fi; gh pr merge --merge --match-head-commit \"$(git rev-parse HEAD)\" \"$@\"' -"
+	# method is merge unless the repo says otherwise — `git config pr.mergeMethod rebase` where linear history is required
+	merge-pr = "!sh -c 'if [ -n \"$(git status --porcelain)\" ]; then echo \"working tree is not clean, commit and push first\" >&2; exit 1; fi; method=$(git config --get --default merge pr.mergeMethod); gh pr merge \"--$method\" --match-head-commit \"$(git rev-parse HEAD)\" \"$@\"' -"
 	# rebase the current branch's PR onto its actual base (not necessarily main) and push it
-	update-pr = "!sh -c 'base=$(gh pr view --json baseRefName --jq .baseRefName) || exit 1; git fetch origin \"$base\" && git rebase \"origin/$base\" && git push --force-with-lease' -"
+	# `git update-pr NNN` when parent PR NNN was squash-merged: drops its old commits instead of replaying them
+	update-pr = "!sh -c 'base=$(gh pr view --json baseRefName --jq .baseRefName) || exit 1; git fetch origin \"$base\" || exit 1; if [ -n \"$1\" ]; then old=$(gh pr view \"$1\" --json headRefOid --jq .headRefOid) || exit 1; git fetch origin \"$old\" || exit 1; git rebase --onto \"origin/$base\" \"$old\"; else git rebase \"origin/$base\"; fi && git push --force-with-lease' -"
 	branch-exists = show-ref --quiet --heads
 	# the escaped quotes are so "$@" survives the config parser, which strips bare ones
 	blame-with-subject = "!bash -ic 'git_blame_with_subject \"$@\"' -"
