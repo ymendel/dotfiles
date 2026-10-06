@@ -67,9 +67,43 @@ git_clean_merged()
     mapfile -t doomed < <(git for-each-ref --merged="$main" "${exclude[@]}" \
         --format='%(refname:short)' refs/heads/)
 
+    if [[ ${#doomed[@]} -gt 0 ]]
+    then
+        git branch -d "${doomed[@]}"
+    fi
+
+    # rebase- and squash-merged branches aren't ancestors of main, and
+    # since the only way I'd get here (reasonably) is because of GitHub
+    # merge strategies, ask GitHub about it. Any branch whose tip is
+    # exactly a merged PR's head is safe to remove (with -D this time)
+    local -a candidates
+    mapfile -t candidates < <(git for-each-ref --no-merged="$main" "${exclude[@]}" \
+        --format='%(refname:short) %(objectname)' refs/heads/)
+
+    [[ ${#candidates[@]} -gt 0 ]] || return 0
+    [[ $(git remote get-url origin 2>/dev/null) == *github.com[:/]* ]] || return 0
+
+    local -A merged_heads
+    local oid
+    while read -r oid
+    do
+        merged_heads[$oid]=1
+    done < <(gh pr list --state merged --limit 200 --json headRefOid --jq '.[].headRefOid')
+
+    doomed=()
+    local candidate
+    for candidate in "${candidates[@]}"
+    do
+        read -r branch oid <<< "$candidate"
+        if [[ -n ${merged_heads[$oid]} ]]
+        then
+            doomed+=( "$branch" )
+        fi
+    done
+
     [[ ${#doomed[@]} -gt 0 ]] || return 0
 
-    git branch -d "${doomed[@]}"
+    git branch -D "${doomed[@]}"
 }
 
 git_fetch_branch()
