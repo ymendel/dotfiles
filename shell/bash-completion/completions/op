@@ -1,0 +1,5 @@
+# op reaches into 1Password's group container even just to print this, and
+# macOS charges that to whatever app the shell is running under. So it stays
+# lazy: at startup it would have Zed asking to "access data from other apps" on
+# every launch, with restored terminals stuck until the dialog is answered.
+source <(op completion bash)

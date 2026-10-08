@@ -6,7 +6,9 @@
 # Mine had been naming a 10.8.0 that hasn't been installed for a long time.
 #
 # Regenerating the cache only resets that clock, so skip its setup script and
-# source the completion function straight from opt/, which doesn't move.
+# source the completion function straight from opt/. opt/ itself doesn't move,
+# but the layout under libexec is heroku's and can change between majors, so if
+# verify-completions reports heroku LOST, find heroku.bash again first.
 #
 # The two variables are the ones the function refuses to run without. The commands
 # list they point at is heroku's to write — shell/install.sh handles that.
@@ -15,6 +17,6 @@ _heroku_autocomplete="$HOME/Library/Caches/heroku/autocomplete"
 HEROKU_AC_ANALYTICS_DIR="$_heroku_autocomplete/completion_analytics"
 HEROKU_AC_COMMANDS_PATH="$_heroku_autocomplete/commands"
 
-source "$HOMEBREW_PREFIX/opt/heroku/libexec/autocomplete-scripts/bash/heroku.bash"
+source "$HOMEBREW_PREFIX/opt/heroku/libexec/lib/node_modules/heroku/autocomplete-scripts/bash/heroku.bash"
 
 unset _heroku_autocomplete

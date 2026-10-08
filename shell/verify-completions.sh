@@ -77,13 +77,11 @@ bash -lic '
     check gcloud shim
     check bq     shim
     check gsutil shim
+    check op     shim
     check git    lazy
 
-    # Two the repo registers itself, because bashrc.symlink sources every *.bash
-    # and both of these are one: ruby/rake_completion.bash, and
-    # security/completion.bash, which runs `op completion bash` to get its source.
-    # So EAGER is the right answer for them, and having them here keeps that branch
-    # exercised instead of taking it on trust.
+    # One the repo registers itself, because bashrc.symlink sources every *.bash
+    # and ruby/rake_completion.bash is one. So EAGER is the right answer for it,
+    # and having it here keeps that branch exercised instead of taking it on trust.
     check rake   repo
-    check op     repo
 ' 2>&1 | grep -v 'job control\|terminal process group'
