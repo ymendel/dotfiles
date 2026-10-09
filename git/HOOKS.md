@@ -1,6 +1,6 @@
 # Git hooks
 
-This repo ships [a small set of hooks](template/hooks) (mostly ctags maintenance)
+This repo ships [a small set of hooks](hooks) (mostly ctags maintenance)
 and uses git's `core.hooksPath` to apply them to every repo on the machine from
 a single central location.
 
@@ -10,10 +10,10 @@ a single central location.
 
 ```
 [core]
-    hooksPath = ~/.dotfiles/git/template/hooks
+    hooksPath = ~/.dotfiles/git/hooks
 ```
 
-With that set, every repo on the machine runs hooks from `~/.dotfiles/git/template/hooks/`
+With that set, every repo on the machine runs hooks from `~/.dotfiles/git/hooks/`
 exclusively, regardless of what's in its own `.git/hooks/`. Edit a hook in one place, and
 every repo picks up the change immediately, for its next hook fire.
 
@@ -114,7 +114,7 @@ symlinks. The global `hooksPath` takes over again.
 
 ## Cleaning up old copies: `git hooks-clean`
 
-Repos that were `git init`'d back when `init.templateDir` was in use have
+Repos that were `git init`'d back when `init.templateDir` had the hooks have
 real hook *copies* sitting in `.git/hooks/`. These are inert now (the
 global `core.hooksPath` overrides), but they're confusing cruft and the
 copies are likely stale relative to the central versions.
@@ -154,6 +154,10 @@ One edit, all repos updated.
 The cost is that per-repo customization is less casual — you can't just
 drop a script in `.git/hooks/` and have it work. `git hooks-override`
 makes the opt-in cheap.
+
+`init.templateDir` actually is set, but it points at [`template/`](template),
+which has no hooks. It's currently only there to give new repos an
+`info/exclude` to ensure `.claude/` gets ignored.
 
 ## Where did this come from?
 

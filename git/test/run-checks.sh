@@ -12,7 +12,7 @@
 # Deliberately not set -e: a failing check should report, not abort the run.
 
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
-hooks="$(cd "$here/../template/hooks" && pwd -P)"
+hooks="$(cd "$here/../hooks" && pwd -P)"
 
 # Hyphens are not in GitHub's PAT alphabet, so this cannot match GitHub's own
 # secret-scanning pattern and trip push protection on this very file.

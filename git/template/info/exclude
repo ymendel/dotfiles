@@ -1,0 +1,8 @@
+# git ls-files --others --exclude-from=.git/info/exclude
+# Lines that start with '#' are comments.
+
+# Claude Code's per-project directory. ~/.gitignore covers it too,
+# but some tools (e.g. Tailwind v4) only honor this file, and not
+# the global excludes. Also a bit of belt-and-suspenders to ensure
+# this stays.
+/.claude/
