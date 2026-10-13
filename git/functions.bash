@@ -118,7 +118,8 @@ git_fetch_branch()
     then
         git pull $force
     else
-        git fetch origin $1:$1 $force
+        # the plain fetch is to trigger pruning, keep it
+        git fetch origin && git fetch origin $1:$1 $force
     fi
 }
 
