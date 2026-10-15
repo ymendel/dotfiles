@@ -62,6 +62,27 @@
     },
   },
   "use_smartcase_search": true,
+  "auto_install_extensions": {
+    "csv": true,
+    "dockerfile": true,
+    "git-firefly": true,
+    "html": true,
+    "lua": true,
+    "make": true,
+    "ruby": true,
+    "scss": true,
+    "sql": true,
+    "tmux": true,
+    "toml": true,
+  },
+  // the .symlink suffix convention (in my dotfiles) makes these not be picked up
+  // Zed can handle a vim modeline, but that's not how I want to do this
+  "file_types": {
+    "Git Config": ["gitconfig.symlink"],
+    "Git Ignore": ["gitignore.symlink", "**/info/exclude"],
+    "Shell Script": ["bashrc.symlink", "bash_profile.symlink"],
+    "tmux": ["tmux.conf.symlink"],
+  },
   // ruby-lsp rather than solargraph, which is the extension's default. Both are
   // gems, so either has to exist for whichever ruby a project's .ruby-version
   // names — see ruby/bin/ruby-lsp-install in the dotfiles. ruby-lsp is the one
