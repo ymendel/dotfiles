@@ -39,7 +39,7 @@ set bell-style none
 # (this has been the default for a good while, but I want to be explicit)
 set enable-bracketed-paste on
 
-# ctrl-x ctrl-p appends ` | less` to the line and runs it. Mostly for `--help`
-# output, which is long and doesn't page itself. LESS has -F, so this is safe
-# to hit on something short.
-"\C-x\C-p": "\C-e | less\C-m"
+# ctrl-x ctrl-p appends ` |& less` to the line and runs it. Mostly for `--help`
+# output, which is long and doesn't page itself. `|&` because some tools print
+# usage to stderr. LESS has -F, so this is safe to hit on something short.
+"\C-x\C-p": "\C-e |& less\C-m"
