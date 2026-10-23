@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+# Delete local branches that have been merged into the main branch.
+#
+# Usage:
+#   git clean-merged
+
+# for git_main_branch
+source "$(dirname "$0")/../functions.bash"
+
+main=$(git_main_branch) || exit 1
+
+# sometimes a repo has branches other than "the main one" to keep around
+# one example is an integration branch behind the production branch
+# protect those branches with `git config --add config.keep-branch <name>`
+mapfile -t keep < <(git config --get-all config.keep-branch)
+
+exclude=( "--exclude=refs/heads/$main" )
+for branch in "${keep[@]}"
+do
+    exclude+=( "--exclude=refs/heads/$branch" )
+done
+
+mapfile -t doomed < <(git for-each-ref --merged="$main" "${exclude[@]}" \
+    --format='%(refname:short)' refs/heads/)
+
+if [[ ${#doomed[@]} -gt 0 ]]
+then
+    git branch -d "${doomed[@]}"
+fi
+
+# rebase- and squash-merged branches aren't ancestors of main, and
+# since the only way I'd get here (reasonably) is because of GitHub
+# merge strategies, ask GitHub about it. Any branch whose tip is
+# exactly a merged PR's head is safe to remove (with -D this time)
+mapfile -t candidates < <(git for-each-ref --no-merged="$main" "${exclude[@]}" \
+    --format='%(refname:short) %(objectname)' refs/heads/)
+
+[[ ${#candidates[@]} -gt 0 ]] || exit 0
+[[ $(git remote get-url origin 2>/dev/null) == *github.com[:/]* ]] || exit 0
+
+declare -A merged_heads
+while read -r oid
+do
+    merged_heads[$oid]=1
+done < <(gh pr list --state merged --limit 200 --json headRefOid --jq '.[].headRefOid')
+
+doomed=()
+for candidate in "${candidates[@]}"
+do
+    read -r branch oid <<< "$candidate"
+    if [[ -n ${merged_heads[$oid]} ]]
+    then
+        doomed+=( "$branch" )
+    fi
+done
+
+[[ ${#doomed[@]} -gt 0 ]] || exit 0
+
+exec git branch -D "${doomed[@]}"

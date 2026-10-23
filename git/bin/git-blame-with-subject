@@ -1,0 +1,10 @@
+#!/bin/sh
+# git blame, with each commit's subject in place of the author and date.
+#
+# Usage:
+#   git blame-with-subject [git blame options] FILE
+
+git blame -s "$@" | while read -r hash filename rest
+do
+    printf "%-9s %-50.50s | %s\n" "$hash" "$(git log -1 --pretty=%s "$hash")" "$rest"
+done

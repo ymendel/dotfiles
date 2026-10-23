@@ -60,8 +60,7 @@
 	sts = status --short --branch --untracked-files=all
 	stat = !git diff --stat $(git merge-base HEAD \"$REVIEW_BASE\")
 	files = !git diff --name-only $(git merge-base HEAD \"$REVIEW_BASE\")
-	fetch-branch = !bash -ic 'git_fetch_branch ${1:-$(git_current_branch)}' -
-	fetch-branch-force = !bash -ic 'git_fetch_branch ${1:-$(git_current_branch)} force' -
+	fetch-branch-force = fetch-branch --force
 	fb = fetch-branch
 	fbf = fetch-branch-force
 	pushf = push --force-with-lease
@@ -85,10 +84,7 @@
 	paused = !git log -1 --format="%s" | grep -q '^PAUSED: '
 	resume = !git paused && git rmcommit
 	merged = !sh -c 'git merge-base --is-ancestor ${1:-HEAD} ${2:-$MAIN_BRANCH}' -
-	clean-merged = !bash -ic 'git_clean_merged'
 	branch-exists = show-ref --quiet --heads
-	# the escaped quotes are so "$@" survives the config parser, which strips bare ones
-	blame-with-subject = "!bash -ic 'git_blame_with_subject \"$@\"' -"
 	bws = blame-with-subject
 	blame-follow = blame -w -C -C -C
 	spelunk = blame-follow

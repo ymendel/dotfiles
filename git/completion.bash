@@ -1,8 +1,9 @@
-# completion for the `!sh -c` aliases
+# completion for the `!sh -c` aliases and the git-* scripts
 #
 # Completion generally works on aliases, provided it's a "plain" one that resolves
 # to a regular git command. But if the alias is more interesting than that (i.e.
-# starts with `!`), that gets skipped and completion is… not good.
+# starts with `!`), that gets skipped and completion is… not good. Same for a
+# git-* script, which git completion knows nothing about.
 #
 # For instance, `git pob <TAB>` completes as `git name`, thanks to `${1:?branch name required}`
 #

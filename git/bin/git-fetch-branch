@@ -1,0 +1,26 @@
+#!/bin/sh
+# Bring a local branch up to date with origin without checking it out.
+# On the current branch that's just a pull.
+#
+# Usage:
+#   git fetch-branch [--force] [BRANCH]    # BRANCH defaults to the current one
+
+force=''
+if [ "$1" = "--force" ]; then
+    force='--force'
+    shift
+fi
+
+current=$(git branch --show-current)
+branch=${1:-$current}
+if [ -z "$branch" ]; then
+    echo "not on a branch, name one" >&2
+    exit 2
+fi
+
+if [ "$branch" = "$current" ]; then
+    exec git pull $force
+fi
+
+# the plain fetch is to trigger pruning, keep it
+git fetch origin && exec git fetch origin "$branch:$branch" $force
