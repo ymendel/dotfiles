@@ -1,0 +1,41 @@
+#!/bin/sh
+# Merge the current branch's PR, with extra behavior
+#
+# checks directly here:
+# - remote branch head must be local HEAD, so nothing unpushed gets left behind
+# - base must not have a merged PR, so the merge doesn't land on a stale branch
+#
+# checks from `gh pr merge`:
+# - PR must be ready, not draft
+# - required statuses must be green
+#
+# behavior:
+# - automatically deletes the branch, even if the GitHub repo isn't set to do that
+# - method defaults to merge, but can be overridden, e.g. `git config pr.mergeMethod rebase`
+#
+# Usage:
+#   git merge-pr
+
+if [ -n "$(git status --porcelain)" ]; then
+    echo "working tree is not clean, commit and push first" >&2
+    exit 1
+fi
+
+# Refuse the merge if there's an existing merged PR for the base, because that
+# would just land on a stale branch.
+# check using the base's tip, not the name
+base=$(gh pr view --json baseRefName --jq .baseRefName) || exit 1
+base_tip=$(git ls-remote origin "refs/heads/$base" | cut -f 1)
+if [ -n "$base_tip" ]; then
+    merged=$(gh pr list --head "$base" --state merged --json number,headRefOid \
+        --jq "first(.[] | select(.headRefOid == \"$base_tip\") | .number)") || exit 1
+    if [ -n "$merged" ]; then
+        target=$(gh pr view "$merged" --json baseRefName --jq .baseRefName)
+        echo "base $base already merged in #$merged, retarget first: gh pr edit --base $target" >&2
+        echo "turning on 'Automatically delete head branches' in the repo settings would avoid this" >&2
+        exit 1
+    fi
+fi
+
+method=$(git config --get --default merge pr.mergeMethod)
+exec gh pr merge "--$method" --match-head-commit "$(git rev-parse HEAD)" --delete-branch

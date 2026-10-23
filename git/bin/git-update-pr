@@ -1,0 +1,21 @@
+#!/bin/sh
+# Rebase the current branch's PR onto its actual base (not necessarily main)
+# and push it.
+#
+# Usage:
+#   git update-pr        # rebase onto the base
+#   git update-pr NNN    # parent PR NNN was squash-merged — drops its old
+#                        # commits instead of replaying them
+
+base=$(gh pr view --json baseRefName --jq .baseRefName) || exit 1
+git fetch origin "$base" || exit 1
+
+if [ -n "$1" ]; then
+    old=$(gh pr view "$1" --json headRefOid --jq .headRefOid) || exit 1
+    git fetch origin "$old" || exit 1
+    git rebase --onto "origin/$base" "$old" || exit 1
+else
+    git rebase "origin/$base" || exit 1
+fi
+
+git push --force-with-lease
