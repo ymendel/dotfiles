@@ -1,6 +1,7 @@
 #!/bin/sh
 #
-# Refuse to push a commit made by `git pause`, or one carrying a credential.
+# Refuse to push a commit made by `git pause`, a `WIP: ` commit, or one
+# carrying a credential.
 #
 # I get a lot of good out of `git pause`, but it is very much a checkpoint
 # and not real history. It's more of a branch-based stash, really. That's
@@ -12,8 +13,11 @@
 # a pre-commit hook that attempts to stop me from committing any creds
 # where I shouldn't, I _really_ don't need to accidentally push them.
 #
+# `WIP: ` commits are the same kind of checkpoint, done by a different
+# workflow.
+#
 # This is a bit of belt-and-suspenders coverage on the credentials as well
-# as the 'PAUSED: ' market, but it's not like `--no-verify` can't be used
+# as the 'PAUSED: ' marker, but it's not like `--no-verify` can't be used
 # at other times.
 #
 # This checks every commit, not just the tip, because history is important.
@@ -61,21 +65,26 @@ push_range () {  # push_range <local sha> <remote sha>
     fi
 }
 
-paused_report=$(printf '%s\n' "$refs" | while read -r local_ref local_sha remote_ref remote_sha
-do
-    if is_all_zeros "$local_sha"
-    then
-        # deleting a ref sends no commits to inspect
-        continue
-    fi
-
-    git log --format='%h %s' $(push_range "$local_sha" "$remote_sha") \
-        | grep -E '^[0-9a-f]+ PAUSED: ' \
-        | while IFS= read -r hit
+marked_commits () {  # marked_commits <subject prefix>
+    printf '%s\n' "$refs" | while read -r local_ref local_sha remote_ref remote_sha
     do
-        printf '  %s  %s\n' "$local_ref" "$hit"
+        if is_all_zeros "$local_sha"
+        then
+            # deleting a ref sends no commits to inspect
+            continue
+        fi
+
+        git log --format='%h %s' $(push_range "$local_sha" "$remote_sha") \
+            | grep -E "^[0-9a-f]+ $1" \
+            | while IFS= read -r hit
+        do
+            printf '  %s  %s\n' "$local_ref" "$hit"
+        done
     done
-done)
+}
+
+paused_report=$(marked_commits 'PAUSED: ')
+wip_report=$(marked_commits 'WIP: ')
 
 credential_report=$(printf '%s\n' "$refs" | while read -r local_ref local_sha remote_ref remote_sha
 do
@@ -110,7 +119,7 @@ do
     done
 done)
 
-if [ -n "$paused_report" ] || [ -n "$credential_report" ]
+if [ -n "$paused_report" ] || [ -n "$wip_report" ] || [ -n "$credential_report" ]
 then
     printf '\npre-push: refusing this push.\n' >&2
 
@@ -118,6 +127,12 @@ then
     then
         printf '\nPaused commits — run `git resume` to take one back off:\n\n%s\n' \
             "$paused_report" >&2
+    fi
+
+    if [ -n "$wip_report" ]
+    then
+        printf '\nWIP commits — reword or squash before pushing:\n\n%s\n' \
+            "$wip_report" >&2
     fi
 
     if [ -n "$credential_report" ]

@@ -23,7 +23,7 @@ every repo picks up the change immediately, for its next hook fire.
 - `post-checkout`, `post-commit`, `post-merge` — run `ctags`
 - `post-rewrite` — if the action is a rebase, run `post-merge`
 - `pre-commit` — refuse a commit that stages a settings file carrying a credential (below)
-- `pre-push` — refuse a push carrying a paused commit, or a credential (below)
+- `pre-push` — refuse a push carrying a paused or WIP commit, or a credential (below)
 - `lib/credentials.sh` — the credential matching, shared by the two above
 
 ## `pre-commit` — no credentials in a settings file
@@ -71,6 +71,9 @@ purpose — parking work shouldn't have to satisfy any guards.
 But this is just a checkpoint, and it's not meant to leave the local machine. So now
 a `pre-push` that refuses a push carrying the `PAUSED: ` commit-subject marker. And
 it checks every commit, of course, not just the tip.
+
+`WIP: ` commits get the same check, but in their own section of the refusal since
+there's a different fix — not `git resume` but a reword, a squash, or similar.
 
 `pre-push` also does the credential check, same as `pre-commit`. Since `--no-verify`
 is possible in other instances _and_ the `git add --all` may pick up something that

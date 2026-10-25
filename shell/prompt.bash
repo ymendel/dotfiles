@@ -64,6 +64,7 @@ add_prompt_git_info()
     PS1+="\[${Cyan}\]${BranchInfo[local]}\[${ResetColor}\]"
 
     PS1+="\[${Cyan}\]$(prompt_git_paused_marker)\[${ResetColor}\]"
+    PS1+="\[${Magenta}\]$(prompt_git_wip_marker)\[${ResetColor}\]"
 
     PS1+="|"
 
@@ -226,6 +227,11 @@ see_git_dirty_simple()
 prompt_git_paused_marker()
 {
     git paused && echo -n ' ¶'
+}
+
+prompt_git_wip_marker()
+{
+    git wip && echo -n ' ✎'
 }
 
 prompt_git_rebasing_marker()

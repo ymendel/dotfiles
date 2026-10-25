@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # Checks the two hooks that can stop something — pre-commit's credential guard and
-# pre-push's paused-commit guard. Run it after touching either:
+# pre-push's paused- and WIP-commit guard. Run it after touching either:
 #
 #     git/test/run-checks.sh
 #
@@ -56,6 +56,7 @@ body ()    { printf '%s\n' "$1" | tail -n +2; }
 zeros=0000000000000000000000000000000000000000
 
 paused_subject='PAUSED: Use `git resume` to continue working.'
+wip_subject='WIP: port the worktree-aware dev environment'
 
 fixture () {  # fixture <dir> — an empty repo, central hooks kept out of it
     git -C "$1" init --quiet
@@ -211,6 +212,36 @@ dir="$(mktemp -d)"
 history "$dir" 'first' "$paused_subject"
 check "a new branch carrying a pause commit is blocked" "blocked" \
     "$(verdict "$(attempt_push "$dir" "$(at "$dir" HEAD)" "$zeros")")"
+rm -rf "$dir"
+
+echo "== pre-push — WIP commits, same as paused ones"
+dir="$(mktemp -d)"
+history "$dir" 'first' "$wip_subject"
+result="$(attempt_push "$dir" "$(at "$dir" HEAD)" "$(at "$dir" HEAD~1)")"
+check "a WIP commit on top of a pushed branch is blocked" "blocked" \
+    "$(verdict "$result")"
+check "it gets its own section" "yes" \
+    "$([[ "$(body "$result")" == *"WIP commits"* ]] && echo yes || echo no)"
+check "and not the paused one" "no" \
+    "$([[ "$(body "$result")" == *"Paused commits"* ]] && echo yes || echo no)"
+rm -rf "$dir"
+
+dir="$(mktemp -d)"
+history "$dir" 'first' "$wip_subject" 'work on top of the WIP'
+check "a WIP commit buried under a later one is blocked" "blocked" \
+    "$(verdict "$(attempt_push "$dir" "$(at "$dir" HEAD)" "$(at "$dir" HEAD~2)")")"
+rm -rf "$dir"
+
+dir="$(mktemp -d)"
+history "$dir" "$wip_subject" 'later work'
+check "a WIP commit already on the remote is left alone" "allowed" \
+    "$(verdict "$(attempt_push "$dir" "$(at "$dir" HEAD)" "$(at "$dir" HEAD~1)")")"
+rm -rf "$dir"
+
+dir="$(mktemp -d)"
+history "$dir" 'first' 'finish the WIP: from yesterday'
+check "WIP mid-subject is not the marker" "allowed" \
+    "$(verdict "$(attempt_push "$dir" "$(at "$dir" HEAD)" "$(at "$dir" HEAD~1)")")"
 rm -rf "$dir"
 
 echo "== pre-push — the credential pre-commit never saw"
