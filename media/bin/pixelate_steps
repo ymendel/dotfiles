@@ -1,0 +1,111 @@
+#!/usr/bin/env bash
+
+# Turn an image into a series of pixelated steps, from barely recognizable
+# to fairly clear, for revealing it a bit at a time.
+#
+# Yes, Dropout, this is "Needs More Pixels". Don't get mad at me.
+#
+# Each step is set by how many blocks across it is, so images of
+# different sizes come out looking the same.
+
+set -euo pipefail
+
+PROGRAM="$(basename "$0")"
+
+STEPS="5,7,9,12,24,48"
+OUTPUT_DIR="."
+
+usage() {
+    cat <<USAGE
+Usage: $PROGRAM [options] <image>...
+
+Write a pixelated series of each image, named <image>-step1, -step2, &c.,
+coarsest first, at the original's size and format.
+
+Options:
+  -s, --steps LIST     blocks across for each step, comma-separated
+                       (default: $STEPS)
+  -o, --output DIR     where to write the steps (default: current directory)
+  -h, --help           show this message
+USAGE
+}
+
+require_value() {
+    if [[ -z "${2:-}" ]]
+    then
+        echo "$PROGRAM: $1 needs a value" >&2
+        exit 1
+    fi
+}
+
+while [[ $# -gt 0 ]]
+do
+    case "$1" in
+        -s|--steps)
+            require_value "$1" "${2:-}"
+            STEPS="$2"
+            shift 2
+            ;;
+        -o|--output)
+            require_value "$1" "${2:-}"
+            OUTPUT_DIR="$2"
+            shift 2
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        -*)
+            echo "$PROGRAM: unknown option: $1" >&2
+            usage >&2
+            exit 1
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
+
+if [[ ! "$STEPS" =~ ^[0-9]+(,[0-9]+)*$ ]]
+then
+    echo "$PROGRAM: --steps wants whole numbers separated by commas, got: $STEPS" >&2
+    exit 1
+fi
+
+if [[ $# -lt 1 ]]
+then
+    usage >&2
+    exit 1
+fi
+
+if [[ ! -d "$OUTPUT_DIR" ]]
+then
+    echo "$PROGRAM: no such directory: $OUTPUT_DIR" >&2
+    exit 1
+fi
+
+IFS=, read -r -a BLOCKS <<< "$STEPS"
+
+for INPUT in "$@"
+do
+    if [[ ! -f "$INPUT" ]]
+    then
+        echo "$PROGRAM: no such file: $INPUT" >&2
+        exit 1
+    fi
+
+    NAME="$(basename "${INPUT%.*}")"
+    EXTENSION="${INPUT##*.}"
+
+    for i in "${!BLOCKS[@]}"
+    do
+        # -scale averages on the way down and copies pixels on the way up,
+        # making the hard-edged blocks. And saving the size means it's easy
+        # to go back to exactly the original size.
+        magick "$INPUT" \
+            -set option:dims '%wx%h' \
+            -scale "${BLOCKS[$i]}x" \
+            -scale '%[dims]!' \
+            "$OUTPUT_DIR/$NAME-step$((i + 1)).$EXTENSION"
+    done
+done
