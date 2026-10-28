@@ -89,6 +89,8 @@
 	bws = blame-with-subject
 	blame-follow = blame -w -C -C -C
 	spelunk = blame-follow
+	# takes vX.Y.Z (starting v optional)
+	version-tag = "!sh -c 'v=${1:?version required}; v=${v#v}; shift; git tag --annotate \"v$v\" --message \"$v\" \"$@\"' -"
 [pager]
 	# shell aliases don't paginate on their own
 	logd = true
