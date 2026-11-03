@@ -114,6 +114,12 @@
     },
     "ruby-lsp": {
       "initialization_options": {
+        "addonSettings": {
+          "Ruby LSP Rails": {
+            // without this, I get _a lot_ of prompts when migrations are generated
+            "enablePendingMigrationsPrompt": false,
+          },
+        },
         "featuresConfiguration": {
           // for whatever reason, ruby-lsp has every inlay hint off by default
           // but I want 'em
